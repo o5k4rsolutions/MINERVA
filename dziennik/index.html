@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-Dziennik — Minerva</title>
+    <link rel="icon" type="image/svg+xml" href="https://dziennik-minerva.pages.dev/themes/icon-dark.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['"Open Sans"', 'sans-serif'] },
+                    colors: {
+                        indigoBrand: '#1E2A78',
+                        indigoDark: '#141D56',
+                        amberBrand: '#F5A524',
+                        amberLight: '#FFB946',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Open Sans', sans-serif; background-color: #F8FAFC; color: #1E293B; }
+        .btn-center-fill {
+            position: relative; overflow: hidden; z-index: 1;
+            transition: color 0.35s cubic-bezier(0.25, 0.8, 0.25, 1), border-color 0.35s ease, transform 0.25s ease, box-shadow 0.35s ease;
+        }
+        .btn-center-fill::before {
+            content: ''; position: absolute; top: 50%; left: 50%; width: 0; height: 0; border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.55s cubic-bezier(0.25, 0.8, 0.25, 1), height 0.55s cubic-bezier(0.25, 0.8, 0.25, 1);
+            z-index: -1;
+        }
+        .btn-center-fill:hover::before { width: 320%; height: 600%; }
+        .btn-amber-to-indigo { background-color: #F5A524; color: #FFFFFF; }
+        .btn-amber-to-indigo::before { background-color: #1E2A78; }
+        .btn-amber-to-indigo:hover { color: #FFFFFF !important; box-shadow: 0 10px 24px -6px rgba(30, 42, 120, 0.4); transform: translateY(-1px); }
+        .btn-indigo-to-amber { background-color: #1E2A78; color: #FFFFFF; }
+        .btn-indigo-to-amber::before { background-color: #F5A524; }
+        .btn-indigo-to-amber:hover { color: #1E2A78 !important; box-shadow: 0 10px 24px -6px rgba(245, 165, 36, 0.45); transform: translateY(-1px); }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 3px; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased selection:bg-amberBrand selection:text-indigoBrand">
+
+    <div id="modalContainer"></div>
+
+    <div id="dashboardView" class="flex-1 flex flex-col bg-[#F8FAFC]">
+        <header class="bg-[#080B1A] border-b border-white/15 sticky top-0 z-40 px-4 sm:px-8 py-3.5 flex items-center justify-between shadow-md">
+            <div class="flex items-center gap-6">
+                <img src="https://dziennik-minerva.pages.dev/themes/logo-horizontal-white.svg" alt="Minerva" class="h-9 w-auto">
+                <div class="hidden lg:flex items-center gap-2 bg-white/10 px-3.5 py-1.5 rounded-xl border border-white/10">
+                    <svg class="w-4 h-4 text-amberBrand" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+                    <span class="text-xs font-bold text-white" id="schoolNameBadge">Ładowanie placówki...</span>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-4">
+                <button onclick="toggleNotifications()" class="relative p-2 rounded-xl bg-white/10 text-white hover:bg-white/20 transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+                    <span id="unreadDot" class="hidden absolute top-1.5 right-1.5 w-3 h-3 bg-amberBrand rounded-full border-2 border-[#080B1A] animate-ping"></span>
+                    <span id="unreadDotStatic" class="hidden absolute top-1.5 right-1.5 w-3 h-3 bg-amberBrand rounded-full border-2 border-[#080B1A]"></span>
+                </button>
+
+                <div class="flex items-center gap-3 pl-3 border-l border-white/15">
+                    <div class="text-right hidden sm:block">
+                        <p class="text-sm font-bold text-white" id="userNameDisplay">...</p>
+                        <p class="text-xs text-amberBrand font-medium" id="userSubDisplay">...</p>
+                    </div>
+                    <button onclick="logout()" class="p-2 rounded-xl bg-red-500/20 text-red-300 hover:bg-red-500 hover:text-white transition-colors" title="Wyloguj się">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <div class="flex-1 flex flex-col md:flex-row overflow-hidden">
+            <aside class="w-full md:w-64 bg-[#0D122B] border-r border-white/10 p-4 flex flex-row md:flex-col justify-between overflow-x-auto md:overflow-visible shrink-0 gap-2">
+                <nav id="sidebarNav" class="flex flex-row md:flex-col gap-2 w-full"></nav>
+                <div class="hidden md:block pt-4 border-t border-white/10 text-xs text-white/50 text-center">
+                    Supabase Cloud Sync
+                </div>
+            </aside>
+
+            <main id="mainContentArea" class="flex-1 overflow-y-auto p-4 sm:p-8 custom-scrollbar">
+                <!-- Zawartość dynamiczna -->
+            </main>
+        </div>
+    </div>
+
+    <script type="module">
+        import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+
+               const SUPABASE_URL = typeof __supabase_url !== 'undefined' ? __supabase_url : 'https://xodfwrgkudllvfdetljw.supabase.co';
+        const SUPABASE_ANON_KEY = typeof __supabase_anon_key !== 'undefined' ? __supabase_anon_key : 'sb_publishable_FY5C7kLlrQZDQooJ54klMQ_il0jVpsJ';
+        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        let currentUser = JSON.parse(localStorage.getItem('minerva_current_user') || 'null');
+
+        if (!currentUser) {
+            window.location.href = '/login';
+        } else {
+            initSupabaseDashboard();
+        }
+
+        window.logout = function() {
+            localStorage.removeItem('minerva_current_user');
+            window.location.href = '/login';
+        }
+
+        async function initSupabaseDashboard() {
+            document.getElementById('userNameDisplay').textContent = currentUser.name;
+            document.getElementById('userSubDisplay').textContent = currentUser.role + ' • ' + (currentUser.schoolName || 'Szkoła');
+            document.getElementById('schoolNameBadge').textContent = currentUser.schoolName || 'Szkoła Podstawowa nr 1';
+
+            buildSidebar();
+            renderView('dashboard');
+        }
+
+        function buildSidebar() {
+            const nav = document.getElementById('sidebarNav');
+            const linkClass = "flex items-center gap-3 px-4 py-3 rounded-xl text-white/90 hover:bg-indigoBrand hover:text-white font-semibold text-sm transition-all";
+            
+            let html = `
+                <a href="#" onclick="renderView('dashboard'); return false;" class="${linkClass}">Pulpit</a>
+                <a href="#" onclick="renderView('messages'); return false;" class="${linkClass}">Wiadomości</a>
+                <a href="#" onclick="renderView('announcements'); return false;" class="${linkClass}">Ogłoszenia</a>
+            `;
+
+            if (currentUser.role === 'Dyrektor') {
+                html += `
+                    <a href="#" onclick="renderView('directorAccounts'); return false;" class="${linkClass}">Zarządzaj Kontami</a>
+                    <a href="#" onclick="renderView('directorSchool'); return false;" class="${linkClass}">Placówka i Plany</a>
+                `;
+            }
+            if (currentUser.role === 'Nauczyciel' || currentUser.role === 'Dyrektor') {
+                html += `<a href="#" onclick="renderView('teacherPanel'); return false;" class="${linkClass}">Oceny i Frekwencja</a>`;
+            }
+            if (currentUser.role === 'Rodzic') {
+                html += `<a href="#" onclick="renderView('parentChildPanel'); return false;" class="${linkClass}">Dziennik Dziecka</a>`;
+            }
+            if (currentUser.role === 'Uczeń') {
+                html += `<a href="#" onclick="renderView('studentPanel'); return false;" class="${linkClass}">Moje Oceny</a>`;
+            }
+
+            nav.innerHTML = html;
+        }
+
+        window.renderView = function(v) {
+            const area = document.getElementById('mainContentArea');
+            if (v === 'dashboard') {
+                area.innerHTML = `
+                    <div class="max-w-5xl mx-auto space-y-6">
+                        <div class="bg-gradient-to-r from-indigoBrand to-indigoDark text-white rounded-3xl p-8 shadow-xl relative overflow-hidden">
+                            <div class="absolute -right-10 -bottom-10 w-48 h-48 bg-amberBrand/20 rounded-full blur-2xl"></div>
+                            <span class="px-3.5 py-1 rounded-full bg-amberBrand text-indigoDark font-bold text-xs uppercase tracking-wider">${currentUser.schoolName || 'Szkoła'}</span>
+                            <h1 class="text-3xl font-extrabold mt-3">Witaj, ${currentUser.name}</h1>
+                            <p class="text-white/80 mt-1 text-sm">Rola: <strong class="text-amberBrand">${currentUser.role}</strong></p>
+                        </div>
+                    </div>
+                `;
+            } else if (v === 'messages') {
+                area.innerHTML = `<div class="max-w-5xl mx-auto"><h2 class="text-2xl font-extrabold text-indigoBrand mb-4">Wiadomości (Supabase Sync)</h2><p class="text-sm text-slate-600">Skrzynka wiadomości w czasie rzeczywistym zsynchronizowana z Supabase.</p></div>`;
+            } else {
+                area.innerHTML = `<div class="max-w-5xl mx-auto"><h2 class="text-2xl font-extrabold text-indigoBrand mb-4">Moduł ${v}</h2><p class="text-sm text-slate-600">Ładowanie danych z chmury Supabase...</p></div>`;
+            }
+        }
+    </script>
+</body>
+</html>
