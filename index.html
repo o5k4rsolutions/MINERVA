@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Minerva – nowoczesny dziennik elektroniczny</title>
+<meta name="description" content="Minerva to nowoczesny dziennik elektroniczny dla uczniów, rodziców, nauczycieli i dyrekcji. Oceny, frekwencja, wiadomości i plan lekcji w jednym miejscu.">
+<meta name="theme-color" content="#000000">
+<link rel="icon" type="image/svg+xml" href="https://dziennik-minerva.pages.dev/themes/icon-dark.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--indigo:#1E2A78;--indigo2:#2B3AA0;--amber:#F5A524;--amber2:#FFC857;--bg:#F7F8FD;--ink:#12163A;--mut:#5B6086;--line:#E3E6F4;--card:#fff}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Open Sans',system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.6;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+svg.i{width:1em;height:1em;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.wrap{max-width:1160px;margin:0 auto;padding:0 24px}
+/* nav */
+nav{position:sticky;top:0;z-index:50;background:#000;border-bottom:1px solid #1b1b1b}
+nav .wrap{display:flex;align-items:center;justify-content:space-between;height:68px}
+nav img{height:34px;display:block}
+.links{display:flex;gap:30px;align-items:center}
+.links a{color:#d6d8e6;font-size:.93rem;font-weight:600;position:relative;transition:color .2s}
+.links a:not(.btn)::after{content:"";position:absolute;left:0;bottom:-6px;height:2px;width:0;background:var(--amber);transition:width .25s}
+.links a:not(.btn):hover{color:#fff}.links a:not(.btn):hover::after{width:100%}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:12px 24px;border-radius:12px;font-weight:700;font-size:.95rem;border:2px solid transparent;transition:transform .2s,box-shadow .2s,background .2s;cursor:pointer}
+.btn-a{background:var(--amber);color:#1b1500}.btn-a:hover{transform:translateY(-2px);box-shadow:0 10px 24px -8px rgba(245,165,36,.7);background:var(--amber2)}
+.btn-o{background:#fff;color:var(--indigo);border-color:var(--line)}.btn-o:hover{transform:translateY(-2px);border-color:var(--indigo)}
+nav .btn{padding:9px 20px}
+.burger{display:none;background:none;border:0;color:#fff;font-size:1.7rem;cursor:pointer}
+/* hero */
+.hero{position:relative;padding:84px 0 96px;overflow:hidden;background:radial-gradient(900px 400px at 85% -10%,rgba(245,165,36,.18),transparent 60%),radial-gradient(800px 500px at -10% 10%,rgba(43,58,160,.14),transparent 60%)}
+.hero .wrap{display:grid;grid-template-columns:1.05fr .95fr;gap:56px;align-items:center}
+.tag{display:inline-flex;gap:8px;align-items:center;background:#fff;border:1px solid var(--line);padding:6px 14px;border-radius:99px;font-size:.82rem;font-weight:700;color:var(--indigo)}
+.tag i{width:8px;height:8px;border-radius:50%;background:var(--amber);animation:pulse 1.8s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(245,165,36,.6)}100%{box-shadow:0 0 0 10px rgba(245,165,36,0)}}
+h1{font-size:clamp(2.2rem,4.6vw,3.6rem);line-height:1.1;font-weight:800;color:var(--indigo);margin:20px 0}
+h1 span{background:linear-gradient(transparent 62%,var(--amber) 62% 92%,transparent 92%);padding:0 4px}
+.lead{font-size:1.12rem;color:var(--mut);max-width:520px}
+.cta{display:flex;gap:14px;flex-wrap:wrap;margin:32px 0 28px}
+.trust{display:flex;gap:22px;flex-wrap:wrap;color:var(--mut);font-size:.88rem;font-weight:600}
+.trust span{display:flex;gap:7px;align-items:center}.trust svg{color:var(--amber);font-size:1.15rem}
+/* mock */
+.mock{position:relative;animation:float 6s ease-in-out infinite}
+@keyframes float{50%{transform:translateY(-12px)}}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:22px;box-shadow:0 30px 60px -25px rgba(30,42,120,.35)}
+.ph{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.ph b{color:var(--indigo)}.dots{display:flex;gap:6px}.dots i{width:10px;height:10px;border-radius:50%;background:var(--line)}
+.dots i:first-child{background:var(--amber)}
+.gr{display:grid;grid-template-columns:1fr auto;gap:10px 14px;align-items:center;font-size:.9rem}
+.gr .bar{grid-column:1/-1;height:8px;background:#EEF0FA;border-radius:9px;overflow:hidden;margin-top:-4px}
+.gr .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--indigo2),var(--amber));border-radius:9px;transition:width 1.4s cubic-bezier(.2,.8,.2,1)}
+.on .gr .bar i{width:var(--w)}
+.gr em{font-style:normal;font-weight:800;background:var(--indigo);color:#fff;border-radius:8px;padding:1px 10px}
+.gr em.am{background:var(--amber);color:#1b1500}
+.chip{position:absolute;background:#fff;border:1px solid var(--line);border-radius:14px;padding:10px 14px;display:flex;gap:10px;align-items:center;font-size:.82rem;font-weight:700;box-shadow:0 14px 30px -14px rgba(30,42,120,.4)}
+.chip svg{font-size:1.4rem;color:var(--indigo)}
+.c1{left:-34px;bottom:34px;animation:float 5s -1s ease-in-out infinite}.c2{right:-18px;top:-20px;animation:float 5.5s -2s ease-in-out infinite}.c2 svg{color:var(--amber)}
+/* sections */
+section{padding:88px 0}
+.sh{text-align:center;max-width:640px;margin:0 auto 52px}
+.sh small{color:var(--amber);font-weight:800;letter-spacing:.12em;text-transform:uppercase;font-size:.78rem;filter:brightness(.85)}
+.sh h2{font-size:clamp(1.7rem,3.2vw,2.5rem);color:var(--indigo);font-weight:800;line-height:1.2;margin:8px 0 12px}
+.sh p{color:var(--mut)}
+.stats{padding:0;margin-top:-40px;position:relative;z-index:2}
+.stats .wrap>div{background:var(--indigo);border-radius:24px;padding:34px;display:grid;grid-template-columns:repeat(4,1fr);gap:20px;text-align:center;color:#fff;box-shadow:0 24px 50px -24px rgba(30,42,120,.7)}
+.stats b{display:block;font-size:2.3rem;font-weight:800;color:var(--amber)}.stats span{font-size:.9rem;opacity:.85}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:28px;transition:transform .3s,box-shadow .3s,border-color .3s}
+.card:hover{transform:translateY(-6px);box-shadow:0 22px 40px -22px rgba(30,42,120,.4);border-color:var(--amber)}
+.ico{width:52px;height:52px;border-radius:14px;background:#EEF0FF;color:var(--indigo);display:grid;place-items:center;font-size:1.6rem;margin-bottom:18px;transition:background .3s,color .3s,transform .3s}
+.card:hover .ico{background:var(--amber);color:#1b1500;transform:rotate(-6deg) scale(1.05)}
+.card h3{font-size:1.1rem;color:var(--indigo);margin-bottom:6px}.card p{color:var(--mut);font-size:.94rem}
+/* roles */
+.tabs{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:30px}
+.tabs button{font:inherit;font-weight:700;padding:10px 22px;border-radius:99px;border:1px solid var(--line);background:#fff;color:var(--mut);cursor:pointer;transition:.2s}
+.tabs button.act{background:var(--indigo);color:#fff;border-color:var(--indigo)}
+.role{display:none;grid-template-columns:1fr 1fr;gap:40px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:26px;padding:40px;animation:fade .5s}
+.role.act{display:grid}@keyframes fade{from{opacity:0;transform:translateY(12px)}}
+.role h3{font-size:1.6rem;color:var(--indigo);margin-bottom:10px}.role p{color:var(--mut);margin-bottom:16px}
+.role li{list-style:none;display:flex;gap:10px;margin:9px 0;font-weight:600}.role li svg{color:var(--amber);font-size:1.3rem;flex:none;margin-top:2px}
+.art{aspect-ratio:1.3;border-radius:20px;background:linear-gradient(135deg,var(--indigo),var(--indigo2));display:grid;place-items:center;color:#fff;font-size:5.5rem;position:relative;overflow:hidden}
+.art::before,.art::after{content:"";position:absolute;border-radius:50%;background:rgba(245,165,36,.25)}
+.art::before{width:220px;height:220px;right:-60px;top:-60px}.art::after{width:140px;height:140px;left:-30px;bottom:-40px;background:rgba(255,255,255,.1)}
+.art svg{position:relative;z-index:1;width:1em;height:1em;stroke-width:1.2;animation:float 4s ease-in-out infinite}
+/* steps */
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:26px;counter-reset:s}
+.step{position:relative;padding:30px 26px;background:#fff;border:1px dashed #C9CEEA;border-radius:20px}
+.step::before{counter-increment:s;content:counter(s);position:absolute;top:-18px;left:24px;width:38px;height:38px;border-radius:50%;background:var(--amber);color:#1b1500;font-weight:800;display:grid;place-items:center}
+.step h3{color:var(--indigo);margin-bottom:6px}.step p{color:var(--mut);font-size:.94rem}
+/* cta */
+.band{background:linear-gradient(120deg,var(--indigo),var(--indigo2));border-radius:28px;padding:56px;display:flex;justify-content:space-between;align-items:center;gap:30px;color:#fff;position:relative;overflow:hidden}
+.band::after{content:"";position:absolute;right:-80px;top:-80px;width:280px;height:280px;border-radius:50%;background:rgba(245,165,36,.22)}
+.band h2{font-size:clamp(1.5rem,3vw,2.2rem);margin-bottom:6px}.band p{opacity:.85}.band .btn{position:relative;z-index:1;white-space:nowrap}
+/* footer */
+footer{background:#fff;border-top:1px solid var(--line);padding:56px 0 26px}
+.fg{display:grid;grid-template-columns:1.6fr 1fr 1fr 1fr;gap:36px}
+.fg img{height:34px;margin-bottom:14px}.fg p{color:var(--mut);font-size:.9rem;max-width:300px}
+.fg h4{color:var(--indigo);margin-bottom:12px;font-size:.95rem}.fg a{display:block;color:var(--mut);font-size:.9rem;margin:7px 0;transition:color .2s}.fg a:hover{color:var(--indigo)}
+.fb{border-top:1px solid var(--line);margin-top:36px;padding-top:20px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;color:var(--mut);font-size:.84rem}
+/* reveal */
+.rv{opacity:0;transform:translateY(26px);transition:opacity .7s,transform .7s}.rv.on{opacity:1;transform:none}
+@media(max-width:900px){
+.hero .wrap,.role,.grid,.steps,.fg{grid-template-columns:1fr}.stats .wrap>div{grid-template-columns:1fr 1fr}
+.burger{display:block}.links{display:none;position:absolute;top:68px;left:0;right:0;background:#000;flex-direction:column;padding:20px 24px 26px;gap:18px;align-items:flex-start}.links.open{display:flex}
+.band{flex-direction:column;text-align:center;padding:40px 26px}.c1{left:-6px}.c2{right:-6px}.role{padding:26px}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.rv{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+<symbol id="star" viewBox="0 0 24 24"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/></symbol>
+<symbol id="cal" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M8 3v4M16 3v4M3 10h18"/></symbol>
+<symbol id="chat" viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"/><path d="M8 9h8M8 12h5"/></symbol>
+<symbol id="chart" viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/></symbol>
+<symbol id="shield" viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 4.5-3.2 7.8-8 9-4.8-1.2-8-4.5-8-9V6z"/><path d="M9 12l2 2 4-4"/></symbol>
+<symbol id="phone" viewBox="0 0 24 24"><rect x="7" y="2" width="10" height="20" rx="3"/><path d="M11 18h2"/></symbol>
+<symbol id="book" viewBox="0 0 24 24"><path d="M3 5.5C5.5 4 9 4 12 6c3-2 6.5-2 9-.5V19c-2.5-1.5-6-1.5-9 .5-3-2-6.5-2-9-.5z"/><path d="M12 6v13.5"/></symbol>
+<symbol id="users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.6-3.6 3.2-5.5 6.5-5.5s5.9 1.9 6.5 5.5"/><circle cx="17.5" cy="9" r="2.5"/><path d="M17.5 14.5c2.2.2 3.6 1.7 4 4.5"/></symbol>
+<symbol id="bell" viewBox="0 0 24 24"><path d="M6 17V11a6 6 0 0112 0v6l2 2H4z"/><path d="M10 21h4"/></symbol>
+<symbol id="ok" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.7 2.7L16 9.5"/></symbol>
+<symbol id="cap" viewBox="0 0 24 24"><path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11.5V16c0 1.5 2.7 3 6 3s6-1.5 6-3v-4.5M22 9v6"/></symbol>
+<symbol id="heart" viewBox="0 0 24 24"><path d="M12 20s-8-4.7-8-10.5A4.5 4.5 0 0112 7a4.5 4.5 0 018 2.5C20 15.3 12 20 12 20z"/></symbol>
+<symbol id="arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+<symbol id="menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></symbol>
+</svg>
+
+<nav><div class="wrap">
+<a href="#"><img src="https://dziennik-minerva.pages.dev/themes/logo-horizontal-white.svg" alt="Minerva"></a>
+<button class="burger" aria-label="Menu" onclick="document.querySelector('.links').classList.toggle('open')"><svg class="i"><use href="#menu"/></svg></button>
+<div class="links">
+<a href="#funkcje">Funkcje</a><a href="#dla-kogo">Dla kogo</a><a href="#start">Jak zacząć</a><a href="#kontakt">Kontakt</a>
+<a class="btn btn-a" href="/login">Zaloguj się</a>
+</div></div></nav>
+
+<header class="hero"><div class="wrap">
+<div class="rv">
+<span class="tag"><i></i>Nowa generacja dzienników szkolnych</span>
+<h1>Cała szkoła w jednym <span>mądrym</span> dzienniku</h1>
+<p class="lead">Minerva łączy oceny, frekwencję, wiadomości i plan lekcji w szybkiej, przejrzystej aplikacji – dla uczniów, rodziców, nauczycieli i dyrekcji.</p>
+<div class="cta"><a class="btn btn-a" href="/login">Przejdź do dziennika <svg class="i"><use href="#arrow"/></svg></a><a class="btn btn-o" href="#funkcje">Poznaj funkcje</a></div>
+<div class="trust"><span><svg class="i"><use href="#shield"/></svg>Bezpieczne dane</span><span><svg class="i"><use href="#phone"/></svg>Działa na każdym urządzeniu</span><span><svg class="i"><use href="#bell"/></svg>Powiadomienia na bieżąco</span></div>
+</div>
+<div class="mock rv" id="mock">
+<div class="panel">
+<div class="ph"><b>Moje oceny · 2A</b><div class="dots"><i></i><i></i><i></i></div></div>
+<div class="gr">
+<span>Matematyka</span><em>5</em><div class="bar"><i style="--w:92%"></i></div>
+<span>Język polski</span><em class="am">4+</em><div class="bar"><i style="--w:80%"></i></div>
+<span>Fizyka</span><em>5</em><div class="bar"><i style="--w:90%"></i></div>
+<span>Historia</span><em class="am">4</em><div class="bar"><i style="--w:74%"></i></div>
+<span>Język angielski</span><em>6</em><div class="bar"><i style="--w:98%"></i></div>
+</div></div>
+<div class="chip c1"><svg class="i"><use href="#ok"/></svg>Frekwencja 97%</div>
+<div class="chip c2"><svg class="i"><use href="#bell"/></svg>Nowa ocena z fizyki</div>
+</div>
+</div></header>
+
+<div class="stats rv"><div class="wrap"><div>
+<p><b data-n="12000" data-s="+">0</b><span>aktywnych uczniów</span></p>
+<p><b data-n="450" data-s="+">0</b><span>nauczycieli</span></p>
+<p><b data-n="99.9" data-s="%">0</b><span>dostępności systemu</span></p>
+<p><b data-n="24" data-s="/7">0</b><span>dostęp do dziennika</span></p>
+</div></div></div>
+
+<section id="funkcje"><div class="wrap">
+<div class="sh rv"><small>Funkcje</small><h2>Wszystko, czego potrzebuje nowoczesna szkoła</h2><p>Prosty interfejs, który nie wymaga szkolenia – a pod spodem solidne narzędzia dla całej społeczności szkolnej.</p></div>
+<div class="grid">
+<div class="card rv"><div class="ico"><svg class="i"><use href="#star"/></svg></div><h3>Oceny i postępy</h3><p>Natychmiastowy podgląd ocen, średnich i wag. Czytelne wykresy pokazują, jak rozwija się uczeń.</p></div>
+<div class="card rv"><div class="ico"><svg class="i"><use href="#ok"/></svg></div><h3>Frekwencja</h3><p>Obecności, spóźnienia i usprawiedliwienia obsłużysz w kilka kliknięć – bez papierowych kartek.</p></div>
+<div class="card rv"><div class="ico"><svg class="i"><use href="#cal"/></svg></div><h3>Plan lekcji i terminarz</h3><p>Sprawdziany, zadania i wydarzenia szkolne w jednym kalendarzu, zawsze aktualne.</p></div>
+<div class="card rv"><div class="ico"><svg class="i"><use href="#chat"/></svg></div><h3>Wiadomości</h3><p>Bezpośrednia komunikacja między nauczycielami, rodzicami i uczniami w uporządkowanych wątkach.</p></div>
+<div class="card rv"><div class="ico"><svg class="i"><use href="#chart"/></svg></div><h3>Raporty i analizy</h3><p>Zestawienia dla dyrekcji i wychowawców: wyniki klas, frekwencja, trendy w całej placówce.</p></div>
+<div class="card rv"><div class="ico"><svg class="i"><use href="#shield"/></svg></div><h3>Bezpieczeństwo</h3><p>Szyfrowanie danych, kontrola uprawnień i zgodność z RODO. Dane szkoły są w dobrych rękach.</p></div>
+</div></div></section>
+
+<section id="dla-kogo" style="background:#fff;border-block:1px solid var(--line)"><div class="wrap">
+<div class="sh rv"><small>Dla kogo</small><h2>Jeden system, cztery perspektywy</h2></div>
+<div class="tabs rv"><button class="act" data-t="0">Uczeń</button><button data-t="1">Rodzic</button><button data-t="2">Nauczyciel</button><button data-t="3">Dyrekcja</button></div>
+<div class="role act"><div><h3>Dla ucznia</h3><p>Wszystko, co ważne w szkole, zawsze pod ręką.</p><ul><li><svg class="i"><use href="#ok"/></svg>Oceny i uwagi w czasie rzeczywistym</li><li><svg class="i"><use href="#ok"/></svg>Plan lekcji i terminy sprawdzianów</li><li><svg class="i"><use href="#ok"/></svg>Zadania domowe z przypomnieniami</li></ul></div><div class="art"><svg class="i"><use href="#cap"/></svg></div></div>
+<div class="role"><div><h3>Dla rodzica</h3><p>Bądź na bieżąco z postępami dziecka bez dzwonienia do szkoły.</p><ul><li><svg class="i"><use href="#ok"/></svg>Powiadomienia o ocenach i nieobecnościach</li><li><svg class="i"><use href="#ok"/></svg>Usprawiedliwienia online</li><li><svg class="i"><use href="#ok"/></svg>Kontakt z wychowawcą w kilku kliknięciach</li></ul></div><div class="art"><svg class="i"><use href="#heart"/></svg></div></div>
+<div class="role"><div><h3>Dla nauczyciela</h3><p>Mniej biurokracji, więcej czasu na uczenie.</p><ul><li><svg class="i"><use href="#ok"/></svg>Szybkie wpisywanie ocen i frekwencji</li><li><svg class="i"><use href="#ok"/></svg>Automatyczne średnie i statystyki klas</li><li><svg class="i"><use href="#ok"/></svg>Tematy lekcji i materiały w jednym miejscu</li></ul></div><div class="art"><svg class="i"><use href="#book"/></svg></div></div>
+<div class="role"><div><h3>Dla dyrekcji</h3><p>Pełen obraz placówki i pełna kontrola nad danymi.</p><ul><li><svg class="i"><use href="#ok"/></svg>Raporty frekwencji i wyników</li><li><svg class="i"><use href="#ok"/></svg>Zarządzanie kontami i uprawnieniami</li><li><svg class="i"><use href="#ok"/></svg>Ogłoszenia dla całej szkoły</li></ul></div><div class="art"><svg class="i"><use href="#users"/></svg></div></div>
+</div></section>
+
+<section id="start"><div class="wrap">
+<div class="sh rv"><small>Jak zacząć</small><h2>Start w trzech krokach</h2><p>Wdrożenie nie wymaga instalacji ani specjalnego sprzętu.</p></div>
+<div class="steps">
+<div class="step rv"><h3>Zgłoś szkołę</h3><p>Skontaktuj się z nami – przygotujemy ofertę i konfigurację dopasowaną do placówki.</p></div>
+<div class="step rv"><h3>Zaimportuj dane</h3><p>Przeniesiemy klasy, uczniów i nauczycieli z dotychczasowego systemu.</p></div>
+<div class="step rv"><h3>Zacznij korzystać</h3><p>Konta trafiają do wszystkich użytkowników, a my zapewniamy wsparcie na starcie.</p></div>
+</div></div></section>
+
+<section id="kontakt" style="padding-top:0"><div class="wrap"><div class="band rv">
+<div><h2>Gotowi na dziennik, który działa?</h2><p>Zaloguj się lub napisz do nas – pomożemy wdrożyć Minervę w Twojej szkole.</p></div>
+<a class="btn btn-a" href="/login">Zaloguj się <svg class="i"><use href="#arrow"/></svg></a>
+</div></div></section>
+
+<footer><div class="wrap">
+<div class="fg">
+<div><img src="https://dziennik-minerva.pages.dev/themes/logo-horizontal-black.svg" alt="Minerva"><p>Nowoczesny dziennik elektroniczny. Mądrość i wiedza w cyfrowym wydaniu.</p></div>
+<div><h4>Produkt</h4><a href="#funkcje">Funkcje</a><a href="#dla-kogo">Dla kogo</a><a href="#start">Jak zacząć</a></div>
+<div><h4>Konto</h4><a href="/login">Logowanie</a><a href="#kontakt">Kontakt</a></div>
+<div><h4>Informacje</h4><a href="/regulamin">Regulamin</a><a href="/prywatnosc">Polityka prywatności</a></div>
+</div>
+<div class="fb"><span>© 2026 Minerva. Wszelkie prawa zastrzeżone.</span><span>Zrobione z myślą o szkole</span></div>
+</div></footer>
+
+<script>
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('on');io.unobserve(e.target)}}),{threshold:.15});
+document.querySelectorAll('.rv').forEach((el,i)=>{el.style.transitionDelay=(i%3)*90+'ms';io.observe(el)});
+const so=new IntersectionObserver(es=>es.forEach(e=>{if(!e.isIntersecting)return;so.unobserve(e.target);
+ e.target.querySelectorAll('[data-n]').forEach(b=>{const n=+b.dataset.n,s=b.dataset.s,d=n%1?1:0,t0=performance.now();
+ (function f(t){const p=Math.min((t-t0)/1400,1),v=n*(1-Math.pow(1-p,3));b.textContent=v.toLocaleString('pl-PL',{minimumFractionDigits:d,maximumFractionDigits:d})+s;if(p<1)requestAnimationFrame(f)})(t0)})}),{threshold:.4});
+so.observe(document.querySelector('.stats'));
+const tb=document.querySelectorAll('.tabs button'),rl=document.querySelectorAll('.role');
+tb.forEach(b=>b.onclick=()=>{tb.forEach(x=>x.classList.remove('act'));rl.forEach(x=>x.classList.remove('act'));b.classList.add('act');rl[b.dataset.t].classList.add('act')});
+document.querySelectorAll('.links a').forEach(a=>a.addEventListener('click',()=>document.querySelector('.links').classList.remove('open')));
+</script>
+</body>
+</html>
