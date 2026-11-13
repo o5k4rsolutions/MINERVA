@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Minerva – nowoczesny dziennik elektroniczny</title>
 <meta name="description" content="Minerva to nowoczesny dziennik elektroniczny dla uczniów, rodziców, nauczycieli i dyrekcji.">
-<meta name="theme-color" content="#0B0C10">
+<meta name="theme-color" content="#000000">
 <link rel="icon" type="image/svg+xml" href="https://dziennik-minerva.pages.dev/themes/icon-dark.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -20,7 +20,7 @@
   --text: #12163A;
   --muted: #5B6086;
   --border: #E2E5F0;
-  --dark: #0B0C10;
+  --dark: #000000;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -43,62 +43,124 @@ button { font: inherit; cursor: pointer; border: none; background: none; }
   padding: 0 24px;
 }
 
-/* ——— NAV ——— */
+/* ========== NAV – dokładnie jak na screenie ========== */
 .nav {
   position: sticky;
   top: 0;
   z-index: 100;
-  background: var(--dark);
-  border-bottom: 1px solid #1c1d24;
+  background: #000;
+  height: 64px;
 }
 .nav-inner {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 60px;
+  height: 64px;
 }
-.nav-logo img { height: 26px; }
+.nav-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #fff;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+.nav-logo svg {
+  width: 32px;
+  height: 32px;
+}
 .nav-links {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 8px;
 }
-.nav-links a {
-  padding: 8px 14px;
-  font-size: 14px;
-  font-weight: 600;
-  color: #a8abb8;
-  border-radius: 8px;
-  transition: color .15s, background .15s;
-}
-.nav-links a:hover {
+.nav-links a:not(.btn) {
+  padding: 8px 16px;
+  font-size: 15px;
+  font-weight: 500;
   color: #fff;
-  background: rgba(255,255,255,.06);
-}
-.nav-cta {
-  margin-left: 12px;
-  padding: 9px 18px;
-  background: var(--amber);
-  color: #1a1400;
-  font-size: 14px;
-  font-weight: 700;
   border-radius: 8px;
-  transition: background .15s, transform .15s;
+  transition: opacity .15s;
 }
-.nav-cta:hover {
+.nav-links a:not(.btn):hover {
+  opacity: 0.75;
+}
+
+/* Przycisk z wypełnieniem od środka */
+.btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 22px;
+  font-size: 15px;
+  font-weight: 600;
+  border-radius: 999px;
+  overflow: hidden;
+  z-index: 1;
+  transition: color .25s ease;
+}
+.btn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--amber);
+  border-radius: inherit;
+  transform: scale(0);
+  transition: transform .3s cubic-bezier(.2,.8,.2,1);
+  z-index: -1;
+}
+.btn:hover::before {
+  transform: scale(1);
+}
+
+/* Wariant outline (jak na screenie) */
+.btn-outline {
+  color: #fff;
+  border: 1.5px solid rgba(255,255,255,.7);
+  background: transparent;
+}
+.btn-outline:hover {
+  color: #1a1400;
+  border-color: var(--amber);
+}
+
+/* Wariant filled */
+.btn-filled {
+  color: #1a1400;
+  background: var(--amber);
+  border: 1.5px solid var(--amber);
+}
+.btn-filled::before {
   background: #ffb83d;
-  transform: translateY(-1px);
 }
+.btn-filled:hover {
+  color: #1a1400;
+}
+
+/* Wariant primary (indigo) */
+.btn-primary {
+  color: #fff;
+  background: var(--indigo);
+  border: 1.5px solid var(--indigo);
+}
+.btn-primary::before {
+  background: var(--indigo-dark);
+}
+.btn-primary:hover {
+  color: #fff;
+}
+
 .nav-burger {
   display: none;
   color: #fff;
-  font-size: 22px;
   padding: 6px;
 }
 
-/* ——— HERO ——— */
+/* ========== HERO ========== */
 .hero {
-  padding: 72px 0 64px;
+  padding: 80px 0 72px;
   background: var(--surface);
   border-bottom: 1px solid var(--border);
 }
@@ -139,34 +201,6 @@ button { font: inherit; cursor: pointer; border: none; background: none; }
   gap: 12px;
   flex-wrap: wrap;
   margin-bottom: 32px;
-}
-.btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 22px;
-  font-size: 15px;
-  font-weight: 700;
-  border-radius: 9px;
-  transition: transform .15s, box-shadow .15s, background .15s;
-}
-.btn-primary {
-  background: var(--indigo);
-  color: #fff;
-}
-.btn-primary:hover {
-  background: var(--indigo-dark);
-  transform: translateY(-1px);
-  box-shadow: 0 8px 20px -8px rgba(30,42,120,.4);
-}
-.btn-secondary {
-  background: var(--surface);
-  color: var(--indigo);
-  border: 1.5px solid var(--border);
-}
-.btn-secondary:hover {
-  border-color: var(--indigo);
-  transform: translateY(-1px);
 }
 .hero-meta {
   display: flex;
@@ -263,7 +297,7 @@ button { font: inherit; cursor: pointer; border: none; background: none; }
 }
 .mock.on .grade-bar span { width: var(--w); }
 
-/* ——— STATS ——— */
+/* ========== STATS ========== */
 .stats {
   padding: 0;
   margin-top: -28px;
@@ -297,7 +331,7 @@ button { font: inherit; cursor: pointer; border: none; background: none; }
   opacity: .8;
 }
 
-/* ——— SECTIONS ——— */
+/* ========== SECTIONS ========== */
 .section {
   padding: 80px 0;
 }
@@ -524,15 +558,6 @@ button { font: inherit; cursor: pointer; border: none; background: none; }
   font-size: 15px;
   opacity: .8;
 }
-.cta-block .btn-primary {
-  background: var(--amber);
-  color: #1a1400;
-  white-space: nowrap;
-}
-.cta-block .btn-primary:hover {
-  background: #ffb83d;
-  box-shadow: 0 8px 20px -8px rgba(245,165,36,.45);
-}
 
 /* Footer */
 .footer {
@@ -610,10 +635,10 @@ button { font: inherit; cursor: pointer; border: none; background: none; }
     display: flex;
     flex-direction: column;
     position: absolute;
-    top: 60px;
+    top: 64px;
     left: 0;
     right: 0;
-    background: var(--dark);
+    background: #000;
     padding: 12px 16px 20px;
     gap: 2px;
     align-items: stretch;
@@ -632,6 +657,7 @@ button { font: inherit; cursor: pointer; border: none; background: none; }
 @media (prefers-reduced-motion: reduce) {
   .reveal { opacity: 1; transform: none; transition: none; }
   .grade-bar span { transition: none; }
+  .btn::before { transition: none; }
 }
 </style>
 </head>
@@ -641,17 +667,25 @@ button { font: inherit; cursor: pointer; border: none; background: none; }
 <header class="nav">
   <div class="container nav-inner">
     <a href="#" class="nav-logo">
-      <img src="https://dziennik-minerva.pages.dev/themes/logo-horizontal-white.svg" alt="Minerva">
+      <!-- prosta sowa w stylu z screena -->
+      <svg viewBox="0 0 32 32" fill="none">
+        <path d="M16 2C9.4 2 4 7.4 4 14c0 4.4 2.4 8.2 6 10.2V28l6-3 6 3v-3.8c3.6-2 6-5.8 6-10.2C28 7.4 22.6 2 16 2z" fill="#fff"/>
+        <circle cx="11.5" cy="13" r="2.2" fill="#000"/>
+        <circle cx="20.5" cy="13" r="2.2" fill="#000"/>
+        <path d="M14 18.5c.8.8 2.2.8 3 0" stroke="#000" stroke-width="1.6" stroke-linecap="round"/>
+      </svg>
+      Minerva
     </a>
+
     <button class="nav-burger" aria-label="Menu" id="burger">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
     </button>
+
     <nav class="nav-links" id="navLinks">
-      <a href="#funkcje">Funkcje</a>
-      <a href="#dla-kogo">Dla kogo</a>
-      <a href="#start">Jak zacząć</a>
+      <a href="#funkcje">Dlaczego my?</a>
+      <a href="#dla-kogo">O firmie</a>
       <a href="#kontakt">Kontakt</a>
-      <a href="/login" class="nav-cta">Zaloguj się</a>
+      <a href="/login" class="btn btn-outline">Zaloguj się</a>
     </nav>
   </div>
 </header>
@@ -665,7 +699,7 @@ button { font: inherit; cursor: pointer; border: none; background: none; }
       <p class="hero-lead">Oceny, frekwencja, wiadomości i plan lekcji. Dla uczniów, rodziców, nauczycieli i dyrekcji — bez zbędnego bałaganu.</p>
       <div class="hero-actions">
         <a href="/login" class="btn btn-primary">Przejdź do dziennika</a>
-        <a href="#funkcje" class="btn btn-secondary">Zobacz funkcje</a>
+        <a href="#funkcje" class="btn btn-outline" style="color:var(--indigo);border-color:var(--border)">Zobacz funkcje</a>
       </div>
       <div class="hero-meta">
         <span>
@@ -910,7 +944,7 @@ button { font: inherit; cursor: pointer; border: none; background: none; }
         <h2>Gotowi na dziennik, który działa?</h2>
         <p>Zaloguj się albo napisz do nas — pomożemy wdrożyć Minervę.</p>
       </div>
-      <a href="/login" class="btn btn-primary">Zaloguj się</a>
+      <a href="/login" class="btn btn-filled">Zaloguj się</a>
     </div>
   </div>
 </section>
@@ -948,7 +982,6 @@ button { font: inherit; cursor: pointer; border: none; background: none; }
 </footer>
 
 <script>
-// Mobile menu
 document.getElementById('burger').addEventListener('click', () => {
   document.getElementById('navLinks').classList.toggle('open');
 });
@@ -956,7 +989,6 @@ document.querySelectorAll('#navLinks a').forEach(a => {
   a.addEventListener('click', () => document.getElementById('navLinks').classList.remove('open'));
 });
 
-// Reveal on scroll
 const revealObserver = new IntersectionObserver((entries) => {
   entries.forEach(entry => {
     if (entry.isIntersecting) {
@@ -970,7 +1002,6 @@ document.querySelectorAll('.reveal').forEach((el, i) => {
   revealObserver.observe(el);
 });
 
-// Grade bars + mock
 const mock = document.getElementById('mock');
 const mockObserver = new IntersectionObserver((entries) => {
   if (entries[0].isIntersecting) {
@@ -980,7 +1011,6 @@ const mockObserver = new IntersectionObserver((entries) => {
 }, { threshold: 0.3 });
 mockObserver.observe(mock);
 
-// Counters
 const statsObserver = new IntersectionObserver((entries) => {
   if (!entries[0].isIntersecting) return;
   statsObserver.disconnect();
@@ -1005,7 +1035,6 @@ const statsObserver = new IntersectionObserver((entries) => {
 }, { threshold: 0.4 });
 statsObserver.observe(document.querySelector('.stats-inner'));
 
-// Role tabs
 const tabBtns = document.querySelectorAll('.role-tabs button');
 const panels = document.querySelectorAll('.role-panel');
 tabBtns.forEach(btn => {
