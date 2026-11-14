@@ -983,7 +983,8 @@ async function togBot(id,b){const on=!P[id].is_bot;if(await act(sb.from('profile
 async function botTick(q){const {data,error}=await sb.functions.invoke('parent-bot',{body:{a:'tick'}});if(q)return;error||data?.error?warn(data?.error||error.message):toast('Boty wykonały akcji: '+(data.done||0))}
 setInterval(()=>{if(me&&dir()&&!document.hidden)botTick(true)},6e5);
 
-init();
 </script>
+<script src="/extensions.js"></script>
+<script>init();</script>
 </body>
 </html>
