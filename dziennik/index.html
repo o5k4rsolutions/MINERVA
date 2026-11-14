@@ -69,20 +69,32 @@ tr.hv{cursor:pointer}tr.hv:hover td{background:#fffaf0}tr.today td{background:#f
 .cell{min-height:54px;cursor:pointer}.cell:hover{background:#fffaf0}
 #prt{position:fixed;inset:0;background:#fff;z-index:400;overflow:auto;display:none}#prt.show{display:block}
 .acc{border:2px solid var(--in);border-radius:12px;padding:20px;margin:16px auto;max-width:520px;page-break-inside:avoid}.acc code{font-family:monospace;font-size:20px;background:#fef3c7;padding:2px 8px;border-radius:6px;font-weight:700}
-@media print{body>*:not(#prt){display:none!important}#prt{position:static;display:block}.np{display:none!important}}
+@media print{body.pp>*:not(#prt){display:none!important}body.pp #prt{position:static;display:block}.np,aside,#mnav,.top{display:none!important}}
+.side{background:#23253a}#mnav{background:#23253a}
+.side .nv{border-radius:0 999px 999px 0;border-left:0;width:calc(100% - 14px);padding:.8rem 1.1rem;font-size:.95rem;margin:2px 0}.side .nv .ic{width:1.5em;height:1.5em}.side .nv.on{background:#2f3fb5}
+html[data-fs="1"]{font-size:17.5px}html[data-fs="2"]{font-size:19.5px}
+#fs button{border:0;background:none;font-weight:700;color:var(--mu);border-bottom:3px solid transparent;padding:0 4px;line-height:1.2}#fs button.on{color:var(--tx);border-bottom-color:var(--in)}
+.gc{background:#fff;border:1.5px solid #d5dbe7;box-shadow:0 1px 2px #0001}.g1{background:#fff;color:#dc2626;border-color:#fca5a5}.g2{background:#fff;color:#ea580c;border-color:#fdba74}.g3{background:#fff;color:#a16207;border-color:#fde047}.g4{background:#fff;color:#4d7c0f;border-color:#bef264}.g5{background:#fff;color:#15803d;border-color:#86efac}.g6{background:#fff;color:#0f766e;border-color:#5eead4}.g0{color:#475569}
+.lk{text-decoration:underline;font-size:.85rem;cursor:pointer;color:var(--in);font-weight:600}
+.pw{display:grid;grid-template-columns:64px repeat(5,minmax(140px,1fr));gap:6px;min-width:760px}.tm{font-size:.72rem;color:var(--mu);text-align:right;padding-top:.3rem}.dh{text-align:center;padding:.4rem;border-radius:10px 10px 0 0}.dh b{font-size:1.4rem}.dh.tdy{background:#fff4d6}.dh small{display:block;font-size:.7rem}
+.lsn{background:#e4f6c8;border-top:2px solid #8fc94a;padding:.45rem .55rem;font-size:.82rem;min-height:70px;border-radius:2px}.lt{font-weight:700;font-size:.78rem;text-align:right}
+.hol{background:repeating-linear-gradient(135deg,#fdf0f0,#fdf0f0 6px,#fae3e3 6px,#fae3e3 12px)}
+.ab{width:26px;height:26px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:.7rem;flex-shrink:0}.ab.o{background:#2f7d3b}.ab.n{background:#c0392b}.ab.nu{background:#8e44ad}.ab.s{background:#c0642b}
+.fl{display:flex;justify-content:space-between;align-items:center;width:100%;padding:.6rem .8rem;border-radius:8px;border:0;background:none;font-weight:600;text-align:left}.fl:hover{background:#f1f4fa}.fl.on{background:#eef0fb;color:var(--in)}.fl em{font-style:normal;background:#ef4444;color:#fff;border-radius:999px;font-size:.68rem;padding:0 6px}
+td .ck{padding:.15rem;margin:0;border:0;background:none}th .ck{padding:.15rem;margin:0}
 </style>
 </head>
 <body>
 <div class="md:flex min-h-screen">
 <aside class="side md:w-60 md:h-screen md:sticky md:top-0 md:flex md:flex-col shrink-0">
   <div class="flex items-center gap-3 p-4"><img src="https://dziennik-minerva.pages.dev/themes/icon-dark.svg" class="h-9" alt=""><div class="leading-tight min-w-0"><div class="font-extrabold">Minerva</div><div id="sch" class="text-xs text-white/60 truncate"></div></div></div>
-  <nav id="nav" class="md:flex-1 overflow-y-auto"></nav>
+  <div class="px-4 pb-3 mb-2 border-b border-white/10"><div class="font-bold text-lg" id="ptl"></div><div id="pnm"></div><div id="pcl" class="text-xs text-white/60"></div></div><nav id="nav" class="md:flex-1 overflow-y-auto"></nav>
   <div class="p-4 border-t border-white/10"><div id="who" class="text-xs text-white/70"></div></div>
 </aside>
 <div class="flex-1 min-w-0">
-  <div class="bg-white border-b sticky top-0 z-30 px-4 md:px-6 h-16 flex items-center justify-between gap-3" style="border-color:var(--ln)">
+  <div class="top bg-white border-b sticky top-0 z-30 px-4 md:px-6 h-16 flex items-center justify-between gap-3" style="border-color:var(--ln)">
     <h1 id="ptitle" class="font-extrabold text-xl truncate" style="color:var(--in)"></h1>
-    <div class="flex items-center gap-3"><span id="live" class="text-xs mu hidden sm:inline"></span><button id="rfi" class="mu" title="Odśwież dane" onclick="refresh()" style="background:none;border:0"></button><div id="quick" class="flex gap-2"></div><button class="gh sm" id="lo" onclick="logout()"></button></div>
+    <div class="flex items-center gap-3"><span id="live" class="text-xs mu hidden sm:inline"></span><button id="rfi" class="mu" title="Odśwież dane" onclick="refresh()" style="background:none;border:0"></button><div id="quick" class="flex gap-2"></div><div id="fs" class="hidden sm:flex items-end gap-1" title="Rozmiar tekstu"><button onclick="setFs(0)" style="font-size:.85rem">A</button><button onclick="setFs(1)" style="font-size:1.1rem">A</button><button onclick="setFs(2)" style="font-size:1.4rem">A</button></div><button class="gh sm ddb" id="um" onclick="userMenu(this)" style="width:auto;min-height:0"></button></div>
   </div>
   <main id="main" class="p-4 md:p-6 max-w-6xl"></main>
 </div></div>
@@ -100,7 +112,7 @@ const RL={director:'Dyrektor',teacher:'Nauczyciel',parent:'Rodzic/opiekun',stude
 const AS={present:'obecny',absent:'nieobecny',late:'spóźniony',excused:'usprawiedliwiony'};
 const DAYS=['','Poniedziałek','Wtorek','Środa','Czwartek','Piątek'];
 let me,school,P={},C=[],SUB=[],T=[],ST={},PC=[],KIDS=[],tab='home',sid=null,dots={},curT=null,curC=null,rid=0,detail=null,mtab='in',pre={},dirty=false,
- curD=isoL(new Date()),curL=1,plSel=null,annNew=false,ntF='all',jsF='pending',adTab=null,GR={},GW='1';
+ curD=isoL(new Date()),curL=1,plSel=null,annNew=false,ntF='all',jsF='pending',adTab=null,GR={},GW='1',wk=null,atV='week',gsem='1',msort=['d',-1],MIDS=[];
 const nm=id=>P[id]?P[id].first_name+' '+P[id].last_name:'—',ln=id=>P[id]?P[id].last_name+' '+P[id].first_name:'—';
 const cn=id=>C.find(c=>c.id===id)?.name||'—',sn=id=>SUB.find(s=>s.id===id)?.name||'—',tl=t=>cn(t.class_id)+' — '+sn(t.subject_id);
 const staff=()=>me.role==='teacher'||me.role==='director',dir=()=>me.role==='director';
@@ -164,6 +176,7 @@ const LIVE={
  messages:()=>{},attendance:()=>{}};
 const fatal=(t,m)=>{$('#main').innerHTML=`<div class="pn"><div class="pb"><h3 class="mh">${esc(t)}</h3><p>${esc(m)}</p><button class="btn mt-3" onclick="logout()">Wyloguj i wróć do logowania</button></div></div>`};
 async function init(){
+  try{setFs(+localStorage.getItem('fs')||0)}catch{setFs(0)}
   const {data:{session}}=await sb.auth.getSession();if(!session)return location.href='/login';
   sb.auth.onAuthStateChange(ev=>{if(ev==='SIGNED_OUT')location.href='/login'});
   const {data:m,error}=await sb.from('profiles').select('*').eq('id',session.user.id).maybeSingle();
@@ -171,7 +184,11 @@ async function init(){
   if(!m)return fatal('Brak profilu użytkownika','Konto logowania istnieje, ale nie ma wpisu w tabeli profiles. Poproś dyrekcję o ponowne założenie konta.');
   if(m.must_change_password)return location.href='/login';
   me=m;try{await load()}catch(e){return fatal('Błąd wczytywania danych',e.message)}
-  $('#sch').textContent=school;$('#rfi').innerHTML=ic('sync');$('#lo').innerHTML=ic('out')+' Wyloguj';$('#who').textContent=`${nm(me.id)} · ${RL[me.role]}`;
+  $('#sch').textContent=school;$('#rfi').innerHTML=ic('sync');$('#who').textContent=`${nm(me.id)} · ${RL[me.role]}`;
+  $('#ptl').textContent={student:'Panel ucznia',parent:'Panel rodzica',teacher:'Panel nauczyciela',director:'Panel dyrektora'}[me.role];
+  const hcn=C.filter(c=>c.homeroom_teacher_id===me.id).map(c=>c.name);
+  $('#pnm').textContent=nm(me.id);$('#pcl').textContent=me.role==='student'?`Klasa ${cn(ST[me.id]?.class_id)} · ${school}`:me.role==='teacher'&&hcn.length?`Wychowawca klasy ${hcn.join(', ')} · ${school}`:school;
+  $('#um').innerHTML=`<span class="av" style="width:26px;height:26px;font-size:.7rem">${esc(me.first_name[0])}</span> ${esc(me.first_name)} ${ic('chev')}`;
   if(me.role==='student')sid=me.id;if(me.role==='parent')sid=KIDS[0]||null;
   await calcDots();nav();render();
   let to;const ch=sb.channel('live');
@@ -219,47 +236,70 @@ async function refresh(quiet){const i=$('#rfi');i&&i.firstElementChild?.classLis
 async function logout(){await sb.auth.signOut();location.href='/login'}
 const reload=async()=>{await load();dirty=false;await render(true)};
 
+const BELLS=[['07:45','08:30'],['08:35','09:20'],['09:25','10:10'],['10:20','11:05'],['11:20','12:05'],['12:20','13:05'],['13:10','13:55'],['14:00','14:45'],['14:50','15:35'],['15:40','16:25']];
+const mon=d=>{const x=new Date(d);x.setHours(12,0,0,0);x.setDate(x.getDate()-((x.getDay()+6)%7));return x};
+const addD=(d,n)=>{const x=new Date(d);x.setDate(x.getDate()+n);return x};
+const fshort=d=>pad(d.getDate())+'.'+pad(d.getMonth()+1)+'.'+d.getFullYear();
+const easter=y=>{const a=y%19,b=Math.floor(y/100),c=y%100,d=Math.floor(b/4),e=b%4,f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),h=(19*a+b-d-g+15)%30,i=Math.floor(c/4),k=c%4,l=(32+2*e+2*i-h-k)%7,m=Math.floor((a+11*h+22*l)/451),mo=Math.floor((h+l-7*m+114)/31),da=(h+l-7*m+114)%31+1;return new Date(y,mo-1,da,12)};
+const HOL=[[0,1,'Nowy Rok'],[0,6,'Trzech Króli'],[4,1,'Święto Pracy'],[4,3,'Święto Konstytucji 3 Maja'],[7,15,'Wniebowzięcie NMP'],[10,1,'Wszystkich Świętych'],[10,11,'Narodowe Święto Niepodległości'],[11,24,'Wigilia'],[11,25,'Boże Narodzenie'],[11,26,'Boże Narodzenie']];
+const hol=d=>{const E=easter(d.getFullYear()),t=isoL(d);if(isoL(addD(E,1))===t)return'Poniedziałek Wielkanocny';if(isoL(addD(E,60))===t)return'Boże Ciało';return(HOL.find(h=>d.getMonth()===h[0]&&d.getDate()===h[1])||[])[2]||''};
+wk=mon(new Date());
+const wkNav=()=>`<div class="flex items-center gap-2 np"><button class="gh sm" onclick="wk=addD(wk,-7);rr()">${ic('back')}</button><b class="text-sm">${fshort(wk)} – ${fshort(addD(wk,6))}</b><button class="gh sm" onclick="wk=addD(wk,7);rr()"><span style="display:inline-block;transform:scaleX(-1)">${ic('back')}</span></button><button class="gh sm" onclick="wk=mon(new Date());rr()">Dziś</button></div>`;
+const AC={present:['O','o'],absent:['N','n'],late:['S','s'],excused:['NU','nu']};
+const abc=s=>s&&AC[s]?`<span class="ab ${AC[s][1]}" title="${AS[s]}">${AC[s][0]}</span>`:'';
+function weekGrid(data,cell){
+  const days=[0,1,2,3,4].map(i=>addD(wk,i)),td=isoL(new Date()),ns=data.map(e=>e.lesson_no);
+  if(!ns.length)return '<p class="em">Brak lekcji w planie.</p>';
+  let h='<div class="overflow-x-auto"><div class="pw"><div></div>'+days.map((d,i)=>{const ho=hol(d);return `<div class="dh${ho?' hol':''}${isoL(d)===td?' tdy':''}"><b>${pad(d.getDate())}</b><div>${DAYS[i+1].toLowerCase()}</div>${ho?`<small>${ho}</small>`:''}</div>`}).join('');
+  for(let n=Math.min(...ns);n<=Math.max(...ns);n++){h+=`<div class="tm">${(BELLS[n-1]||[]).join('<br>')}</div>`;days.forEach((d,i)=>{const e=data.find(x=>x.weekday===i+1&&x.lesson_no===n);h+=hol(d)?'<div class="hol"></div>':e?cell(e,T.find(x=>x.id===e.teaching_id),isoL(d)):'<div></div>'})}
+  return h+'</div></div>'}
 /* ---------- widoki ---------- */
 const V={};
 V.home=async()=>{
-  const pup=me.role==='student'||me.role==='parent',ids=me.role==='student'?[me.id]:KIDS,wd=new Date().getDay(),cid=pup?ST[sid]?.class_id:null,E=Promise.resolve({data:[],count:0});
+  const pup=me.role==='student'||me.role==='parent',ids=me.role==='student'?[me.id]:KIDS,now=new Date(),wd=now.getDay(),cid=pup?ST[sid]?.class_id:null,E=Promise.resolve({data:[],count:0}),hd=hol(now),since=me.prev_seen||new Date(0).toISOString(),d3=isoL(addD(now,-3));
   const [a,g,m,tt,ab,j]=await Promise.all([
     sb.from('announcements').select('*').order('created_at',{ascending:false}).limit(4),
-    pup&&ids.length?sb.from('grades').select('*').in('student_id',ids).order('created_at',{ascending:false}).limit(6):E,
+    pup&&ids.length?sb.from('grades').select('*').in('student_id',ids).order('created_at',{ascending:false}).limit(30):E,
     sb.from('message_recipients').select('read_at,messages(*)').eq('recipient_id',me.id).is('read_at',null).limit(20),
     wd>=1&&wd<=5?sb.from('timetable').select('*').eq('weekday',wd).order('lesson_no'):E,
-    pup&&ids.length?sb.from('attendance').select('*').in('student_id',ids).neq('status','present').order('date',{ascending:false}).limit(5):E,
+    pup&&ids.length?sb.from('attendance').select('*').in('student_id',ids).neq('status','present').gte('date',d3).order('date',{ascending:false}):E,
     staff()?sb.from('justifications').select('*',{count:'exact',head:true}).eq('status','pending'):E]);
-  const mt=T.filter(t=>t.teacher_id===me.id).map(t=>t.id),n=x=>`<p class="mu text-sm">${x}</p>`,row=h=>`<div class="py-2 border-b last:border-0" style="border-color:var(--ln)">${h}</div>`;
-  const les=(tt.data||[]).filter(e=>pup?e.class_id===cid:mt.includes(e.teaching_id));
-  const plan=les.length?les.map(e=>{const t=T.find(x=>x.id===e.teaching_id);return `<div class="flex items-center gap-3 py-2"><span class="av">${e.lesson_no}</span><div><div class="font-semibold">${esc(sn(t?.subject_id))}</div><div class="text-xs mu">${pup?esc(nm(t?.teacher_id)):'klasa '+esc(cn(e.class_id))}</div></div></div>`}).join(''):n(wd>=1&&wd<=5?'Brak lekcji w planie na dziś.':'Dziś brak lekcji.');
+  const mt=T.filter(t=>t.teacher_id===me.id).map(t=>t.id),n=x=>`<p class="mu text-sm">${x}</p>`,row=h=>`<div class="py-2 border-b last:border-0" style="border-color:var(--ln)">${h}</div>`,lk=(k,l)=>`<a class="lk" onclick="go('${k}')">${l}</a>`;
+  const les=hd?[]:(tt.data||[]).filter(e=>pup?e.class_id===cid:mt.includes(e.teaching_id));
+  const plan=(hd?`<p class="tag r mb-2">${hd}</p>`:'')+(les.length?les.map(e=>{const t=T.find(x=>x.id===e.teaching_id);return `<div class="flex items-center gap-3 py-2 border-b last:border-0" style="border-color:var(--ln)"><span class="av">${e.lesson_no}</span><div class="flex-1"><div class="font-semibold">${esc(sn(t?.subject_id))}</div><div class="text-xs mu">${pup?esc(nm(t?.teacher_id)):'klasa '+esc(cn(e.class_id))}</div></div><div class="text-xs mu">${(BELLS[e.lesson_no-1]||[]).join('–')}</div></div>`}).join(''):n(wd>=1&&wd<=5&&!hd?'Brak lekcji w planie na dziś.':'Dziś brak lekcji.'));
   const msgs=(m.data||[]).filter(r=>r.messages&&!r.messages.recalled_at).map(r=>r.messages).sort((x,y)=>y.created_at.localeCompare(x.created_at)).slice(0,4);
-  (g.data||[]).forEach(x=>GR[x.id]=x);
-  const side=pup?pn('Ostatnie oceny',(g.data||[]).map(x=>row(`<div class="flex items-center gap-3"><button class="gc ${gcls(x.value)}" onclick="gDet('${x.id}')">${esc(x.value)}</button><div class="text-sm"><b>${esc(sn(T.find(t=>t.id===x.teaching_id)?.subject_id))}</b><div class="text-xs mu">${me.role==='parent'?esc(nm(x.student_id))+' · ':''}${fd(x.created_at)}</div></div></div>`)).join('')||n('Brak ocen.'),'','gr')
-   +pn('Nieobecności i spóźnienia',(ab.data||[]).map(x=>row(`${fdl(x.date)} · lekcja ${x.lesson_no} <span class="tag ${x.status==='late'?'y':x.status==='excused'?'b':'r'}">${AS[x.status]}</span>`)).join('')||n('Brak wpisów.'),'','at')
-   :pn('Do rozpatrzenia',`<div class="text-center"><b class="text-4xl" style="color:var(--in)">${j.count||0}</b><p class="text-sm mu">usprawiedliwień czeka na decyzję</p><button class="gh mt-2" onclick="go('js')">Przejdź</button></div>`,'','js')
-   +pn('Moje przedmioty',myT().slice(0,8).map(t=>`<button class="gh sm m-1" onclick="curT='${t.id}';go('gr')">${esc(tl(t))}</button>`).join('')||n('Brak przydziałów — dyrekcja ustawia je w Administracji.'),'','gr');
-  return `<div class="mb-4"><div class="text-xl font-bold">Dzień dobry, ${esc(me.first_name)}!</div><div class="text-sm mu">${new Date().toLocaleDateString('pl-PL',{weekday:'long',day:'numeric',month:'long'})} · poprzednie logowanie: ${fd(me.prev_seen)}</div></div>
-  <div class="grid lg:grid-cols-3 gap-4 items-start"><div>${pn('Dzisiejszy plan',plan,'','pl')}</div>
-  <div>${pn('Ogłoszenia',(a.data||[]).map(x=>row(`<b>${esc(x.title)}</b><div class="text-xs mu">${esc(nm(x.author_id))} · ${fd(x.created_at)}</div><p class="text-sm">${esc(x.body.slice(0,140))}${x.body.length>140?'…':''}</p>`)).join('')||n('Brak ogłoszeń.'),'','ann')}
-   ${pn('Nieprzeczytane wiadomości',msgs.map(x=>`<div class="py-2 cursor-pointer" onclick="go('msg');openMsg('${x.id}')"><b>${esc(x.subject)}</b><div class="text-xs mu">${esc(nm(x.sender_id))} · ${fd(x.created_at)}</div></div>`).join('')||n('Brak nowych wiadomości.'),'','msg')}</div>
-  <div>${side}</div></div>`;
+  const newG=(g.data||[]).filter(x=>x.created_at>since);newG.forEach(x=>GR[x.id]=x);
+  const today=isoL(now),imp=[hd?row(`<b>${hd}</b><div class="text-xs mu">Dzień wolny od zajęć</div>`):'',...(a.data||[]).filter(x=>x.created_at.slice(0,10)===today).map(x=>row(`<b>${esc(x.title)}</b>`))].join('')||n('Brak informacji.');
+  const ht=pup?C.find(c=>c.id===cid)?.homeroom_teacher_id:null;
+  const help=ht?`<section class="pn" style="background:var(--in);color:#fff;border:0"><div class="pb"><b class="text-lg">Potrzebujesz pomocy?</b><p class="text-sm mt-1" style="opacity:.85">Napisz do wychowawcy klasy ${esc(cn(cid))}: ${esc(nm(ht))}.</p><button class="btn am mt-3" onclick="pre={to:'${ht}',subject:''};mtab='new';go('msg')">Napisz do wychowawcy</button></div></section>`:'';
+  const c3=pup?help+pn('Ważne dzisiaj',imp)+pn('Frekwencja — ostatnie 3 dni',(ab.data||[]).map(x=>row(`${fdl(x.date)} · lekcja ${x.lesson_no} <span class="tag ${x.status==='late'?'y':x.status==='excused'?'b':'r'}">${AS[x.status]}</span>`)).join('')||n('Brak nieobecności i spóźnień.'),lk('at','Cała frekwencja'),'at')
+   :pn('Do rozpatrzenia',`<div class="text-center"><b class="text-4xl" style="color:var(--in)">${j.count||0}</b><p class="text-sm mu">usprawiedliwień czeka na decyzję</p><button class="gh mt-2" onclick="go('js')">Przejdź</button></div>`,'','js')+pn('Ważne dzisiaj',imp)+pn('Moje przedmioty',myT().slice(0,8).map(t=>`<button class="gh sm m-1" onclick="curT='${t.id}';go('gr')">${esc(tl(t))}</button>`).join('')||n('Brak przydziałów — dyrekcja ustawia je w Administracji.'),'','gr');
+  const c2=(pup?pn('Oceny od ostatniego logowania',newG.map(x=>row(`<div class="flex items-center gap-3"><button class="gc ${gcls(x.value)}" onclick="gDet('${x.id}')">${esc(x.value)}</button><div class="text-sm"><b>${esc(sn(T.find(t=>t.id===x.teaching_id)?.subject_id))}</b><div class="text-xs mu">${me.role==='parent'?esc(nm(x.student_id))+' · ':''}${fd(x.created_at)}</div></div></div>`)).join('')||n('Brak nowych ocen.'),lk('gr','Wszystkie oceny'),'gr'):'')
+   +pn('Ogłoszenia',(a.data||[]).map(x=>row(`<b>${esc(x.title)}</b><div class="text-xs mu">${esc(nm(x.author_id))} · ${fd(x.created_at)}</div><p class="text-sm">${esc(x.body.slice(0,140))}${x.body.length>140?'…':''}</p>`)).join('')||n('Brak ogłoszeń.'),lk('ann','Wszystkie'),'ann')
+   +pn('Nieprzeczytane wiadomości',msgs.map(x=>`<div class="py-2 cursor-pointer" onclick="mtab='in';go('msg');openMsg('${x.id}')"><b>${esc(x.subject)}</b><div class="text-xs mu">${esc(nm(x.sender_id))} · ${fd(x.created_at)}</div></div>`).join('')||n('Brak nowych wiadomości.'),lk('msg','Skrzynka'),'msg');
+  return `<div class="mb-4"><div class="text-xl font-bold">Dzień dobry, ${esc(me.first_name)}!</div><div class="text-sm mu">${now.toLocaleDateString('pl-PL',{weekday:'long',day:'numeric',month:'long'})} · poprzednie logowanie: ${fd(me.prev_seen)}</div></div>
+  <div class="grid lg:grid-cols-3 gap-4 items-start"><div>${pn('Dzisiejszy plan zajęć',plan,lk('pl','Cały plan'),'pl')}</div><div>${c2}</div><div>${c3}</div></div>`;
 };
 
 // Wiadomości
 V.msg=async()=>{
   const [i,s]=await Promise.all([sb.from('message_recipients').select('read_at,messages(*)').eq('recipient_id',me.id),sb.from('messages').select('*').eq('sender_id',me.id).order('created_at',{ascending:false}).limit(100)]);
   if(i.error)throw i.error;if(s.error)throw s.error;
-  const inbox=i.data.filter(r=>r.messages).map(r=>({...r.messages,unread:!r.read_at})).sort((a,b)=>b.created_at.localeCompare(a.created_at));
+  const inbox=i.data.filter(r=>r.messages).map(r=>({...r.messages,unread:!r.read_at}));
   const rc=s.data.length?(await sb.from('message_recipients').select('message_id,recipient_id').in('message_id',s.data.map(m=>m.id))).data||[]:[];
-  const unread=inbox.filter(m=>m.unread).length;
-  const row=(m,out)=>{let who=nm(m.sender_id);if(out){const r=rc.filter(x=>x.message_id===m.id).map(x=>nm(x.recipient_id));who='do: '+(r.slice(0,2).join(', ')||'—')+(r.length>2?` +${r.length-2}`:'')}
-    return `<tr class="hv msg-row" onclick="openMsg('${m.id}')"><td style="width:48px"><span class="av">${esc(((out?who.slice(4):who)[0])||'?')}</span></td><td><div class="${m.unread?'font-bold':''}">${m.unread?'<span class="tag r" style="padding:0 .4rem">nowa</span> ':''}${m.recalled_at?'<i class="mu">(wycofana)</i> ':''}${esc(m.subject)}</div><div class="text-xs mu">${esc(who)}</div></td><td class="text-xs mu" style="white-space:nowrap">${fd(m.created_at)}</td></tr>`};
-  const list=(a,out)=>a.length?`<table><tbody>${a.map(m=>row(m,out)).join('')}</tbody></table>`:'<p class="em">Brak wiadomości.</p>';
-  const tabs=seg('mt',[['in','Odebrane'+(unread?` (${unread})`:'')],['out','Wysłane'],['new','Napisz']],mtab,k=>{mtab=k;rr()});
-  const head=`<div class="pn pb flex flex-wrap gap-2 items-center">${tabs}${mtab!=='new'?`<input type="text" placeholder="Szukaj w wiadomościach…" style="max-width:240px;margin-left:auto" oninput="const q=this.value.toLowerCase();$$('.msg-row').forEach(r=>r.style.display=r.textContent.toLowerCase().includes(q)?'':'none')">`:''}${mtab==='in'&&unread?`<button class="gh sm" onclick="markAll()">Oznacz wszystkie jako przeczytane</button>`:''}</div>`;
-  return head+(mtab==='new'?compose():`<div class="pn">${mtab==='in'?list(inbox):list(s.data,1)}</div>`);
+  const unread=inbox.filter(m=>m.unread).length,inb=mtab!=='out';
+  const rows=inb?inbox.map(m=>({...m,who:nm(m.sender_id)})):s.data.map(m=>{const r=rc.filter(x=>x.message_id===m.id).map(x=>nm(x.recipient_id));return{...m,who:(r.slice(0,2).join(', ')||'—')+(r.length>2?` +${r.length-2}`:'')}});
+  const kf=m=>msort[0]==='f'?m.who.toLowerCase():msort[0]==='s'?m.subject.toLowerCase():m.created_at;
+  rows.sort((a,b)=>(kf(a)<kf(b)?-1:kf(a)>kf(b)?1:0)*msort[1]);MIDS=inb?rows.map(m=>m.id):[];
+  const th=(k,l)=>`<th style="cursor:pointer" onclick="msortBy('${k}')">${l} ${msort[0]===k?(msort[1]>0?'↑':'↓'):'↕'}</th>`;
+  const allck=inb?ck('ms_all',false,''):'';if(inb)DD.ms_all={on:x=>{MIDS.forEach(i=>FV['ms_'+i]=x);$$('.mt td:first-child .ck').forEach(b=>b.classList.toggle('on',x))}};
+  const left=`<div class="pn pb"><button class="btn w-full justify-center mb-3" onclick="mtab='new';rr()">${ic('edit')} Nowa wiadomość</button><button class="fl ${mtab==='in'?'on':''}" onclick="mtab='in';rr()"><span>${ic('msg')} Odebrane</span>${unread?`<em>${unread}</em>`:''}</button><button class="fl ${mtab==='out'?'on':''}" onclick="mtab='out';rr()"><span>${ic('ann')} Wysłane</span></button></div>`;
+  const list=pn(inb?'Odebrane':'Wysłane',`<input type="text" placeholder="Filtruj wiadomości…" class="mb-3" oninput="const q=this.value.toLowerCase();$$('.msg-row').forEach(r=>r.style.display=r.textContent.toLowerCase().includes(q)?'':'none')">`+(rows.length?`<div class="overflow-x-auto"><table class="mt"><thead><tr><th style="width:44px">${allck}</th>${th('f',inb?'Nadawca':'Odbiorcy')}${th('s','Temat')}${th('d',inb?'Otrzymano':'Wysłano')}<th>${inb?'Przeczytano':''}</th></tr></thead><tbody>${rows.map(m=>{const o=`onclick="openMsg('${m.id}')"`;return `<tr class="hv msg-row"><td>${inb?ck('ms_'+m.id,false,''):''}</td><td ${o} class="${m.unread?'font-bold':''}">${esc(m.who)}</td><td ${o} class="${m.unread?'font-bold':''}">${m.unread?'<span class="tag r" style="padding:0 .4rem">nowa</span> ':''}${m.recalled_at?'<i class="mu">(wycofana)</i> ':''}${esc(m.subject)}</td><td ${o} class="text-xs mu" style="white-space:nowrap">${fd(m.created_at)}</td><td ${o}>${inb&&!m.unread?ic('check','text-green-600'):''}</td></tr>`}).join('')}</tbody></table></div>`:'<p class="em">Brak wiadomości.</p>'),
+   `<button class="btn sm" onclick="refresh()">Odśwież</button>${inb?`<button class="gh sm red" onclick="delSel()">${ic('trash')} Usuń zaznaczone</button>`:''}${inb&&unread?`<button class="gh sm" onclick="markAll()">Oznacz jako przeczytane</button>`:''}`);
+  return `<div class="grid md:grid-cols-[210px_1fr] gap-4 items-start">${left}<div>${mtab==='new'?compose():list}</div></div>`;
 };
+const msortBy=k=>{msort=[k,msort[0]===k?-msort[1]:1];rr()};
+const delSel=async()=>{const ids=MIDS.filter(i=>FV['ms_'+i]);if(!ids.length)return warn('Zaznacz wiadomości do usunięcia.');if(await ask(`Usunąć zaznaczone wiadomości (${ids.length})?`,'Usuń'))act(sb.from('message_recipients').delete().eq('recipient_id',me.id).in('message_id',ids),async()=>{await calcDots();nav();rr()},'Usunięto')};
 function compose(){
   const p0=pre;pre={};
   const people=Object.values(P).filter(p=>p.id!==me.id&&(staff()||['teacher','director'].includes(p.role))).sort((a,b)=>ln(a.id).localeCompare(ln(b.id),'pl'));
@@ -313,9 +353,10 @@ V.gr=async()=>{
     if(!sid)return pn('Oceny','<p class="em">Do konta nie przypisano ucznia.</p>');
     const {data,error}=await sb.from('grades').select('*').eq('student_id',sid).order('created_at');if(error)throw error;
     const by={};data.forEach(g=>{const s=sn(T.find(t=>t.id===g.teaching_id)?.subject_id);(by[s]??=[]).push(g)});
-    const subs=Object.keys(by).sort((a,b)=>a.localeCompare(b,'pl')),av=subs.map(s=>wavg(by[s])).filter(x=>x!=null),tot=av.length?av.reduce((a,b)=>a+b,0)/av.length:null;
-    return `<div class="st"><div><b>${fa(tot)}</b><span>średnia ogólna</span></div><div><b>${data.length}</b><span>ocen łącznie</span></div><div><b>${subs.length}</b><span>przedmiotów</span></div></div>`
-     +pn(`Oceny — ${esc(nm(sid))} (klasa ${esc(cn(ST[sid]?.class_id))})`,tbl(['Przedmiot','Okres I','Śr. I','Okres II','Śr. II','Śr. roczna'],subs.map(s=>{const a=by[s],a1=a.filter(x=>sem(x)===1),a2=a.filter(x=>sem(x)===2);return `<tr><td><b>${esc(s)}</b></td><td>${chips(a1)}</td><td>${fa(wavg(a1))}</td><td>${chips(a2)}</td><td>${fa(wavg(a2))}</td><td><b>${fa(wavg(a))}</b></td></tr>`}))+'<p class="text-xs mu mt-3">Kliknij ocenę, aby zobaczyć wagę, komentarz i nauczyciela. Średnie są ważone.</p>','','gr');
+    const cid=ST[sid]?.class_id,subs=[...new Set([...T.filter(t=>t.class_id===cid).map(t=>sn(t.subject_id)),...Object.keys(by)])].sort((a,b)=>a.localeCompare(b,'pl'));
+    const av=Object.values(by).map(wavg).filter(x=>x!=null),tot=av.length?av.reduce((a,b)=>a+b,0)/av.length:null;
+    return `<div class="st"><div><b>${fa(tot)}</b><span>średnia ogólna</span></div><div><b>${data.length}</b><span>ocen łącznie</span></div><div><b>${data.filter(x=>String(sem(x))===gsem).length}</b><span>ocen w tym okresie</span></div></div>`
+     +pn(`Oceny — ${esc(nm(sid))} (klasa ${esc(cn(cid))})`,`<div class="mb-3">${seg('gs',[['1','Okres 1'],['2','Okres 2']],gsem,k=>{gsem=k;rr()})}</div>`+tbl(['Przedmiot','Oceny bieżące','Średnia z okresu','Średnia roczna'],subs.map(s=>{const a=by[s]||[],cur=a.filter(x=>String(sem(x))===gsem);return `<tr><td><b>${esc(s)}</b></td><td>${chips(cur)}</td><td>${fa(wavg(cur))}</td><td><b>${fa(wavg(a))}</b></td></tr>`}))+'<p class="text-xs mu mt-3">Kliknij ocenę, aby zobaczyć wagę, komentarz i nauczyciela. Średnie są ważone.</p>','','gr');
   }
   const ts=myT();if(!ts.length)return pn('Oceny','<p class="em">Nie masz przypisanych klas i przedmiotów — dyrekcja ustawia je w Administracji.</p>');
   if(!ts.find(x=>x.id===curT))curT=ts[0].id;const t=ts.find(x=>x.id===curT),sts=classStudents(t.class_id);
@@ -343,10 +384,19 @@ const delNote=async id=>await ask('Usunąć wpis?','Usuń')&&act(sb.from('notes'
 V.at=async()=>{
   if(!staff()){
     if(!sid)return pn('Frekwencja','<p class="em">Do konta nie przypisano ucznia.</p>');
+    const tabs=`<div class="pn pb">${seg('atv',[['week','Tydzień'],['sum','Podsumowanie']],atV,k=>{atV=k;rr()})}</div>`;
+    if(atV==='week'){
+      const cid=ST[sid]?.class_id||'00000000-0000-0000-0000-000000000000';
+      const [tt,at]=await Promise.all([sb.from('timetable').select('*').eq('class_id',cid),sb.from('attendance').select('*').eq('student_id',sid).gte('date',isoL(wk)).lte('date',isoL(addD(wk,4)))]);
+      if(tt.error)throw tt.error;if(at.error)throw at.error;
+      const mp={};at.data.forEach(a=>mp[a.date+'|'+a.lesson_no]=a.status);
+      const leg=[['present','Obecność'],['absent','Nieobecność'],['excused','Nieobecność usprawiedliwiona'],['late','Spóźnienie']].map(([k,l])=>`<span class="mr-4 inline-flex items-center gap-1 text-sm">${abc(k)} ${l}</span>`).join('');
+      return tabs+pn('Frekwencja w tygodniu',weekGrid(tt.data,(e,t,d)=>`<div class="lsn flex gap-2">${abc(mp[d+'|'+e.lesson_no])||'<span class="ab" style="background:#cbd3e1">·</span>'}<div class="min-w-0"><div class="lt">${(BELLS[e.lesson_no-1]||[]).join(' – ')}</div><b>${esc(sn(t?.subject_id))}</b><div class="text-xs">${esc(nm(t?.teacher_id))}</div></div></div>`)+`<div class="mt-3">${leg}</div>`,wkNav(),'at');
+    }
     const {data,error}=await sb.from('attendance').select('*').eq('student_id',sid).order('date',{ascending:false});if(error)throw error;
     const c=s=>data.filter(x=>x.status===s).length,tot=data.length,bad=data.filter(x=>x.status!=='present'),pc=tot?Math.round((c('present')+c('late'))/tot*100):null;
     const by={};bad.forEach(a=>{const k=a.date.slice(0,7);(by[k]??=[]).push(a)});
-    return `<div class="st"><div><b>${pc==null?'—':pc+'%'}</b><span>frekwencja</span></div><div><b>${c('absent')}</b><span>nieobecności</span></div><div><b>${c('late')}</b><span>spóźnienia</span></div><div><b>${c('excused')}</b><span>usprawiedliwione</span></div></div>`
+    return tabs+`<div class="st"><div><b>${pc==null?'—':pc+'%'}</b><span>frekwencja</span></div><div><b>${c('absent')}</b><span>nieobecności</span></div><div><b>${c('late')}</b><span>spóźnienia</span></div><div><b>${c('excused')}</b><span>usprawiedliwione</span></div></div>`
      +(Object.keys(by).map(k=>pn(new Date(k+'-15').toLocaleDateString('pl-PL',{month:'long',year:'numeric'}),tbl(['Data','Lekcja','Przedmiot','Status'],by[k].map(a=>`<tr><td>${fdl(a.date)}</td><td>${a.lesson_no}</td><td>${esc(sn(T.find(t=>t.id===a.teaching_id)?.subject_id))}</td><td><span class="tag ${a.status==='late'?'y':a.status==='excused'?'b':'r'}">${AS[a.status]}</span></td></tr>`)),'','at')).join('')||pn('Nieobecności i spóźnienia','<p class="em">Brak nieobecności i spóźnień.</p>','','at'));
   }
   const ts=myT();if(!ts.length)return pn('Frekwencja','<p class="em">Brak przypisanych lekcji.</p>');
@@ -395,11 +445,10 @@ function stuDet(id){const {g,n,a}=CLD,by={};g.filter(x=>x.student_id===id).forEa
 V.pl=async()=>{
   const pup=me.role==='student'||me.role==='parent';let cid,mineT=false;
   if(pup)cid=ST[sid]?.class_id;else{if(!plSel)plSel=myT().length?'my':(C[0]?.id||'');mineT=plSel==='my';cid=mineT?null:plSel}
-  const sel=staff()?`<div class="pn pb" style="max-width:420px"><label class="lb">Plan</label>${dd('pls',[['my','Mój plan (moje lekcje)'],...C.map(c=>[c.id,'Klasa '+c.name])],plSel,{on:x=>{plSel=x;rr()}})}</div>`:'';
-  if(!cid&&!mineT)return sel+pn('Plan lekcji','<p class="em">Brak przypisanej klasy.</p>');
+  const sel=staff()?`<div class="pn pb np" style="max-width:420px"><label class="lb">Plan</label>${dd('pls',[['my','Mój plan (moje lekcje)'],...C.map(c=>[c.id,'Klasa '+c.name])],plSel,{on:x=>{plSel=x;rr()}})}</div>`:'';
+  if(!cid&&!mineT)return sel+pn('Plan zajęć','<p class="em">Brak przypisanej klasy.</p>');
   const q=sb.from('timetable').select('*');const {data,error}=await(mineT?q.in('teaching_id',myT().map(t=>t.id)):q.eq('class_id',cid));if(error)throw error;
-  const td=new Date().getDay();
-  return sel+pn(mineT?'Mój plan':'Plan — klasa '+esc(cn(cid)),tbl(['Lekcja',...DAYS.slice(1).map((d,i)=>i+1===td?d+' (dziś)':d)],[1,2,3,4,5,6,7,8,9,10].map(n=>`<tr><td><span class="av">${n}</span></td>${[1,2,3,4,5].map(d=>{const e=data.find(x=>x.weekday===d&&x.lesson_no===n),t=e&&T.find(x=>x.id===e.teaching_id);return `<td${d===td?' style="background:#fff8e6"':''}>${t?`<b>${esc(sn(t.subject_id))}</b><br><span class="text-xs mu">${mineT?'klasa '+esc(cn(t.class_id)):esc(nm(t.teacher_id))}</span>`:''}</td>`}).join('')}</tr>`)),'','pl');
+  return sel+pn(mineT?'Mój plan zajęć':'Plan zajęć — klasa '+esc(cn(cid)),weekGrid(data,(e,t)=>`<div class="lsn"><div class="lt">${(BELLS[e.lesson_no-1]||[]).join(' – ')}</div><b>${esc(sn(t?.subject_id))}</b><div class="text-xs">${mineT?'klasa '+esc(cn(t?.class_id)):esc(nm(t?.teacher_id))}</div></div>`),wkNav()+`<button class="btn sm np" onclick="window.print()">${ic('print')} Drukuj</button>`,'pl');
 };
 
 /* ---------- Administracja ---------- */
@@ -492,9 +541,11 @@ async function resetPw(id){
 }
 function showAccts(a){
   const rl={...RL,parent:'Rodzic / opiekun'};closeModal();
-  $('#prt').innerHTML=`<div class="np" style="text-align:center;padding:16px"><button class="btn" onclick="window.print()">${ic('print')} Drukuj</button> <button class="gh" onclick="$('#prt').classList.remove('show')">Zamknij</button></div>`+a.map(x=>`<div class="acc"><div style="color:var(--in);font-weight:800">${esc(school)} — Dziennik Minerva</div><h1 style="font-size:1.6rem;font-weight:800;margin:6px 0">${esc(x.name)}</h1><p style="color:#555;margin:10px 0">Rodzaj konta: <b>${rl[x.role]}</b></p><p style="color:#555;margin:10px 0">Login: <code>${esc(x.login)}</code></p><p style="color:#555;margin:10px 0">Hasło jednorazowe: <code>${esc(x.password)}</code></p><p style="font-size:12px;color:#777">Po pierwszym zalogowaniu system poprosi o ustawienie własnego hasła. Hasło jednorazowe działa tylko do tego momentu.</p></div>`).join('');
-  $('#prt').classList.add('show');
+  $('#prt').innerHTML=`<div class="np" style="text-align:center;padding:16px"><button class="btn" onclick="window.print()">${ic('print')} Drukuj</button> <button class="gh" onclick="$('#prt').classList.remove('show');document.body.classList.remove('pp')">Zamknij</button></div>`+a.map(x=>`<div class="acc"><div style="color:var(--in);font-weight:800">${esc(school)} — Dziennik Minerva</div><h1 style="font-size:1.6rem;font-weight:800;margin:6px 0">${esc(x.name)}</h1><p style="color:#555;margin:10px 0">Rodzaj konta: <b>${rl[x.role]}</b></p><p style="color:#555;margin:10px 0">Login: <code>${esc(x.login)}</code></p><p style="color:#555;margin:10px 0">Hasło jednorazowe: <code>${esc(x.password)}</code></p><p style="font-size:12px;color:#777">Po pierwszym zalogowaniu system poprosi o ustawienie własnego hasła. Hasło jednorazowe działa tylko do tego momentu.</p></div>`).join('');
+  $('#prt').classList.add('show');document.body.classList.add('pp');
 }
+function setFs(n){document.documentElement.dataset.fs=n;try{localStorage.setItem('fs',n)}catch{}$$('#fs button').forEach((b,i)=>b.classList.toggle('on',i==n))}
+function userMenu(b){const p=$('#pop');if(p.className==='show'&&p.dataset.f==='um')return closePop();p.dataset.f='um';p.innerHTML=`<div class="pl"><div class="px-3 py-2 text-xs mu">${esc(nm(me.id))} · ${RL[me.role]}</div><div class="pi" onclick="closePop();refresh()">${ic('sync')} Odśwież dane</div><div class="pi" onclick="logout()">${ic('out')} Wyloguj</div></div>`;place(b,220)}
 init();
 </script>
 </body>
