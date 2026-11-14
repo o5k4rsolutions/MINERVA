@@ -956,9 +956,9 @@ new MutationObserver(evFix).observe($('#main'),{childList:true,subtree:true});
 new MutationObserver(()=>{const g=$('#sg_brush');if(g&&!g.querySelector('[data-k=released]'))g.insertAdjacentHTML('beforeend',`<button type="button" data-k="released" class="${FV.brush==='released'?'on':''}" onclick="sgP('brush','released')">z zwolniony</button>`)}).observe($('#main'),{childList:true,subtree:true});
 
 /* 5. Zmiany w planie: lista nauczycieli z informacją kto wolny */
-const tchAt=async(d,n)=>{const [t,a]=await Promise.all([sb.from('timetable').select('*'),sb.from('teacher_absences').select('*').eq('date',d)]);
+const tchAt=async(d,n)=>{const [t,a]=await Promise.all([sb.from('timetable').select('*'),sb.from('teacher_absences').select('*').lte('date',d)]);
   const busy=new Set(entries(t.data||[],mon(new Date(d+'T12:00')),r=>r.d===d&&r.n===n&&r.st!=='cancel'&&r.st!=='moved').map(r=>r.st==='sub'?r.sub:T.find(y=>y.id===r.teaching_id)?.teacher_id)),
-   abs=new Set((a.data||[]).filter(x=>x.lesson_from<=n&&x.lesson_to>=n).map(x=>x.teacher_id));return{busy,abs}};
+   abs=new Set((a.data||[]).filter(x=>(x.date_to||x.date)>=d&&x.lesson_from<=n&&x.lesson_to>=n).map(x=>x.teacher_id));return{busy,abs}};
 const _cp=chPick;chPick=function(cid,d,n,tid){_cp(cid,d,n,tid);tchAt(d,n).then(({busy,abs})=>{if(!DD.ct2)return;
   const r=id=>abs.has(id)?2:busy.has(id)?1:0;
   DD.ct2.o=DD.ct2.o.map(([id,l])=>[id,l,abs.has(id)?'nieobecny':busy.has(id)?'ma lekcję':'wolny']).sort((a,b)=>r(a[0])-r(b[0]));$('#dd_ct2').innerHTML=ddb('ct2')})};
@@ -968,33 +968,41 @@ const _ad=V.ad;V.ad=async()=>{let h=await _ad();if(!adTab)h=h.replace(/<\/div>$/
 let ABP=[];
 AD.abs=async back=>{
   const tch=Object.values(P).filter(p=>['teacher','director'].includes(p.role)).sort((a,b)=>ln(a.id).localeCompare(ln(b.id),'pl')),L=[1,2,3,4,5,6,7,8,9,10].map(n=>[n,'Lekcja '+n]);
-  const {data}=await sb.from('teacher_absences').select('*').gte('date',isoL(addD(new Date(),-7))).order('date');
-  return pn('Nowa nieobecność nauczyciela',`<div class="grid md:grid-cols-3 gap-3"><div><label class="lb">Nauczyciel</label>${dd('abt',tch.map(p=>[p.id,ln(p.id)]),'',{ph:'Wybierz…'})}</div><div><label class="lb">Dzień</label>${dp('abd',isoL(new Date()))}</div><div><label class="lb">Powód</label>${dd('abr',[['Choroba','Choroba'],['Wycieczka','Wycieczka (opiekun)'],['Delegacja / szkolenie','Delegacja / szkolenie'],['Inne','Inne']],'Choroba')}</div>
-   <div><label class="lb">Od lekcji (cały dzień: 1-10)</label>${dd('ab1',L,1)}</div><div><label class="lb">Do lekcji</label>${dd('ab2',L,10)}</div></div>
+  const {data,error}=await sb.from('teacher_absences').select('*').order('date');if(error)throw error;
+  const rows=(data||[]).filter(x=>(x.date_to||x.date)>=isoL(addD(new Date(),-7)));
+  return pn('Nowa nieobecność nauczyciela',`<div class="grid md:grid-cols-3 gap-3"><div><label class="lb">Nauczyciel</label>${dd('abt',tch.map(p=>[p.id,ln(p.id)]),'',{ph:'Wybierz…'})}</div><div><label class="lb">Od dnia</label>${dp('abd',isoL(new Date()))}</div><div><label class="lb">Do dnia (puste = jeden dzień)</label>${dp('abd2','')}</div>
+   <div><label class="lb">Powód</label>${dd('abr',[['Choroba','Choroba'],['Wycieczka','Wycieczka (opiekun)'],['Delegacja / szkolenie','Delegacja / szkolenie'],['Inne','Inne']],'Choroba')}</div><div><label class="lb">Od lekcji (każdego dnia)</label>${dd('ab1',L,1)}</div><div><label class="lb">Do lekcji</label>${dd('ab2',L,10)}</div></div>
+   <p class="text-xs mu mt-2">Cały dzień: lekcje 1-10. Przy kilku dniach ten sam zakres lekcji dotyczy każdego dnia roboczego (weekendy i święta są pomijane).</p>
    <button class="btn mt-3" onclick="absRun()">Pokaż propozycje zastępstw</button><div id="abx" class="mt-3"></div>`,back,'user')
-  +pn('Zgłoszone nieobecności (od tygodnia wstecz)',(data||[]).length?tbl(['Data','Nauczyciel','Lekcje','Powód',''],data.map(x=>`<tr><td>${fdl(x.date)}</td><td>${esc(nm(x.teacher_id))}</td><td>${x.lesson_from}-${x.lesson_to}</td><td>${esc(x.reason||'')}</td><td><button class="gh sm red" onclick="absDel('${x.id}')">${ic('trash')}</button></td></tr>`)):'<p class="em">Brak.</p>','','user')};
+  +pn('Zgłoszone nieobecności (od tygodnia wstecz)',rows.length?tbl(['Od','Do','Nauczyciel','Lekcje','Powód',''],rows.map(x=>`<tr><td>${fdl(x.date)}</td><td>${fdl(x.date_to||x.date)}</td><td>${esc(nm(x.teacher_id))}</td><td>${x.lesson_from}-${x.lesson_to}</td><td>${esc(x.reason||'')}</td><td><button class="gh sm red" onclick="absDel('${x.id}')">${ic('trash')}</button></td></tr>`)):'<p class="em">Brak.</p>','','user')};
 async function absRun(){
-  const t=FV.abt,d=FV.abd,a=+FV.ab1,b=+FV.ab2;if(!t||!d)return warn('Wybierz nauczyciela i dzień.');if(b<a)return warn('Zakres lekcji jest błędny.');
-  const dt=new Date(d+'T12:00');if(dt.getDay()%6===0||hol(dt))return warn('To dzień wolny od zajęć.');
-  const [tt,ab]=await Promise.all([sb.from('timetable').select('*'),sb.from('teacher_absences').select('*').eq('date',d)]);
-  const mt=T.filter(x=>x.teacher_id===t).map(x=>x.id),all=entries(tt.data||[],mon(dt),r=>r.d===d),
-   mine=all.filter(r=>!r.st&&mt.includes(r.teaching_id)&&r.n>=a&&r.n<=b).sort((x,y)=>x.n-y.n),tchs=Object.values(P).filter(p=>['teacher','director'].includes(p.role)),taken=new Set();
-  if(!mine.length){$('#abx').innerHTML='<p class="em">Ten nauczyciel nie ma w tym czasie lekcji.</p>';return}
-  ABP=mine.map(r=>{
-    const live=all.filter(x=>x.n===r.n&&x.st!=='cancel'&&x.st!=='moved'),busy=new Set(live.map(x=>x.st==='sub'?x.sub:T.find(y=>y.id===x.teaching_id)?.teacher_id)),
-     away=new Set([t,...(ab.data||[]).filter(x=>x.lesson_from<=r.n&&x.lesson_to>=r.n).map(x=>x.teacher_id)]),
-     free=tchs.filter(p=>!busy.has(p.id)&&!away.has(p.id)&&!taken.has(p.id+'|'+r.n)),
-     cl=all.filter(x=>x.class_id===r.class_id&&x.st!=='cancel'&&x.st!=='moved').map(x=>x.n),edge=r.n===Math.min(...cl)||r.n===Math.max(...cl),
-     subj=T.find(y=>y.id===r.teaching_id)?.subject_id,same=free.filter(p=>T.some(y=>y.teacher_id===p.id&&y.subject_id===subj)),pk=edge?null:(same[0]||free[0]);
-    if(pk)taken.add(pk.id+'|'+r.n);return{r,free,same,edge,def:pk?'sub:'+pk.id:'cancel'}});
-  $('#abx').innerHTML=`<p class="text-sm mu mb-2">Pierwsza/ostatnia lekcja klasy: domyślnie odwołanie. W pozostałych: zastępstwo (najpierw nauczyciel tego samego przedmiotu). Możesz zmienić każdą propozycję.</p>`
-   +tbl(['Lekcja','Klasa','Przedmiot','Propozycja'],ABP.map((p,i)=>`<tr><td>${p.r.n} <span class="text-xs mu">${(BELLS[p.r.n-1]||[]).join('-')}</span></td><td>${esc(cn(p.r.class_id))}${p.edge?' <span class="tag y">skraj dnia</span>':''}</td><td>${esc(sn(T.find(y=>y.id===p.r.teaching_id)?.subject_id))}</td><td style="min-width:260px">${dd('abp'+i,[['','Bez zmian'],['cancel','Odwołaj lekcję'],...p.free.map(f=>['sub:'+f.id,nm(f.id),p.same.includes(f)?'ten przedmiot':'wolny'])],p.def,{sm:1})}</td></tr>`))
+  const t=FV.abt,d1=FV.abd,d2=FV.abd2||d1,a=+FV.ab1,b=+FV.ab2;if(!t||!d1)return warn('Wybierz nauczyciela i dzień.');if(d2<d1)return warn('Data końcowa jest przed początkową.');if(b<a)return warn('Zakres lekcji jest błędny.');
+  const days=[];for(let x=new Date(d1+'T12:00');isoL(x)<=d2&&days.length<62;x=addD(x,1))if(x.getDay()%6&&!hol(x))days.push(isoL(x));
+  if(!days.length)return warn('W tym zakresie nie ma dni roboczych.');
+  const [tt,ab]=await Promise.all([sb.from('timetable').select('*'),sb.from('teacher_absences').select('*').lte('date',d2)]);
+  const abs=(ab.data||[]).filter(x=>(x.date_to||x.date)>=d1),mt=T.filter(x=>x.teacher_id===t).map(x=>x.id),tchs=Object.values(P).filter(p=>['teacher','director'].includes(p.role)),taken=new Set();ABP=[];
+  for(const d of days){
+    const all=entries(tt.data||[],mon(new Date(d+'T12:00')),r=>r.d===d),mine=all.filter(r=>!r.st&&mt.includes(r.teaching_id)&&r.n>=a&&r.n<=b).sort((x,y)=>x.n-y.n);
+    for(const r of mine){
+      const live=all.filter(x=>x.n===r.n&&x.st!=='cancel'&&x.st!=='moved'),busy=new Set(live.map(x=>x.st==='sub'?x.sub:T.find(y=>y.id===x.teaching_id)?.teacher_id)),
+       away=new Set([t,...abs.filter(x=>x.date<=d&&(x.date_to||x.date)>=d&&x.lesson_from<=r.n&&x.lesson_to>=r.n).map(x=>x.teacher_id)]),
+       free=tchs.filter(p=>!busy.has(p.id)&&!away.has(p.id)&&!taken.has(d+'|'+r.n+'|'+p.id)),
+       cl=all.filter(x=>x.class_id===r.class_id&&x.st!=='cancel'&&x.st!=='moved').map(x=>x.n),edge=r.n===Math.min(...cl)||r.n===Math.max(...cl),
+       subj=T.find(y=>y.id===r.teaching_id)?.subject_id,same=free.filter(p=>T.some(y=>y.teacher_id===p.id&&y.subject_id===subj)),
+       pk=edge?null:(same[0]||free[0]),sj={};
+      /* przedmiot na zastępstwie: ten sam, jeśli zastępca go uczy; inaczej jego przedmiot w tej klasie; inaczej jego pierwszy przedmiot */
+      free.forEach(p=>{const m=T.filter(y=>y.teacher_id===p.id);sj[p.id]=(m.find(y=>y.subject_id===subj)||m.find(y=>y.class_id===r.class_id)||m[0])?.subject_id||null});
+      if(pk)taken.add(d+'|'+r.n+'|'+pk.id);
+      ABP.push({r,d,free,same,edge,sj,subj,def:pk?'sub:'+pk.id:'cancel'})}}
+  if(!ABP.length){$('#abx').innerHTML='<p class="em">Ten nauczyciel nie ma lekcji w wybranym czasie.</p>';return}
+  $('#abx').innerHTML=`<p class="text-sm mu mb-2">Pierwsza/ostatnia lekcja klasy: domyślnie odwołanie. W pozostałych: zastępstwo (najpierw nauczyciel tego samego przedmiotu). Przedmiot na zastępstwie dobiera się automatycznie. Każdą propozycję możesz zmienić.</p>`
+   +tbl(['Data','Lekcja','Klasa','Przedmiot','Propozycja'],ABP.map((p,i)=>`<tr><td style="white-space:nowrap">${fdl(p.d)}</td><td>${p.r.n} <span class="text-xs mu">${(BELLS[p.r.n-1]||[]).join('-')}</span></td><td>${esc(cn(p.r.class_id))}${p.edge?' <span class="tag y">skraj dnia</span>':''}</td><td>${esc(sn(p.subj))}</td><td style="min-width:300px">${dd('abp'+i,[['','Bez zmian'],['cancel','Odwołaj lekcję'],...p.free.map(f=>['sub:'+f.id,nm(f.id),(p.sj[f.id]?sn(p.sj[f.id]):'zastępstwo')+(p.same.includes(f)?' ✓':'')])],p.def,{sm:1})}</td></tr>`))
    +`<button class="btn mt-3" onclick="absSave()">Zapisz nieobecność i zmiany w planie</button>`}
 async function absSave(){
-  const t=FV.abt,d=FV.abd,why=FV.abr,note='Nieobecność: '+nm(t)+(why?' ('+why+')':'');
-  const r0=await sb.from('teacher_absences').insert({school_id:me.school_id,teacher_id:t,date:d,lesson_from:+FV.ab1,lesson_to:+FV.ab2,reason:why,created_by:me.id});if(r0.error)return warn(r0.error.message);
-  const rows=ABP.map((p,i)=>{const c=FV['abp'+i];if(!c)return null;const b={school_id:me.school_id,class_id:p.r.class_id,date:d,lesson_no:p.r.n,teaching_id:p.r.teaching_id,note};
-    return c==='cancel'?{...b,kind:'cancelled'}:{...b,kind:'substitution',sub_teacher_id:c.slice(4)}}).filter(Boolean);
+  const t=FV.abt,d1=FV.abd,d2=FV.abd2||d1,why=FV.abr,note='Nieobecność: '+nm(t)+(why?' ('+why+')':'');
+  const r0=await sb.from('teacher_absences').insert({school_id:me.school_id,teacher_id:t,date:d1,date_to:d2,lesson_from:+FV.ab1,lesson_to:+FV.ab2,reason:why,created_by:me.id});if(r0.error)return warn(r0.error.message);
+  const rows=ABP.map((p,i)=>{const c=FV['abp'+i];if(!c)return null;const b={school_id:me.school_id,class_id:p.r.class_id,date:p.d,lesson_no:p.r.n,teaching_id:p.r.teaching_id,note};
+    if(c==='cancel')return{...b,kind:'cancelled'};const id=c.slice(4),sj=p.sj[id];return{...b,kind:'substitution',sub_teacher_id:id,sub_subject_id:sj&&sj!==p.subj?sj:null}}).filter(Boolean);
   if(!rows.length){toast('Zapisano nieobecność');return reload()}
   act(sb.from('timetable_changes').insert(rows),reload,'Zapisano nieobecność i '+rows.length+' zmian w planie')}
 const absDel=async id=>await ask('Usunąć zgłoszenie nieobecności? (zmiany w planie usuń osobno w „Zmiany w planie”)','Usuń')&&act(sb.from('teacher_absences').delete().eq('id',id),reload,'Usunięto');
