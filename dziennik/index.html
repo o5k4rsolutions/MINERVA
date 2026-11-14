@@ -272,7 +272,7 @@ function entries(base,m,scope){
   CH.filter(k=>rng.includes(k.date)).forEach(k=>{
     const x=res.find(r=>r.d===k.date&&r.n===k.lesson_no&&r.class_id===k.class_id&&r.teaching_id===k.teaching_id&&!r.st),v0={d:k.date,n:k.lesson_no,class_id:k.class_id,teaching_id:k.teaching_id,note:k.note};
     if(k.kind==='moved_in'){res.push({...v0,st:'in'});return}
-    if(k.kind==='substitution'){if(x){x.st='sub';x.sub=k.sub_teacher_id;x.note=k.note}else res.push({...v0,st:'sub',sub:k.sub_teacher_id});return}
+    if(k.kind==='substitution'){if(x){x.st='sub';x.sub=k.sub_teacher_id;x.subj=k.sub_subject_id;x.note=k.note}else res.push({...v0,st:'sub',sub:k.sub_teacher_id,subj:k.sub_subject_id});return}
     if(x){x.st=k.kind==='cancelled'?'cancel':'moved';x.note=k.note}});
   return res.filter(scope)}
 const chTag=r=>(r.st==='cancel'?'<span class="tag r">odwołane</span>':r.st==='moved'?'<span class="tag y">przeniesione</span>':r.st==='in'?'<span class="tag b">przeniesione tu</span>':r.st==='sub'?`<span class="tag y">zastępstwo: ${esc(nm(r.sub))}</span>`:'')+(r.note&&r.st?`<div class="text-xs mu">${esc(r.note)}</div>`:'');
@@ -295,7 +295,7 @@ V.home=async()=>{
     staff()?jCount().then(c=>({count:c})):E]);
   const mt=T.filter(t=>t.teacher_id===me.id).map(t=>t.id),n=x=>`<p class="mu text-sm">${x}</p>`,row=h=>`<div class="py-2 border-b last:border-0" style="border-color:var(--ln)">${h}</div>`,lk=(k,l)=>`<a class="lk" onclick="go('${k}')">${l}</a>`;
   const les=hd?[]:entries(tt.data||[],mon(now),r=>r.d===isoL(now)&&(pup?r.class_id===cid:mt.includes(r.teaching_id)||r.sub===me.id)).sort((a,b)=>a.n-b.n);
-  const plan=(hd?`<p class="tag r mb-2">${hd}</p>`:'')+(les.length?les.map(e=>{const t=T.find(x=>x.id===e.teaching_id),dead=e.st==='cancel'||e.st==='moved',nogo=pup||dead||(e.st==='sub'&&e.sub!==me.id&&!dir());return `<div class="flex items-center gap-3 py-2 border-b last:border-0" style="border-color:var(--ln)${nogo?'':';cursor:pointer'}${dead?';opacity:.55':''}" ${nogo?'':`title="Sprawdź obecność" onclick="curT='${e.teaching_id}';curL=${e.n};curD=isoL(new Date());atManual=false;go('at')"`}><span class="av">${e.n}</span><div class="flex-1"><div class="font-semibold"${dead?' style="text-decoration:line-through"':''}>${esc(sn(t?.subject_id))}</div><div class="text-xs mu">${pup?esc(nm(e.sub||t?.teacher_id)):'klasa '+esc(cn(e.class_id))}</div>${chTag(e)}</div><div class="text-xs mu">${(BELLS[e.n-1]||[]).join('-')}</div></div>`}).join(''):n(wd>=1&&wd<=5&&!hd?'Brak lekcji w planie na dziś.':'Dziś brak lekcji.'));
+  const plan=(hd?`<p class="tag r mb-2">${hd}</p>`:'')+(les.length?les.map(e=>{const t=T.find(x=>x.id===e.teaching_id),dead=e.st==='cancel'||e.st==='moved',nogo=pup||dead||(e.st==='sub'&&e.sub!==me.id&&!dir());return `<div class="flex items-center gap-3 py-2 border-b last:border-0" style="border-color:var(--ln)${nogo?'':';cursor:pointer'}${dead?';opacity:.55':''}" ${nogo?'':`title="Sprawdź obecność" onclick="curT='${e.teaching_id}';curL=${e.n};curD=isoL(new Date());atManual=false;go('at')"`}><span class="av">${e.n}</span><div class="flex-1"><div class="font-semibold"${dead?' style="text-decoration:line-through"':''}>${esc(sn(e.subj||t?.subject_id))}</div><div class="text-xs mu">${pup?esc(nm(e.sub||t?.teacher_id)):'klasa '+esc(cn(e.class_id))}</div>${chTag(e)}</div><div class="text-xs mu">${(BELLS[e.n-1]||[]).join('-')}</div></div>`}).join(''):n(wd>=1&&wd<=5&&!hd?'Brak lekcji w planie na dziś.':'Dziś brak lekcji.'));
   const msgs=(m.data||[]).filter(r=>r.messages&&!r.messages.recalled_at).map(r=>r.messages).sort((x,y)=>y.created_at.localeCompare(x.created_at)).slice(0,4);
   const newG=(g.data||[]).filter(x=>x.created_at>since);newG.forEach(x=>GR[x.id]=x);
   const today=isoL(now),imp=[hd?row(`<b>${hd}</b><div class="text-xs mu">Dzień wolny od zajęć</div>`):'',...(a.data||[]).filter(x=>x.created_at.slice(0,10)===today).map(x=>row(`<b>${esc(x.title)}</b>`))].join('')||n('Brak informacji.');
@@ -448,7 +448,7 @@ V.at=async()=>{
       if(tt.error)throw tt.error;if(at.error)throw at.error;
       const mp={};at.data.forEach(a=>mp[a.date+'|'+a.lesson_no]=a.status);
       const leg=[['present','Obecność'],['absent','Nieobecność'],['excused','Nieobecność usprawiedliwiona'],['late','Spóźnienie']].map(([k,l])=>`<span class="mr-4 inline-flex items-center gap-1 text-sm">${abc(k)} ${l}</span>`).join('');
-      return tabs+pn('Frekwencja w tygodniu',weekGrid(entries(tt.data,wk,r=>r.class_id===cid),(e,t,d)=>`<div class="lsn flex gap-2${e.st==='cancel'||e.st==='moved'?' x':''}">${abc(mp[d+'|'+e.n])||'<span class="ab" style="background:#cbd3e1">·</span>'}<div class="min-w-0"><div class="lt">${(BELLS[e.n-1]||[]).join(' - ')}</div><b>${esc(sn(t?.subject_id))}</b><div class="text-xs">${esc(nm(e.sub||t?.teacher_id))}</div>${chTag(e)}</div></div>`)+`<div class="mt-3">${leg}</div>`,wkNav(),'at');
+      return tabs+pn('Frekwencja w tygodniu',weekGrid(entries(tt.data,wk,r=>r.class_id===cid),(e,t,d)=>`<div class="lsn flex gap-2${e.st==='cancel'||e.st==='moved'?' x':''}">${abc(mp[d+'|'+e.n])||'<span class="ab" style="background:#cbd3e1">·</span>'}<div class="min-w-0"><div class="lt">${(BELLS[e.n-1]||[]).join(' - ')}</div><b>${esc(sn(e.subj||t?.subject_id))}</b><div class="text-xs">${esc(nm(e.sub||t?.teacher_id))}</div>${chTag(e)}</div></div>`)+`<div class="mt-3">${leg}</div>`,wkNav(),'at');
     }
     const {data,error}=await sb.from('attendance').select('*').eq('student_id',sid).order('date',{ascending:false});if(error)throw error;
     const c=s=>data.filter(x=>x.status===s).length,tot=data.length,bad=data.filter(x=>x.status!=='present'),pc=tot?Math.round((c('present')+c('late'))/tot*100):null;
@@ -541,13 +541,13 @@ function stuDet(id){const {g,n,a}=CLD,by={};g.filter(x=>x.student_id===id).forEa
 
 // Plan lekcji
 V.pl=async()=>{
-  const pup=me.role==='student'||me.role==='parent';let cid,mineT=false;
-  if(pup)cid=ST[sid]?.class_id;else{if(!plSel)plSel=myT().length?'my':(C[0]?.id||'');mineT=plSel==='my';cid=mineT?null:plSel}
-  const sel=staff()?`<div class="pn pb np" style="max-width:420px"><label class="lb">Plan</label>${dd('pls',[['my','Mój plan (moje lekcje)'],...C.map(c=>[c.id,'Klasa '+c.name])],plSel,{on:x=>{plSel=x;rr()}})}</div>`:'';
+  const pup=me.role==='student'||me.role==='parent';let cid,mineT=false,ptid=null;
+  if(pup)cid=ST[sid]?.class_id;else{if(!plSel)plSel=T.some(t=>t.teacher_id===me.id)?'my':(C[0]?.id||'');ptid=plSel==='my'?me.id:plSel.startsWith('t:')?plSel.slice(2):null;mineT=!!ptid;cid=mineT?null:plSel}
+  const sel=staff()?`<div class="pn pb np" style="max-width:420px"><label class="lb">Plan</label>${dd('pls',[['my','Mój plan (moje lekcje)'],...C.map(c=>[c.id,'Klasa '+c.name]),...(dir()?Object.values(P).filter(p=>['teacher','director'].includes(p.role)&&p.id!==me.id).sort((a,b)=>ln(a.id).localeCompare(ln(b.id),'pl')).map(p=>['t:'+p.id,'Nauczyciel: '+ln(p.id)]):[])],plSel,{on:x=>{plSel=x;rr()}})}</div>`:'';
   if(!cid&&!mineT)return sel+pn('Plan zajęć','<p class="em">Brak przypisanej klasy.</p>');
-  const q=sb.from('timetable').select('*');const {data,error}=await(mineT?q.in('teaching_id',myT().map(t=>t.id)):q.eq('class_id',cid));if(error)throw error;
-  const ids=myT().map(t=>t.id),es=entries(data,wk,mineT?(r=>ids.includes(r.teaching_id)||r.sub===me.id):(r=>r.class_id===cid));
-  return sel+pn(mineT?'Mój plan zajęć':'Plan zajęć - klasa '+esc(cn(cid)),weekGrid(es,(e,t)=>`<div class="lsn${e.st==='cancel'||e.st==='moved'?' x':''}"><div class="lt">${(BELLS[e.n-1]||[]).join(' - ')}</div><b>${esc(sn(t?.subject_id))}</b><div class="text-xs">${mineT?'klasa '+esc(cn(e.class_id)):esc(nm(e.sub||t?.teacher_id))}</div>${chTag(e)}</div>`),wkNav()+`<button class="btn sm np" onclick="window.print()">${ic('print')} Drukuj</button>`,'pl');
+  const q=sb.from('timetable').select('*');const {data,error}=await(mineT?q.in('teaching_id',T.filter(t=>t.teacher_id===ptid).map(t=>t.id)):q.eq('class_id',cid));if(error)throw error;
+  const ids=T.filter(t=>t.teacher_id===ptid).map(t=>t.id),es=entries(data,wk,mineT?(r=>ids.includes(r.teaching_id)||r.sub===ptid):(r=>r.class_id===cid));
+  return sel+pn(mineT?(ptid===me.id?'Mój plan zajęć':'Plan nauczyciela - '+esc(nm(ptid))):'Plan zajęć - klasa '+esc(cn(cid)),weekGrid(es,(e,t)=>`<div class="lsn${e.st==='cancel'||e.st==='moved'?' x':''}"><div class="lt">${(BELLS[e.n-1]||[]).join(' - ')}</div><b>${esc(sn(e.subj||t?.subject_id))}</b><div class="text-xs">${mineT?'klasa '+esc(cn(e.class_id)):esc(nm(e.sub||t?.teacher_id))}</div>${chTag(e)}</div>`),wkNav()+`<button class="btn sm np" onclick="window.print()">${ic('print')} Drukuj</button>`,'pl');
 };
 
 /* ---------- Administracja ---------- */
@@ -621,10 +621,10 @@ AD.chg=back=>{
   const list=CH.filter(k=>k.kind!=='moved_in'&&k.date>=isoL(addD(new Date(),-7))).sort((a,b)=>a.date.localeCompare(b.date)||a.lesson_no-b.lesson_no);
   return pn('Nowa zmiana w planie',`<div class="mb-3">${seg('ck',[['substitution','Zastępstwo'],['cancelled','Odwołanie lekcji'],['moved','Przeniesienie lekcji']],'substitution',k=>{$('#chs').style.display=k==='substitution'?'':'none';$('#chm').style.display=k==='moved'?'':'none'})}</div>
    <div class="grid md:grid-cols-3 gap-3"><div><label class="lb">Klasa</label>${dd('cc2',C.map(c=>[c.id,'Klasa '+c.name]),'',{ph:'Wybierz klasę…'})}</div><div><label class="lb">Data lekcji</label>${dp('cd',isoL(new Date()))}</div><div><label class="lb">Lekcja</label>${dd('cn2',L,1)}</div></div>
-   <div id="chs" class="mt-3" style="max-width:380px"><label class="lb">Nauczyciel zastępujący</label>${dd('ct2',tch,'',{ph:'Wybierz nauczyciela…'})}</div>
+   <div id="chs" class="mt-3" style="max-width:380px"><label class="lb">Nauczyciel zastępujący</label>${dd('ct2',tch,'',{ph:'Wybierz nauczyciela…'})}<label class="lb mt-3">Przedmiot na zastępstwie (opcjonalnie)</label>${dd('cs2',[['','Ten sam przedmiot'],...SUB.map(x=>[x.id,x.name])],'')}</div>
    <div id="chm" class="grid md:grid-cols-2 gap-3 mt-3" style="display:none;max-width:640px"><div><label class="lb">Przenieś na dzień</label>${dp('md','')}</div><div><label class="lb">Na lekcję</label>${dd('mn2',L,1)}</div></div>
    <label class="lb mt-3">Notatka (opcjonalnie)</label><input type="text" id="cnt2" placeholder="np. choroba nauczyciela" style="max-width:480px"><div><button class="btn mt-3" onclick="saveChg()">Zapisz zmianę</button></div>`,back,'pl')
-  +pn('Zaplanowane zmiany (od tygodnia wstecz)',list.length?tbl(['Data','Lekcja','Klasa','Przedmiot','Zmiana',''],list.map(k=>{const t=T.find(x=>x.id===k.teaching_id),to=k.kind==='moved_out'?CH.find(x=>x.grp===k.grp&&x.kind==='moved_in'):null,kd=KL[k.kind]||['-','']; return `<tr><td>${fdl(k.date)}</td><td>${k.lesson_no}</td><td>${esc(cn(k.class_id))}</td><td>${esc(sn(t?.subject_id))}</td><td><span class="tag ${kd[1]}">${kd[0]}</span> ${k.kind==='substitution'?esc(nm(k.sub_teacher_id)):''}${to?'na '+fdl(to.date)+', lekcja '+to.lesson_no:''}${k.note?`<div class="text-xs mu">${esc(k.note)}</div>`:''}</td><td><button class="gh sm red" onclick="delChg('${k.id}','${k.grp||''}')">${ic('trash')}</button></td></tr>`})):'<p class="em">Brak zaplanowanych zmian.</p>','','pl')};
+  +pn('Zaplanowane zmiany (od tygodnia wstecz)',list.length?tbl(['Data','Lekcja','Klasa','Przedmiot','Zmiana',''],list.map(k=>{const t=T.find(x=>x.id===k.teaching_id),to=k.kind==='moved_out'?CH.find(x=>x.grp===k.grp&&x.kind==='moved_in'):null,kd=KL[k.kind]||['-','']; return `<tr><td>${fdl(k.date)}</td><td>${k.lesson_no}</td><td>${esc(cn(k.class_id))}</td><td>${esc(sn(t?.subject_id))}</td><td><span class="tag ${kd[1]}">${kd[0]}</span> ${k.kind==='substitution'?esc(nm(k.sub_teacher_id))+(k.sub_subject_id?' (przedmiot: '+esc(sn(k.sub_subject_id))+')':''):''}${to?'na '+fdl(to.date)+', lekcja '+to.lesson_no:''}${k.note?`<div class="text-xs mu">${esc(k.note)}</div>`:''}</td><td><button class="gh sm red" onclick="delChg('${k.id}','${k.grp||''}')">${ic('trash')}</button></td></tr>`})):'<p class="em">Brak zaplanowanych zmian.</p>','','pl')};
 const delChg=async(id,g)=>await ask('Usunąć tę zmianę w planie?','Usuń')&&act(g?sb.from('timetable_changes').delete().eq('grp',g):sb.from('timetable_changes').delete().eq('id',id),reload,'Usunięto zmianę');
 async function saveChg(){const k=FV.ck,cid=FV.cc2,d=FV.cd,n=+FV.cn2,okd=q=>{const x=new Date(q+'T12:00');return x.getDay()%6!==0&&!hol(x)};
   if(!cid||!d)return warn('Wybierz klasę i datę.');if(!okd(d))return warn('Ten dzień jest wolny od zajęć.');
@@ -634,7 +634,7 @@ async function saveChg(){const k=FV.ck,cid=FV.cc2,d=FV.cd,n=+FV.cn2,okd=q=>{cons
   const e=tt[0];if(!e)return warn('W planie tej klasy nie ma lekcji w tym terminie.');
   if(CH.some(x=>x.class_id===cid&&x.date===d&&x.lesson_no===n&&x.kind!=='moved_in'))return warn('Ta lekcja ma już zmianę. Usuń ją najpierw.');
   const b={school_id:me.school_id,class_id:cid,date:d,lesson_no:n,teaching_id:e.teaching_id,note:v('cnt2').trim()||null};let rows;
-  if(k==='substitution')rows=[{...b,kind:'substitution',sub_teacher_id:FV.ct2}];
+  if(k==='substitution')rows=[{...b,kind:'substitution',sub_teacher_id:FV.ct2,sub_subject_id:FV.cs2||null}];
   else if(k==='cancelled')rows=[{...b,kind:'cancelled'}];
   else{const g=crypto.randomUUID();rows=[{...b,kind:'moved_out',grp:g},{...b,kind:'moved_in',date:FV.md,lesson_no:+FV.mn2,grp:g}]}
   act(sb.from('timetable_changes').insert(rows),reload,'Zapisano zmianę')}
