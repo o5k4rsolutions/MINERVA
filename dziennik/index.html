@@ -1,446 +1,271 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>E-Dziennik — Minerva</title>
-<link rel="icon" type="image/svg+xml" href="https://dziennik-minerva.pages.dev/themes/icon-dark.svg">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<script src="https://cdn.tailwindcss.com"></script>
-<script>
-tailwind.config={theme:{extend:{fontFamily:{sans:['"Open Sans"','sans-serif']},colors:{indigoBrand:'#1E2A78',indigoDark:'#141D56',amberBrand:'#F5A524'}}}}
-</script>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dziennik — Minerva</title>
+<link rel="icon" href="https://dziennik-minerva.pages.dev/themes/icon-dark.svg">
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com/3.4.17"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <style>
 body{font-family:'Open Sans',sans-serif;background:#F8FAFC;color:#1E293B}
-.btn{position:relative;overflow:hidden;z-index:1;background:#1E2A78;color:#fff;padding:.55rem 1rem;border-radius:.75rem;font-weight:700;font-size:.875rem;transition:color .35s,transform .25s}
-.btn::before{content:'';position:absolute;top:50%;left:50%;width:0;height:0;border-radius:50%;background:#F5A524;transform:translate(-50%,-50%);transition:width .5s,height .5s;z-index:-1}
-.btn:hover::before{width:320%;height:600%}.btn:hover{color:#1E2A78}
-.btn-sm{padding:.3rem .65rem;font-size:.75rem}
-.btn-ghost{background:#E2E8F0;color:#1E293B}.btn-red{background:#DC2626}.btn-green{background:#15803D}
-.inp{width:100%;padding:.55rem .75rem;border-radius:.75rem;border:1px solid #CBD5E1;font-size:.875rem;background:#fff;outline:none}
-.inp:focus{border-color:#1E2A78;box-shadow:0 0 0 3px rgba(30,42,120,.15)}
-.card{background:#fff;border:1px solid #E2E8F0;border-radius:1rem;padding:1.25rem}
-.lbl{display:block;font-size:.75rem;font-weight:700;color:#475569;margin:.6rem 0 .25rem}
-.nav{display:flex;align-items:center;gap:.5rem;width:100%;text-align:left;padding:.7rem 1rem;border-radius:.75rem;color:rgba(255,255,255,.9);font-weight:600;font-size:.875rem;white-space:nowrap}
-.nav:hover{background:#1E2A78}.nav.on{background:#1E2A78;box-shadow:inset 3px 0 0 #F5A524}
-.dot{display:none;margin-left:auto;min-width:1.25rem;height:1.25rem;padding:0 .3rem;border-radius:9999px;background:#F5A524;color:#141D56;font-size:.7rem;font-weight:800;align-items:center;justify-content:center}
-th{text-align:left;font-size:.75rem;color:#64748B;padding:.5rem}td{padding:.5rem;border-top:1px solid #F1F5F9;vertical-align:middle;font-size:.875rem}
-@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+.card{background:#fff;border-radius:1rem;padding:1rem;box-shadow:0 1px 3px #0001;margin-bottom:1rem}
+input,select,textarea{border:1px solid #cbd5e1;border-radius:.5rem;padding:.4rem .6rem;width:100%;background:#fff}
+.b{background:#1E2A78;color:#fff;border-radius:.5rem;padding:.4rem .9rem;font-weight:600;transition:.2s}.b:hover{background:#F5A524;color:#1E2A78}
+.b2{background:#fef3c7;color:#1E2A78;border-radius:.5rem;padding:.2rem .6rem;font-size:.8rem;font-weight:600}
+.dot{display:inline-block;width:9px;height:9px;border-radius:9px;background:#ef4444;margin-left:5px;vertical-align:middle}
+th,td{padding:.35rem .5rem;text-align:left;border-bottom:1px solid #e2e8f0;font-size:.9rem}
+.tab{padding:.5rem .9rem;border-radius:.6rem;font-weight:600;white-space:nowrap}.tab.on{background:#F5A524;color:#1E2A78}
+h2{font-weight:800;color:#1E2A78;margin-bottom:.5rem}
 </style>
 </head>
-<body class="min-h-screen flex flex-col antialiased">
-<div id="modal"></div><div id="toast" class="fixed bottom-4 right-4 z-[60] space-y-2"></div>
-
-<header class="bg-[#080B1A] sticky top-0 z-40 px-4 sm:px-8 py-3 flex items-center justify-between shadow-md">
-  <img src="https://dziennik-minerva.pages.dev/themes/logo-horizontal-white.svg" alt="Minerva" class="h-9 w-auto">
-  <div class="flex items-center gap-3">
-    <div class="text-right hidden sm:block"><p class="text-sm font-bold text-white" id="uName">…</p><p class="text-xs text-amberBrand font-semibold" id="uRole"></p></div>
-    <button onclick="passModal(true)" class="text-xs font-semibold text-white/80 hover:text-amberBrand px-2">Zmień hasło</button>
-    <button onclick="logout()" class="px-3 py-2 rounded-xl bg-red-500/20 text-red-200 hover:bg-red-500 hover:text-white text-sm font-semibold">Wyloguj</button>
+<body>
+<header class="bg-[#080B1A] text-white">
+  <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between gap-3">
+    <div class="flex items-center gap-2 min-w-0"><img src="https://dziennik-minerva.pages.dev/themes/icon-dark.svg" class="h-8" alt="">
+      <div class="leading-tight min-w-0"><div id="sch" class="font-bold truncate"></div><div id="who" class="text-xs text-white/60 truncate"></div></div></div>
+    <button class="b2" onclick="logout()">Wyloguj</button>
   </div>
+  <nav id="nav" class="max-w-6xl mx-auto px-4 pb-2 flex gap-1 overflow-x-auto text-white"></nav>
 </header>
-<div class="flex-1 flex flex-col md:flex-row min-h-0">
-  <aside class="md:w-64 bg-[#0D122B] p-3 shrink-0 overflow-x-auto"><nav id="nav" class="flex md:flex-col gap-1"></nav></aside>
-  <main id="main" class="flex-1 p-4 sm:p-8 overflow-y-auto"></main>
-</div>
+<main id="main" class="max-w-6xl mx-auto p-4"></main>
 
-<script type="module">
-import {createClient} from 'https://esm.sh/@supabase/supabase-js@2';
-const sb=createClient('https://xodfwrgkudllvfdetljw.supabase.co','sb_publishable_FY5C7kLlrQZDQooJ54klMQ_il0jVpsJ');
-
-/* ---------- helpery ---------- */
-const $=id=>document.getElementById(id);
+<script>
+const sb=supabase.createClient('https://YOUR-PROJECT.supabase.co','YOUR-ANON-KEY');
+const $=s=>document.querySelector(s), v=id=>$('#'+id).value;
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const fmt=d=>new Date(d).toLocaleString('pl-PL',{dateStyle:'short',timeStyle:'short'});
-const ROLE={dyrektor:'Dyrektor',nauczyciel:'Nauczyciel',rodzic:'Rodzic / opiekun',uczen:'Uczeń'};
-const ST={obecny:'Obecny',nieobecny:'Nieobecny',spozniony:'Spóźniony',usprawiedliwiony:'Usprawiedliwiony'};
-const DAYS=['Pon','Wt','Śr','Czw','Pt'];
-const card=h=>`<div class="card text-sm text-slate-600">${h}</div>`;
-const title=t=>`<h2 class="text-2xl font-extrabold text-indigoBrand mb-4">${t}</h2>`;
-const opts=(arr,sel,k='id',l='name')=>arr.map(o=>`<option value="${o[k]}" ${o[k]===sel?'selected':''}>${esc(o[l])}</option>`).join('');
-const byName=(a,b)=>a.full_name.localeCompare(b.full_name,'pl');
-const toast=(m,bad)=>{const e=document.createElement('div');e.className=`px-4 py-3 rounded-xl text-sm font-semibold shadow-lg text-white ${bad?'bg-red-600':'bg-indigoBrand'}`;e.textContent=m;$('toast').append(e);setTimeout(()=>e.remove(),4000)};
-const ok=async p=>{const r=await p;if(r.error){toast(r.error.message,1);throw r.error}return r.data};
-const modal=(h,wide)=>{$('modal').innerHTML=`<div class="fixed inset-0 z-50 bg-black/50 flex items-start justify-center p-4 overflow-y-auto"><div class="bg-white rounded-2xl p-6 w-full ${wide?'max-w-4xl':'max-w-lg'} mt-8 shadow-2xl">${h}</div></div>`};
-window.closeModal=()=>{$('modal').innerHTML=''};
+const fd=d=>new Date(d).toLocaleString('pl-PL',{dateStyle:'short',timeStyle:'short'});
+const RL={director:'Dyrektor',teacher:'Nauczyciel',parent:'Rodzic/opiekun',student:'Uczeń'};
+const AS={present:'obecny',absent:'nieobecny',late:'spóźniony',excused:'usprawiedliwiony'};
+const DAYS=['','Pon','Wt','Śr','Czw','Pt'];
+let me,school,P={},C=[],SUB=[],T=[],ST={},PC=[],KIDS=[],tab='msg',sid=null,dots={},curT=null,curC=null,att={};
+const nm=id=>P[id]?P[id].first_name+' '+P[id].last_name:'—';
+const cn=id=>C.find(c=>c.id===id)?.name||'—', sn=id=>SUB.find(s=>s.id===id)?.name||'—';
+const tl=t=>cn(t.class_id)+' — '+sn(t.subject_id);
+const staff=()=>me.role==='teacher'||me.role==='director', dir=()=>me.role==='director';
+const isHome=()=>C.some(c=>c.homeroom_teacher_id===me.id);
+const myT=()=>dir()?T:T.filter(t=>t.teacher_id===me.id);
+const opts=(a,f,sel)=>a.map(x=>`<option value="${x.id}" ${x.id===sel?'selected':''}>${esc(f(x))}</option>`).join('');
+const inClass=(pid,cid)=>P[pid]?.role==='student'?ST[pid]?.class_id===cid:PC.some(r=>r.parent_id===pid&&ST[r.student_id]?.class_id===cid);
+const classStudents=cid=>Object.values(P).filter(p=>p.role==='student'&&ST[p.id]?.class_id===cid).sort((a,b)=>a.last_name.localeCompare(b.last_name));
+const tbl=(h,rows)=>`<div class="overflow-x-auto"><table class="w-full"><tr>${h.map(x=>`<th>${x}</th>`).join('')}</tr>${rows.join('')}</table></div>`;
+const act=async(p,ok)=>{const r=await p;if(r.error){alert(r.error.message||r.error);return false}ok&&await ok();return true};
 
-/* ---------- stan ---------- */
-let me,lastSeen,view='dashboard',classes=[],subjects=[],dir=[],assign=[],tsubs=[],children=[],child=null;
-const dots={messages:0,announcements:0,grades:0,excuses:0},clearedAt={};
-const isDir=()=>me.role==='dyrektor',isT=()=>isDir()||me.role==='nauczyciel';
-const cls=id=>classes.find(c=>c.id===id)?.name||'—',subj=id=>subjects.find(s=>s.id===id)?.name||'—',who=id=>dir.find(d=>d.id===id)?.full_name||'—';
-
-/* ---------- start ---------- */
-const {data:{session}}=await sb.auth.getSession();
-if(!session) location.href='/login'; else await init(session.user.id);
-
-async function init(uid){
-  me=await ok(sb.from('profiles').select('*').eq('id',uid).single());
-  lastSeen=me.last_seen||new Date(0).toISOString();
-  await sb.rpc('touch_seen');
-  $('uName').textContent=me.full_name;$('uRole').textContent=ROLE[me.role];
-  if(me.must_change){passModal(false);return}
-  await loadRef();build();render();refreshDots();
-  let t;sb.channel('live').on('postgres_changes',{event:'*',schema:'public'},()=>{clearTimeout(t);t=setTimeout(onLive,400)}).subscribe();
+async function init(){
+  const {data:{session}}=await sb.auth.getSession(); if(!session)return location.href='/login';
+  const {data:m}=await sb.from('profiles').select('*').eq('id',session.user.id).single();
+  if(!m||m.must_change_password)return location.href='/login';
+  me=m; await load();
+  $('#sch').textContent=school; $('#who').textContent=`${nm(me.id)} · ${RL[me.role]}`;
+  if(me.role==='student')sid=me.id; if(me.role==='parent')sid=KIDS[0]||null;
+  await calcDots(); nav(); render();
+  let to; const ch=sb.channel('live'); // żywa aktualizacja
+  ['messages','message_recipients','announcements','grades','notes','attendance','justifications'].forEach(t=>ch.on('postgres_changes',{event:'*',schema:'public',table:t},()=>{clearTimeout(to);to=setTimeout(async()=>{await calcDots();nav();if(!document.activeElement.matches('input,textarea,select'))render()},400)}));
+  ch.subscribe();
 }
-async function loadRef(){
-  [classes,subjects,dir,assign,tsubs]=await Promise.all([
-    ok(sb.from('classes').select('*').order('name')),ok(sb.from('subjects').select('*').order('name')),
-    ok(sb.from('directory').select('*')),ok(sb.from('assignments').select('*')),ok(sb.from('teacher_subjects').select('*'))]);
-  if(me.role==='rodzic') children=(await ok(sb.from('parent_children').select('child_id').eq('parent_id',me.id))).map(r=>r.child_id);
+async function load(){
+  const [p,c,s,t,st,pc,sc]=await Promise.all([sb.from('profiles').select('*'),sb.from('classes').select('*').order('name'),sb.from('subjects').select('*').order('name'),sb.from('teaching').select('*'),sb.from('students').select('*'),sb.from('parent_children').select('*'),sb.from('schools').select('name').single()]);
+  P={};p.data.forEach(x=>P[x.id]=x);C=c.data;SUB=s.data;T=t.data;ST={};st.data.forEach(x=>ST[x.profile_id]=x);PC=pc.data;school=sc.data?.name||'';
+  KIDS=PC.filter(r=>r.parent_id===me.id).map(r=>r.student_id);
 }
-window.logout=async()=>{await sb.auth.signOut();location.href='/login'};
-
-/* ---------- hasło ---------- */
-window.passModal=optional=>{
-  modal(`<h3 class="text-xl font-extrabold text-indigoBrand">${optional?'Zmień hasło':'Ustaw własne hasło'}</h3>
-  ${optional?'':'<p class="text-sm text-slate-600 mt-1">Zalogowano hasłem jednorazowym. Ustaw własne hasło, aby przejść dalej.</p>'}
-  <label class="lbl">Nowe hasło (min. 8 znaków)</label><input id="p1" type="password" class="inp" autocomplete="new-password">
-  <label class="lbl">Powtórz hasło</label><input id="p2" type="password" class="inp" autocomplete="new-password">
-  <div class="flex gap-2 mt-4"><button class="btn" onclick="savePass()">Zapisz hasło</button>${optional?'<button class="btn btn-ghost" onclick="closeModal()">Anuluj</button>':''}</div>`);
-};
-window.savePass=async()=>{
-  const a=$('p1').value;
-  if(a.length<8) return toast('Hasło musi mieć co najmniej 8 znaków',1);
-  if(a!==$('p2').value) return toast('Hasła nie są takie same',1);
-  const {error}=await sb.auth.updateUser({password:a});
-  if(error) return toast(error.message,1);
-  await sb.rpc('finish_password_change');location.reload();
-};
-
-/* ---------- nawigacja i kropki ---------- */
-function build(){
-  const it=[['dashboard','Pulpit'],['messages','Wiadomości'],['announcements','Ogłoszenia']];
-  if(!isT()) it.push(['grades','Oceny i frekwencja']);
-  if(isT()) it.push(['panel','Oceny i frekwencja']);
-  if(me.role==='rodzic'||isT()) it.push(['excuses','Usprawiedliwienia']);
-  it.push(['plan','Plan lekcji']);
-  if(isDir()) it.push(['accounts','Konta'],['school','Placówka']);
-  $('nav').innerHTML=it.map(([k,t])=>`<button class="nav" data-k="${k}" onclick="go('${k}')">${t}<span class="dot" id="dot-${k}"></span></button>`).join('');
+async function calcDots(){
+  const since=me.prev_seen,h=(t)=>sb.from(t).select('*',{count:'exact',head:true});
+  const [m,a,g,n,j]=await Promise.all([h('message_recipients').eq('recipient_id',me.id).is('read_at',null),h('announcements').gt('created_at',since).neq('author_id',me.id),h('grades').gt('created_at',since).neq('author_id',me.id),h('notes').gt('created_at',since).neq('author_id',me.id),h('justifications').eq('status','pending')]);
+  const keep=k=>dots[k]===0?0:undefined; // otwarta zakładka gasi kropkę do końca sesji
+  dots={msg:m.count,ann:keep('ann')??a.count,gr:keep('gr')??g.count,nt:keep('nt')??n.count,js:staff()?(j.count):0};
 }
-window.go=k=>{view=k;if(k==='announcements'||k==='grades')clearedAt[k]=new Date().toISOString();render();refreshDots()};
-async function refreshDots(){
-  const H={count:'exact',head:true},th=k=>clearedAt[k]||lastSeen,n=async q=>(await q).count||0;
-  const kid=me.role==='uczen'||me.role==='rodzic';
-  const [m,a,g,r,e]=await Promise.all([
-    n(sb.from('message_recipients').select('message_id',H).eq('user_id',me.id).is('read_at',null)),
-    n(sb.from('announcements').select('id',H).gt('created_at',th('announcements')).neq('author_id',me.id)),
-    kid?n(sb.from('grades').select('id',H).gt('created_at',th('grades'))):0,
-    kid?n(sb.from('remarks').select('id',H).gt('created_at',th('grades'))):0,
-    isT()?n(sb.from('excuses').select('id',H).eq('status','oczekuje')):
-      me.role==='rodzic'?n(sb.from('excuses').select('id',H).neq('status','oczekuje').gt('decided_at',th('excuses'))):0]);
-  Object.assign(dots,{messages:m,announcements:a,grades:g+r,excuses:e});
-  for(const k in dots){const d=$('dot-'+k);if(d){d.textContent=dots[k];d.style.display=dots[k]?'inline-flex':'none'}}
-  const tot=Object.values(dots).reduce((x,y)=>x+y,0);document.title=(tot?`(${tot}) `:'')+'E-Dziennik — Minerva';
-  if(view==='dashboard')render();
+function nav(){
+  const t=[['msg','Wiadomości'],['ann','Ogłoszenia'],['gr','Oceny'],['nt','Uwagi'],['at','Frekwencja'],['pl','Plan']];
+  if(me.role==='parent'||(staff()&&(dir()||isHome())))t.push(['js','Usprawiedliwienia']);
+  if(staff()&&(dir()||isHome()))t.push(['cl','Klasa']); if(dir())t.push(['ad','Administracja']);
+  $('#nav').innerHTML=t.map(([k,l])=>`<button class="tab ${k===tab?'on':''}" onclick="go('${k}')">${l}${dots[k]?'<span class="dot"></span>':''}</button>`).join('');
 }
-async function onLive(){
-  await refreshDots();
-  const typing=document.activeElement?.closest?.('#main')&&/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName);
-  if(['messages','announcements','grades','excuses'].includes(view)&&!typing&&!$('modal').innerHTML) render();
-}
+function go(k){tab=k;if(['ann','gr','nt'].includes(k))dots[k]=0;nav();render()}
 async function render(){
-  document.querySelectorAll('#nav .nav').forEach(b=>b.classList.toggle('on',b.dataset.k===view));
-  const V={dashboard:vDash,messages:vMessages,announcements:vAnn,grades:vGrades,panel:vPanel,excuses:vExcuses,plan:vPlan,accounts:vAccounts,school:vSchool};
-  try{$('main').innerHTML=`<div class="max-w-5xl mx-auto">${await V[view]()}</div>`}catch(e){$('main').innerHTML=card('Nie udało się wczytać widoku: '+esc(e.message))}
+  let kids='';
+  if(me.role==='parent'&&KIDS.length>1&&['gr','nt','at','pl'].includes(tab))kids=`<div class="card"><select onchange="sid=this.value;render()">${opts(KIDS.map(i=>P[i]),nm,sid)}</select></div>`;
+  $('#main').innerHTML=kids+await V[tab]();
 }
+async function logout(){await sb.auth.signOut();location.href='/login'}
 
-/* ---------- pulpit ---------- */
-async function vDash(){
-  const tile=(k,l)=>`<button onclick="go('${k}')" class="card text-left hover:border-amberBrand"><p class="text-3xl font-extrabold ${dots[k]?'text-amberBrand':'text-slate-300'}">${dots[k]}</p><p class="text-sm font-semibold text-slate-600 mt-1">${l}</p></button>`;
-  return `<div class="rounded-2xl bg-gradient-to-r from-indigoBrand to-indigoDark text-white p-7 mb-5"><h1 class="text-2xl font-extrabold">Witaj, ${esc(me.full_name)}</h1>
-  <p class="text-white/70 text-sm mt-1">Poprzednie logowanie: ${me.last_seen?fmt(me.last_seen):'to pierwsze logowanie'}</p></div>
-  <div class="grid grid-cols-2 md:grid-cols-4 gap-3">${tile('messages','Nieprzeczytane wiadomości')}${tile('announcements','Nowe ogłoszenia')}
-  ${!isT()?tile('grades','Nowe oceny i uwagi'):''}${me.role==='rodzic'||isT()?tile('excuses',isT()?'Usprawiedliwienia do rozpatrzenia':'Rozpatrzone usprawiedliwienia'):''}</div>`;
+/* ---------- widoki ---------- */
+const V={};
+// Wiadomości
+V.msg=async()=>{
+  const [i,s]=await Promise.all([sb.from('message_recipients').select('read_at,messages(*)').eq('recipient_id',me.id),sb.from('messages').select('*').eq('sender_id',me.id).order('created_at',{ascending:false})]);
+  const inbox=i.data.map(r=>({...r.messages,unread:!r.read_at})).sort((a,b)=>b.created_at.localeCompare(a.created_at));
+  const row=(m,out)=>`<tr class="cursor-pointer hover:bg-amber-50" onclick="openMsg('${m.id}')"><td>${m.unread?'<span class="dot" style="margin:0"></span>':''}</td><td>${esc(out?'do: '+'(wysłane)':nm(m.sender_id))}</td><td class="${m.unread?'font-bold':''}">${m.recalled_at?'<i>(wycofana)</i> ':''}${esc(m.subject)}</td><td>${fd(m.created_at)}</td></tr>`;
+  const people=Object.values(P).filter(p=>p.id!==me.id&&(staff()||['teacher','director'].includes(p.role)));
+  let cats=[['role:teacher','Wszyscy nauczyciele'],['role:director','Dyrekcja']];
+  if(staff())cats.push(['role:parent','Wszyscy rodzice'],['role:student','Wszyscy uczniowie'],...C.flatMap(c=>[[`class:${c.id}:parent`,`Rodzice klasy ${c.name}`],[`class:${c.id}:student`,`Uczniowie klasy ${c.name}`]]));
+  return `<div class="card"><h2>Nowa wiadomość</h2><div class="grid md:grid-cols-2 gap-2">
+   <label class="text-sm font-semibold">Kategorie<select id="cat" multiple size="5">${cats.map(c=>`<option value="${c[0]}">${esc(c[1])}</option>`).join('')}</select></label>
+   <label class="text-sm font-semibold">Osoby<select id="to" multiple size="5">${people.map(p=>`<option value="${p.id}">${esc(nm(p.id))} (${RL[p.role]})</option>`).join('')}</select></label></div>
+   <input id="sub" placeholder="Temat" class="mt-2"><textarea id="body" rows="4" placeholder="Treść" class="mt-2"></textarea><button class="b mt-2" onclick="sendMsg()">Wyślij</button></div>
+   <div class="card"><h2>Odebrane</h2>${tbl(['','Od','Temat','Data'],inbox.map(m=>row(m)))}</div>
+   <div class="card"><h2>Wysłane</h2>${tbl(['','','Temat','Data'],s.data.map(m=>row(m,1)))}</div>`;
+};
+async function sendMsg(){
+  const set=new Set([...$('#to').selectedOptions].map(o=>o.value));
+  for(const o of $('#cat').selectedOptions){const[k,a,b]=o.value.split(':');Object.values(P).forEach(p=>{if(p.id===me.id)return;if(k==='role'&&p.role===a)set.add(p.id);if(k==='class'&&p.role===b&&inClass(p.id,a))set.add(p.id)})}
+  if(!set.size||!v('sub').trim()||!v('body').trim())return alert('Wybierz odbiorców i uzupełnij temat oraz treść.');
+  await act(sb.rpc('send_message',{p_subject:v('sub'),p_body:v('body'),p_to:[...set]}),()=>{alert('Wysłano ('+set.size+' odbiorców)');render()});
 }
+async function openMsg(id){
+  const {data:m}=await sb.from('messages').select('*').eq('id',id).single();
+  await sb.from('message_recipients').update({read_at:new Date().toISOString()}).eq('message_id',id).eq('recipient_id',me.id).is('read_at',null);
+  let rec='';if(m.sender_id===me.id){const {data}=await sb.from('message_recipients').select('recipient_id,read_at').eq('message_id',id);rec=`<p class="text-sm text-slate-500">Do: ${data.map(r=>esc(nm(r.recipient_id))+(r.read_at?' ✓':'')).join(', ')}</p>`}
+  const d=m.recalled_at?new Date(m.recalled_at):null;
+  $('#main').innerHTML=`<div class="card"><button class="b2" onclick="render()">← Wróć</button><h2 class="mt-3">${esc(m.subject)}</h2><p class="text-sm text-slate-500">Od: ${esc(nm(m.sender_id))} · ${fd(m.created_at)}</p>${rec}
+   ${d?`<p class="mt-3 italic text-slate-500">Ta wiadomość została usunięta przez nadawcę w dniu ${d.toLocaleDateString('pl-PL')} o godzinie ${d.toLocaleTimeString('pl-PL',{hour:'2-digit',minute:'2-digit'})}.</p>`:`<p class="mt-3 whitespace-pre-wrap">${esc(m.body)}</p>`}
+   ${!d&&m.sender_id===me.id&&staff()?`<button class="b mt-3" onclick="recall('${id}')">Wycofaj wiadomość</button>`:''}</div>`;
+  calcDots().then(nav);
+}
+const recall=id=>confirm('Wycofać wiadomość u wszystkich odbiorców?')&&act(sb.rpc('recall_message',{p_id:id}),()=>openMsg(id));
 
-/* ---------- wiadomości ---------- */
-let tab='in';const mc={};
-async function vMessages(){
-  const [a,b]=await Promise.all([
-    ok(sb.from('message_recipients').select('read_at,messages(id,subject,body,created_at,deleted_at,sender_id)').eq('user_id',me.id)),
-    ok(sb.from('messages').select('id,subject,body,created_at,deleted_at,sender_id,message_recipients(user_id)').eq('sender_id',me.id))]);
-  const d=(x,y)=>new Date(y.created_at)-new Date(x.created_at);
-  const inbox=a.filter(r=>r.messages).map(r=>({...r.messages,unread:!r.read_at,box:'in'})).sort(d);
-  const sent=b.map(m=>({...m,box:'out'})).sort(d);
-  [...inbox,...sent].forEach(m=>mc[m.id+m.box]=m);
-  const list=tab==='in'?inbox:sent;
-  const tb=(k,l)=>`<button onclick="tab='${k}';render()" class="px-4 py-2 rounded-xl text-sm font-bold ${tab===k?'bg-indigoBrand text-white':'bg-white border border-slate-200'}">${l}</button>`;
-  return `<div class="flex items-center justify-between mb-4">${title('Wiadomości').replace('mb-4','')}<button class="btn" onclick="compose()">Nowa wiadomość</button></div>
-  <div class="flex gap-2 mb-3">${tb('in','Odebrane')}${tb('out','Wysłane')}</div>
-  <div class="card p-0 divide-y divide-slate-100">${list.map(m=>`<button onclick="openMsg('${m.id}','${m.box}')" class="w-full text-left px-4 py-3 hover:bg-slate-50 flex items-center gap-3">
-    <span class="w-2.5 h-2.5 rounded-full ${m.unread?'bg-amberBrand':'bg-transparent'}"></span>
-    <span class="flex-1 min-w-0"><span class="block text-sm ${m.unread?'font-extrabold':'font-semibold'} truncate">${m.deleted_at?'<em class="text-slate-400">Wiadomość usunięta przez nadawcę</em>':esc(m.subject)}</span>
-    <span class="block text-xs text-slate-500">${m.box==='in'?'Od: '+esc(who(m.sender_id)):'Do: '+m.message_recipients.length+' os.'}</span></span>
-    <span class="text-xs text-slate-400">${fmt(m.created_at)}</span></button>`).join('')||'<p class="p-6 text-sm text-slate-500">Brak wiadomości.</p>'}</div>`;
-}
-window.tab=tab;Object.defineProperty(window,'tab',{get:()=>tab,set:v=>{tab=v}});
-window.openMsg=async(id,box)=>{
-  const m=mc[id+box];let body;
-  if(m.deleted_at){const d=new Date(m.deleted_at);body=`<p class="p-4 rounded-xl bg-slate-100 text-slate-600 text-sm">Ta wiadomość została usunięta przez nadawcę w dniu ${d.toLocaleDateString('pl-PL')} o godzinie ${d.toLocaleTimeString('pl-PL',{hour:'2-digit',minute:'2-digit'})}.</p>`}
-  else body=`<h3 class="text-xl font-extrabold text-indigoBrand">${esc(m.subject)}</h3><p class="text-xs text-slate-500 mb-3">${box==='in'?'Od: '+esc(who(m.sender_id)):'Do: '+esc(m.message_recipients.map(r=>who(r.user_id)).join(', '))} • ${fmt(m.created_at)}</p><div class="whitespace-pre-wrap text-sm">${esc(m.body)}</div>`;
-  modal(`${body}<div class="flex gap-2 mt-5"><button class="btn btn-ghost" onclick="closeModal()">Zamknij</button>
-  ${box==='out'&&isT()&&!m.deleted_at?`<button class="btn btn-red" onclick="retract('${id}')">Wycofaj wiadomość</button>`:''}</div>`);
-  if(box==='in'&&m.unread){await sb.from('message_recipients').update({read_at:new Date().toISOString()}).match({message_id:id,user_id:me.id});refreshDots()}
+// Ogłoszenia
+V.ann=async()=>{
+  const {data}=await sb.from('announcements').select('*').order('created_at',{ascending:false});
+  const form=staff()?`<div class="card"><h2>Nowe ogłoszenie</h2><input id="at" placeholder="Tytuł"><textarea id="ab" rows="3" placeholder="Treść" class="mt-2"></textarea>
+   <div class="flex flex-wrap gap-4 my-2 text-sm">${['parent','student','teacher'].map(r=>`<label><input type="checkbox" class="ar" value="${r}" style="width:auto" ${r!=='teacher'?'checked':''}> ${{parent:'Rodzice',student:'Uczniowie',teacher:'Nauczyciele'}[r]}</label>`).join('')}</div>
+   <label class="text-sm font-semibold">Klasy (puste = wszystkie)<select id="ac" multiple size="4">${opts(C,c=>c.name)}</select></label><button class="b mt-2" onclick="postAnn()">Opublikuj</button></div>`:'';
+  return form+data.map(a=>`<div class="card"><div class="flex justify-between"><h2>${esc(a.title)}</h2>${a.author_id===me.id||dir()?`<button class="b2" onclick="delAnn('${a.id}')">Usuń</button>`:''}</div><p class="text-xs text-slate-500">${esc(nm(a.author_id))} · ${fd(a.created_at)} · ${a.class_ids.length?a.class_ids.map(cn).join(', '):'cała szkoła'}</p><p class="whitespace-pre-wrap mt-2">${esc(a.body)}</p></div>`).join('')||'<div class="card">Brak ogłoszeń.</div>';
 };
-window.retract=async id=>{if(!confirm('Wycofać wiadomość? Odbiorcy zobaczą informację o usunięciu.'))return;await ok(sb.rpc('retract_message',{p_id:id}));closeModal();toast('Wiadomość wycofana');render()};
-window.compose=()=>{
-  modal(`<h3 class="text-xl font-extrabold text-indigoBrand mb-2">Nowa wiadomość</h3>
-  ${isT()?`<label class="lbl">Odbiorcy</label><div class="flex gap-2"><select id="cMode" class="inp" onchange="cList()"><option value="persons">Wybrane osoby</option><option value="nauczyciel">Wszyscy nauczyciele</option><option value="dyrektor">Dyrekcja</option><option value="rodzic">Rodzice</option><option value="uczen">Uczniowie</option><option value="all">Wszyscy</option></select>
-  <select id="cClass" class="inp" onchange="cList()"><option value="">Wszystkie klasy</option>${opts(classes)}</select></div>`:'<p class="text-xs text-slate-500">Możesz pisać do nauczycieli i wychowawców.</p>'}
-  <div id="cPick"><input id="cFind" class="inp mt-2" placeholder="Szukaj osoby…" oninput="cList()"><div id="cList" class="max-h-44 overflow-auto border border-slate-200 rounded-xl mt-2 p-2"></div></div>
-  <label class="lbl">Temat</label><input id="cSub" class="inp"><label class="lbl">Treść</label><textarea id="cBody" rows="6" class="inp"></textarea>
-  <div class="flex gap-2 mt-4"><button class="btn" onclick="sendMsg()">Wyślij</button><button class="btn btn-ghost" onclick="closeModal()">Anuluj</button></div>`);
-  cList();
-};
-const cMode=()=>isT()?$('cMode').value:'persons';
-window.cList=()=>{
-  const mode=cMode();$('cPick').style.display=mode==='persons'?'block':'none';
-  const q=($('cFind')?.value||'').toLowerCase(),k=$('cClass')?.value;
-  let pool=isT()?dir.filter(d=>d.id!==me.id):dir.filter(d=>['nauczyciel','dyrektor'].includes(d.role));
-  if(k)pool=pool.filter(d=>d.class_id===k);
-  $('cList').innerHTML=pool.filter(d=>d.full_name.toLowerCase().includes(q)).sort(byName).slice(0,100).map(d=>`<label class="flex items-center gap-2 py-1 text-sm"><input type="checkbox" class="cTo" value="${d.id}"> ${esc(d.full_name)} <span class="text-xs text-slate-400">${ROLE[d.role]}${d.class_id?' • '+esc(cls(d.class_id)):''}${classes.find(c=>c.homeroom_id===d.id)?' • wychowawca '+esc(classes.find(c=>c.homeroom_id===d.id).name):''}</span></label>`).join('')||'<p class="text-xs text-slate-400 p-2">Brak osób.</p>';
-};
-window.sendMsg=async()=>{
-  const mode=cMode(),k=$('cClass')?.value;
-  const to=mode==='persons'?[...document.querySelectorAll('.cTo:checked')].map(x=>x.value):dir.filter(d=>d.id!==me.id&&(mode==='all'||d.role===mode)&&(!k||d.class_id===k)).map(d=>d.id);
-  if(!to.length)return toast('Wybierz odbiorców',1);
-  if(!$('cSub').value.trim()||!$('cBody').value.trim())return toast('Uzupełnij temat i treść',1);
-  await ok(sb.rpc('send_message',{p_subject:$('cSub').value.trim(),p_body:$('cBody').value.trim(),p_to:to}));
-  closeModal();toast('Wiadomość wysłana');tab='out';render();
-};
+const postAnn=()=>{const roles=[...document.querySelectorAll('.ar:checked')].map(x=>x.value);if(!v('at').trim()||!roles.length)return alert('Podaj tytuł i odbiorców.');
+  act(sb.from('announcements').insert({school_id:me.school_id,author_id:me.id,title:v('at'),body:v('ab'),roles,class_ids:[...$('#ac').selectedOptions].map(o=>o.value)}),render)};
+const delAnn=id=>confirm('Usunąć?')&&act(sb.from('announcements').delete().eq('id',id),render);
 
-/* ---------- ogłoszenia ---------- */
-async function vAnn(){
-  const L=await ok(sb.from('announcements').select('*').order('created_at',{ascending:false}));
-  const form=isT()?`<div class="card mb-5"><h3 class="font-extrabold text-indigoBrand">Nowe ogłoszenie</h3>
-  <label class="lbl">Tytuł</label><input id="anT" class="inp"><label class="lbl">Treść</label><textarea id="anB" rows="4" class="inp"></textarea>
-  <label class="lbl">Dla kogo (nic nie zaznaczone = wszyscy)</label>
-  <div class="flex gap-4 text-sm flex-wrap">${['nauczyciel','rodzic','uczen'].map(r=>`<label><input type="checkbox" class="anR" value="${r}"> ${{nauczyciel:'Nauczyciele',rodzic:'Rodzice',uczen:'Uczniowie'}[r]}</label>`).join('')}</div>
-  <label class="lbl">Klasy (Ctrl/Cmd — wiele; nic = wszystkie)</label><select id="anC" multiple class="inp h-24">${opts(classes)}</select>
-  <button class="btn mt-3" onclick="postAnn()">Opublikuj</button></div>`:'';
-  return title('Ogłoszenia')+form+`<div class="space-y-3">${L.map(a=>`<article class="card ${a.created_at>lastSeen&&a.author_id!==me.id?'border-amberBrand':''}">
-   <div class="flex justify-between gap-3"><h3 class="font-extrabold">${esc(a.title)}</h3>${a.author_id===me.id||isDir()?`<button class="text-xs text-red-500" onclick="delRow('announcements','${a.id}')">Usuń</button>`:''}</div>
-   <p class="text-xs text-slate-500 mb-2">${esc(who(a.author_id))} • ${fmt(a.created_at)} • Dla: ${a.roles.length?a.roles.map(r=>ROLE[r]).join(', '):'wszystkich'}${a.class_ids.length?' • klasy: '+esc(a.class_ids.map(cls).join(', ')):''}</p>
-   <p class="text-sm whitespace-pre-wrap">${esc(a.body)}</p></article>`).join('')||card('Brak ogłoszeń.')}</div>`;
-}
-window.postAnn=async()=>{
-  if(!$('anT').value.trim()||!$('anB').value.trim())return toast('Uzupełnij tytuł i treść',1);
-  await ok(sb.from('announcements').insert({author_id:me.id,title:$('anT').value.trim(),body:$('anB').value.trim(),roles:[...document.querySelectorAll('.anR:checked')].map(x=>x.value),class_ids:[...$('anC').selectedOptions].map(o=>o.value)}));
-  toast('Ogłoszenie opublikowane');render();
-};
-window.delRow=async(t,id)=>{if(!confirm('Na pewno usunąć?'))return;await ok(sb.from(t).delete().eq('id',id));closeModal();render()};
-
-/* ---------- oceny: uczeń / rodzic ---------- */
-const num=v=>{const n=parseFloat(v);return isNaN(n)?null:n+(/\+$/.test(v)?.5:/-$/.test(v)?-.25:0)};
-const canEdit=r=>isDir()||r.teacher_id===me.id;
-const chip=g=>`<span title="${esc(subj(g.subject_id)+' • waga '+g.weight+(g.category?' • '+g.category:'')+' • '+who(g.teacher_id)+' • '+fmt(g.created_at))}" class="inline-flex items-center gap-1 px-2 py-0.5 mr-1 rounded-lg bg-indigo-50 text-indigoBrand font-bold text-sm ${g.created_at>lastSeen?'ring-2 ring-amberBrand':''}">${esc(g.value)}<small class="text-slate-400">${g.weight>1?'×'+g.weight:''}</small>${canEdit(g)?`<button class="text-red-400 text-xs" onclick="delRow('grades','${g.id}')">×</button>`:''}</span>`;
-async function studentCard(sid){
-  const [g,r,a]=await Promise.all([ok(sb.from('grades').select('*').eq('student_id',sid).order('created_at')),
-    ok(sb.from('remarks').select('*').eq('student_id',sid).order('created_at',{ascending:false})),
-    ok(sb.from('attendance').select('*').eq('student_id',sid).order('date',{ascending:false}).limit(80))]);
-  const bySub={};g.forEach(x=>(bySub[x.subject_id]??=[]).push(x));
-  const avg=l=>{let s=0,w=0;l.forEach(x=>{const n=num(x.value);if(n!==null){s+=n*x.weight;w+=x.weight}});return w?(s/w).toFixed(2):'—'};
-  const cnt=s=>a.filter(x=>x.status===s).length;
-  return `<div class="space-y-4"><div class="card"><h3 class="font-extrabold text-indigoBrand mb-2">Oceny — ${esc(who(sid))} (${esc(cls(dir.find(d=>d.id===sid)?.class_id))})</h3>
-  <table class="w-full"><tr><th>Przedmiot</th><th>Oceny</th><th>Średnia</th></tr>${Object.entries(bySub).map(([s,l])=>`<tr><td class="font-semibold">${esc(subj(s))}</td><td>${l.map(chip).join('')}</td><td class="font-bold">${avg(l)}</td></tr>`).join('')||'<tr><td colspan=3 class="text-slate-500">Brak ocen.</td></tr>'}</table></div>
-  <div class="card"><h3 class="font-extrabold text-indigoBrand mb-2">Uwagi i pochwały</h3>${r.map(x=>`<div class="py-2 border-t border-slate-100 text-sm ${x.created_at>lastSeen?'bg-amber-50':''}"><b class="${x.kind==='uwaga'?'text-red-600':'text-green-700'}">${x.kind==='uwaga'?'Uwaga':'Pochwała'}</b> — ${esc(x.body)} <span class="text-xs text-slate-400">${esc(who(x.teacher_id))}, ${fmt(x.created_at)}</span>${canEdit(x)?` <button class="text-xs text-red-400" onclick="delRow('remarks','${x.id}')">usuń</button>`:''}</div>`).join('')||'<p class="text-sm text-slate-500">Brak wpisów.</p>'}</div>
-  <div class="card"><h3 class="font-extrabold text-indigoBrand mb-2">Frekwencja</h3><p class="text-sm mb-2">Nieobecności: <b>${cnt('nieobecny')}</b> • Spóźnienia: <b>${cnt('spozniony')}</b> • Usprawiedliwione: <b>${cnt('usprawiedliwiony')}</b></p>
-  ${a.filter(x=>x.status!=='obecny').map(x=>`<div class="text-sm py-1 border-t border-slate-100">${new Date(x.date).toLocaleDateString('pl-PL')}, lekcja ${x.hour} — ${esc(subj(x.subject_id))}: <b>${ST[x.status]}</b></div>`).join('')}</div></div>`;
-}
-const curChild=()=>child||children[0];
-window.setChild=v=>{child=v;render()};
-async function vGrades(){
-  let sid=me.id,sel='';
-  if(me.role==='rodzic'){sid=curChild();if(!sid)return card('Do Twojego konta nie przypisano jeszcze dziecka.');
-    if(children.length>1)sel=`<select class="inp max-w-xs mb-4" onchange="setChild(this.value)">${children.map(c=>`<option value="${c}" ${c===sid?'selected':''}>${esc(who(c))}</option>`).join('')}</select>`}
-  return title('Oceny i frekwencja')+sel+await studentCard(sid);
-}
-
-/* ---------- panel nauczyciela ---------- */
-const P={c:null,s:null,t:'grades',d:new Date().toISOString().slice(0,10),h:1};
-window.setP=(k,v)=>{P[k]=v;render()};
-async function vPanel(){
-  const mine=assign.filter(a=>a.teacher_id===me.id);
-  const cl=isDir()?classes:classes.filter(c=>c.homeroom_id===me.id||mine.some(a=>a.class_id===c.id));
-  if(!cl.length)return title('Oceny i frekwencja')+card('Nie masz jeszcze przypisanych klas. Dyrektor przypisuje je w zakładce Placówka.');
-  if(!cl.some(c=>c.id===P.c))P.c=cl[0].id;
-  const subs=isDir()?subjects:subjects.filter(s=>mine.some(a=>a.class_id===P.c&&a.subject_id===s.id));
-  if(!subs.some(s=>s.id===P.s))P.s=subs[0]?.id||null;
-  const home=isDir()||classes.find(c=>c.id===P.c)?.homeroom_id===me.id;
-  if(P.t==='class'&&!home)P.t='grades';
-  const st=dir.filter(d=>d.role==='uczen'&&d.class_id===P.c).sort(byName),ids=st.map(s=>s.id);
-  const tb=(k,l)=>`<button onclick="setP('t','${k}')" class="px-4 py-2 rounded-xl text-sm font-bold ${P.t===k?'bg-indigoBrand text-white':'bg-white border border-slate-200'}">${l}</button>`;
-  let body='';
-  if(P.t==='class'){
-    body=`<div class="card"><p class="text-sm text-slate-500 mb-2">Kliknij ucznia, aby zobaczyć wszystkie oceny, uwagi i frekwencję.</p>${st.map(s=>`<button class="block w-full text-left py-2 border-t border-slate-100 font-semibold hover:text-indigoBrand" onclick="openStudent('${s.id}')">${esc(s.full_name)}</button>`).join('')||'Brak uczniów w klasie.'}</div>`;
-  }else if(!P.s){body=card('Nie uczysz tej klasy żadnego przedmiotu.')}
-  else if(P.t==='grades'){
-    const g=await ok(sb.from('grades').select('*').in('student_id',ids).eq('subject_id',P.s).order('created_at'));
-    body=`<div class="card overflow-x-auto"><table class="w-full"><tr><th>Uczeń</th><th>Oceny</th><th>Nowa ocena</th></tr>${st.map(s=>`<tr><td class="font-semibold whitespace-nowrap">${esc(s.full_name)}</td><td>${g.filter(x=>x.student_id===s.id).map(chip).join('')}</td>
-    <td class="whitespace-nowrap"><input id="gv-${s.id}" maxlength="4" placeholder="np. 4+" class="inp !w-20 inline-block"> <select id="gw-${s.id}" class="inp !w-16 inline-block">${[1,2,3,4,5].map(n=>`<option>${n}</option>`).join('')}</select> <input id="gc-${s.id}" placeholder="za co" class="inp !w-28 inline-block"> <button class="btn btn-sm" onclick="addGrade('${s.id}')">Dodaj</button> <button class="btn btn-sm btn-ghost" onclick="remarkModal('${s.id}')">Uwaga / pochwała</button></td></tr>`).join('')||'<tr><td colspan=3>Brak uczniów.</td></tr>'}</table></div>`;
-  }else{
-    const a=await ok(sb.from('attendance').select('*').in('student_id',ids).eq('date',P.d).eq('hour',P.h));
-    body=`<div class="card"><div class="flex gap-2 mb-3 flex-wrap items-end"><div><label class="lbl">Data</label><input type="date" class="inp" value="${P.d}" onchange="setP('d',this.value)"></div>
-    <div><label class="lbl">Lekcja</label><select class="inp" onchange="setP('h',+this.value)">${[1,2,3,4,5,6,7,8,9,10].map(n=>`<option ${n===P.h?'selected':''}>${n}</option>`).join('')}</select></div></div>
-    <table class="w-full">${st.map(s=>{const cur=a.find(x=>x.student_id===s.id)?.status||'obecny';return `<tr><td class="font-semibold">${esc(s.full_name)}</td><td><select data-att="${s.id}" class="inp !w-48">${Object.entries(ST).map(([k,l])=>`<option value="${k}" ${k===cur?'selected':''}>${l}</option>`).join('')}</select></td></tr>`}).join('')}</table>
-    <button class="btn mt-3" onclick="saveAtt()">Zapisz frekwencję</button></div>`;
+// Oceny
+V.gr=async()=>{
+  if(!staff()){
+    if(!sid)return '<div class="card">Brak przypisanego ucznia.</div>';
+    const {data}=await sb.from('grades').select('*').eq('student_id',sid).order('created_at'),by={};
+    data.forEach(g=>{const s=sn(T.find(t=>t.id===g.teaching_id)?.subject_id);(by[s]??=[]).push(g)});
+    return `<div class="card"><h2>Oceny — ${esc(nm(sid))} (${esc(cn(ST[sid]?.class_id))})</h2>${tbl(['Przedmiot','Oceny'],Object.entries(by).map(([s,g])=>`<tr><td>${esc(s)}</td><td>${g.map(x=>`<span title="${esc((x.comment||'')+' · waga '+x.weight+' · '+fd(x.created_at))}" class="inline-block bg-amber-100 rounded px-2 mr-1 font-bold">${esc(x.value)}</span>`).join('')}</td></tr>`))}</div>`;
   }
-  return title('Oceny i frekwencja')+`<div class="flex gap-2 flex-wrap mb-3"><select class="inp max-w-[10rem]" onchange="setP('c',this.value)">${opts(cl,P.c)}</select>
-  ${P.t!=='class'?`<select class="inp max-w-xs" onchange="setP('s',this.value)">${opts(subs,P.s)}</select>`:''}</div>
-  <div class="flex gap-2 mb-3">${tb('grades','Oceny')}${tb('att','Frekwencja')}${home?tb('class','Klasa — pełny podgląd'):''}</div>${body}`;
-}
-window.addGrade=async sid=>{
-  const v=$('gv-'+sid).value.trim();if(!v)return toast('Wpisz ocenę',1);
-  await ok(sb.from('grades').insert({student_id:sid,subject_id:P.s,teacher_id:me.id,value:v,weight:+$('gw-'+sid).value,category:$('gc-'+sid).value.trim()||null}));
-  toast('Dodano ocenę');render();
+  const ts=myT(); if(!ts.length)return '<div class="card">Nie masz przypisanych klas i przedmiotów — dyrekcja ustawia je w Administracji.</div>';
+  curT=curT&&ts.find(t=>t.id===curT)?curT:ts[0].id; const t=ts.find(x=>x.id===curT),sts=classStudents(t.class_id);
+  const {data:g}=await sb.from('grades').select('*').eq('teaching_id',curT).order('created_at');
+  return `<div class="card"><select onchange="curT=this.value;render()">${opts(ts,tl,curT)}</select>
+   <div class="grid md:grid-cols-5 gap-2 mt-3"><select id="gs" class="md:col-span-2">${opts(sts,p=>p.last_name+' '+p.first_name)}</select><input id="gv" placeholder="Ocena (np. 5, 4+)"><input id="gw" type="number" min="1" max="10" value="1" title="Waga"><input id="gc" placeholder="Komentarz"></div>
+   <button class="b mt-2" onclick="addGrade()">Wstaw ocenę</button></div>
+   <div class="card">${tbl(['Uczeń','Oceny'],sts.map(p=>`<tr><td>${esc(p.last_name+' '+p.first_name)}</td><td>${g.filter(x=>x.student_id===p.id).map(x=>`<span class="inline-block bg-amber-100 rounded px-2 mr-1 font-bold" title="${esc(x.comment||'')} waga ${x.weight}">${esc(x.value)}${dir()||x.author_id===me.id?`<a class="ml-1 text-red-600 cursor-pointer" onclick="delGrade('${x.id}')">×</a>`:''}</span>`).join('')}</td></tr>`))}</div>`;
 };
-window.saveAtt=async()=>{
-  const rows=[...document.querySelectorAll('[data-att]')].map(e=>({student_id:e.dataset.att,date:P.d,hour:P.h,subject_id:P.s,teacher_id:me.id,status:e.value,updated_at:new Date().toISOString()}));
-  await ok(sb.from('attendance').upsert(rows,{onConflict:'student_id,date,hour'}));toast('Frekwencja zapisana');
-};
-window.remarkModal=sid=>modal(`<h3 class="text-xl font-extrabold text-indigoBrand">Wpis dla: ${esc(who(sid))}</h3><label class="lbl">Rodzaj</label><select id="rk" class="inp"><option value="uwaga">Uwaga</option><option value="pochwala">Pochwała</option></select>
-  <label class="lbl">Treść</label><textarea id="rb" rows="4" class="inp"></textarea><div class="flex gap-2 mt-4"><button class="btn" onclick="addRemark('${sid}')">Zapisz</button><button class="btn btn-ghost" onclick="closeModal()">Anuluj</button></div>`);
-window.addRemark=async sid=>{if(!$('rb').value.trim())return toast('Wpisz treść',1);
-  await ok(sb.from('remarks').insert({student_id:sid,teacher_id:me.id,kind:$('rk').value,body:$('rb').value.trim()}));closeModal();toast('Dodano wpis')};
-window.openStudent=async sid=>{modal(`<div class="flex justify-between mb-3"><button class="btn btn-sm" onclick="remarkModal('${sid}')">Dodaj uwagę / pochwałę</button><button class="btn btn-sm btn-ghost" onclick="closeModal()">Zamknij</button></div>${await studentCard(sid)}`,true)};
+const addGrade=()=>v('gv').trim()&&act(sb.from('grades').insert({student_id:v('gs'),teaching_id:curT,value:v('gv').trim(),weight:+v('gw')||1,comment:v('gc')||null,author_id:me.id}),render);
+const delGrade=id=>confirm('Usunąć ocenę?')&&act(sb.from('grades').delete().eq('id',id),render);
 
-/* ---------- usprawiedliwienia ---------- */
-async function vExcuses(){
-  const E=await ok(sb.from('excuses').select('*').order('created_at',{ascending:false}).limit(60));
-  const badge=s=>`<span class="px-2 py-0.5 rounded-lg text-xs font-bold ${{oczekuje:'bg-amber-100 text-amber-800',przyjete:'bg-green-100 text-green-800',odrzucone:'bg-red-100 text-red-700'}[s]}">${{oczekuje:'Oczekuje',przyjete:'Przyjęte',odrzucone:'Odrzucone'}[s]}</span>`;
-  const form=me.role==='rodzic'?`<div class="card mb-5"><h3 class="font-extrabold text-indigoBrand">Usprawiedliw nieobecność lub spóźnienie</h3>
-  <label class="lbl">Dziecko</label><select id="xS" class="inp" onchange="xHours()">${children.map(c=>`<option value="${c}">${esc(who(c))}</option>`).join('')}</select>
-  <label class="lbl">Dzień</label><input id="xD" type="date" class="inp" onchange="xHours()"><label class="lbl">Lekcje</label><div id="xH" class="text-sm text-slate-500">Wybierz dzień.</div>
-  <label class="lbl">Powód</label><textarea id="xR" rows="3" class="inp"></textarea><button class="btn mt-3" onclick="sendExcuse()">Wyślij do wychowawcy</button></div>`:'';
-  return title('Usprawiedliwienia')+form+`<div class="space-y-3">${E.map(e=>`<div class="card"><div class="flex justify-between gap-2 flex-wrap"><b>${esc(who(e.student_id))} <span class="text-slate-400 font-normal">${esc(cls(dir.find(d=>d.id===e.student_id)?.class_id))}</span></b>${badge(e.status)}</div>
-  <p class="text-sm mt-1">${new Date(e.date).toLocaleDateString('pl-PL')} • lekcje: ${e.hours.join(', ')}</p><p class="text-sm text-slate-600 whitespace-pre-wrap">${esc(e.reason)}</p>
-  ${isT()&&e.status==='oczekuje'?`<div class="flex gap-2 mt-3"><button class="btn btn-sm btn-green" onclick="decide('${e.id}',true)">Przyjmij</button><button class="btn btn-sm btn-red" onclick="decide('${e.id}',false)">Odrzuć</button></div>`:''}</div>`).join('')||card('Brak zgłoszeń.')}</div>`;
-}
-window.xHours=async()=>{
-  const d=$('xD').value;if(!d)return;const wd=new Date(d).getDay(),cid=dir.find(x=>x.id===$('xS').value)?.class_id;
-  const L=(await ok(sb.from('lessons').select('*').eq('class_id',cid).eq('weekday',wd))).sort((a,b)=>a.hour-b.hour);
-  $('xH').innerHTML=(L.length?L.map(l=>`<label class="mr-4 inline-block"><input type="checkbox" class="xh" value="${l.hour}"> ${l.hour}. ${esc(subj(l.subject_id))}</label>`):[1,2,3,4,5,6,7,8].map(n=>`<label class="mr-3"><input type="checkbox" class="xh" value="${n}"> ${n}</label>`)).join('');
+// Uwagi i pochwały
+V.nt=async()=>{
+  const q=sb.from('notes').select('*').order('created_at',{ascending:false}).limit(100); if(!staff())q.eq('student_id',sid);
+  const {data}=await q;
+  const form=staff()?`<div class="card"><h2>Dodaj uwagę / pochwałę</h2><div class="grid md:grid-cols-3 gap-2"><select id="ns">${opts(Object.values(P).filter(p=>p.role==='student'),p=>`${p.last_name} ${p.first_name} (${cn(ST[p.id]?.class_id)})`)}</select><select id="nk"><option value="remark">Uwaga</option><option value="praise">Pochwała</option></select></div><textarea id="nb" rows="2" class="mt-2" placeholder="Treść"></textarea><button class="b mt-2" onclick="addNote()">Dodaj</button></div>`:'';
+  return form+`<div class="card"><h2>Uwagi i pochwały</h2>${tbl(['Data','Uczeń','Rodzaj','Treść','Autor',''],data.map(n=>`<tr><td>${fd(n.created_at)}</td><td>${esc(nm(n.student_id))}</td><td>${n.kind==='praise'?'👍 pochwała':'⚠ uwaga'}</td><td>${esc(n.body)}</td><td>${esc(nm(n.author_id))}</td><td>${dir()||n.author_id===me.id?`<button class="b2" onclick="delNote('${n.id}')">Usuń</button>`:''}</td></tr>`))}</div>`;
 };
-window.sendExcuse=async()=>{
-  const h=[...document.querySelectorAll('.xh:checked')].map(x=>+x.value);
-  if(!$('xD').value||!h.length||!$('xR').value.trim())return toast('Wybierz dzień, lekcje i wpisz powód',1);
-  await ok(sb.from('excuses').insert({student_id:$('xS').value,parent_id:me.id,date:$('xD').value,hours:h,reason:$('xR').value.trim()}));toast('Wysłano do wychowawcy');render();
-};
-window.decide=async(id,a)=>{await ok(sb.rpc('decide_excuse',{p_id:id,p_accept:a}));toast(a?'Przyjęto':'Odrzucono');render();refreshDots()};
+const addNote=()=>v('nb').trim()&&act(sb.from('notes').insert({student_id:v('ns'),kind:v('nk'),body:v('nb').trim(),author_id:me.id}),render);
+const delNote=id=>act(sb.from('notes').delete().eq('id',id),render);
 
-/* ---------- plan lekcji ---------- */
-const PL={c:null};
-async function vPlan(){
-  const L=await ok(sb.from('lessons').select('*'));let list,cid=null;
-  if(isDir()){cid=PL.c&&classes.some(c=>c.id===PL.c)?PL.c:classes[0]?.id;list=L.filter(l=>l.class_id===cid)}
-  else if(me.role==='nauczyciel')list=L.filter(l=>l.teacher_id===me.id);
-  else{cid=me.role==='uczen'?me.class_id:dir.find(d=>d.id===curChild())?.class_id;list=L.filter(l=>l.class_id===cid)}
-  const maxH=Math.max(8,...list.map(l=>l.hour));
-  const cell=(d,h)=>{const l=list.find(x=>x.weekday===d&&x.hour===h);if(!l)return '';
-    return `<b>${esc(subj(l.subject_id))}</b><br><span class="text-xs text-slate-500">${me.role==='nauczyciel'?esc(cls(l.class_id)):esc(who(l.teacher_id))}${l.room?' • s.'+esc(l.room):''}</span>${isDir()?` <button class="text-red-400 text-xs" onclick="delRow('lessons','${l.id}')">×</button>`:''}`};
-  const T=teachers=>dir.filter(d=>['nauczyciel','dyrektor'].includes(d.role)).sort(byName);
-  const edit=isDir()&&cid?`<div class="card mt-5"><h3 class="font-extrabold text-indigoBrand">Dodaj lekcję do planu</h3><div class="grid sm:grid-cols-5 gap-2 mt-2">
-  <select id="lD" class="inp">${DAYS.map((d,i)=>`<option value="${i+1}">${d}</option>`).join('')}</select><select id="lH" class="inp">${[1,2,3,4,5,6,7,8,9,10].map(n=>`<option>${n}</option>`).join('')}</select>
-  <select id="lS" class="inp">${opts(subjects)}</select><select id="lT" class="inp">${T().map(t=>`<option value="${t.id}">${esc(t.full_name)}</option>`).join('')}</select><input id="lR" class="inp" placeholder="Sala"></div>
-  <button class="btn mt-3" onclick="addLesson('${cid}')">Dodaj do planu</button></div>`:'';
-  const sel=isDir()?`<select class="inp max-w-[10rem] mb-3" onchange="PL.c=this.value;render()">${opts(classes,cid)}</select>`:'';
-  if(me.role==='rodzic'&&children.length>1)return title('Plan lekcji')+`<select class="inp max-w-xs mb-3" onchange="setChild(this.value)">${children.map(c=>`<option value="${c}" ${c===curChild()?'selected':''}>${esc(who(c))}</option>`).join('')}</select>`+gridHtml();
-  return title('Plan lekcji')+sel+gridHtml()+edit;
-  function gridHtml(){return `<div class="card overflow-x-auto"><table class="w-full"><tr><th>#</th>${DAYS.map(d=>`<th>${d}</th>`).join('')}</tr>${Array.from({length:maxH},(_,i)=>`<tr><td class="font-bold text-slate-400">${i+1}</td>${[1,2,3,4,5].map(d=>`<td>${cell(d,i+1)}</td>`).join('')}</tr>`).join('')}</table></div>`}
-}
-window.PL=PL;
-window.addLesson=async c=>{await ok(sb.from('lessons').insert({class_id:c,weekday:+$('lD').value,hour:+$('lH').value,subject_id:$('lS').value,teacher_id:$('lT').value,room:$('lR').value.trim()||null}));toast('Dodano do planu');render()};
-
-/* ---------- dyrektor: konta ---------- */
-const A={t:'uczen'};
-const PRE={uczen:'u',rodzic:'r',nauczyciel:'n',dyrektor:'d'};
-const mkPass=()=>{const a='abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789',r=crypto.getRandomValues(new Uint32Array(10));return [...r].map(x=>a[x%a.length]).join('')};
-const mkLogin=(role,name)=>{const p=name.toLowerCase().replace(/ł/g,'l').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z ]/g,'').trim().split(/\s+/);
-  return `${PRE[role]}.${(p[0]||'x')[0]}${p[p.length-1]||''}${Math.floor(100+Math.random()*900)}`};
-async function mk(role,name,extra){
-  for(let i=0;i<4;i++){
-    const login=mkLogin(role,name),pass=mkPass();
-    const {data,error}=await sb.rpc('create_account',{p_login:login,p_password:pass,p_name:name,p_role:role,...extra});
-    if(!error)return {id:data,login,pass,name,role};
-    if(!/duplicate|unique/i.test(error.message))throw error;
+// Frekwencja
+V.at=async()=>{
+  if(!staff()){
+    if(!sid)return '<div class="card">Brak ucznia.</div>';
+    const {data}=await sb.from('attendance').select('*').eq('student_id',sid).neq('status','present').order('date',{ascending:false});
+    return `<div class="card"><h2>Nieobecności i spóźnienia</h2>${tbl(['Data','Lekcja','Przedmiot','Status'],data.map(a=>`<tr><td>${a.date}</td><td>${a.lesson_no}</td><td>${esc(sn(T.find(t=>t.id===a.teaching_id)?.subject_id))}</td><td>${AS[a.status]}</td></tr>`))}</div>`;
   }
-  throw new Error('Nie udało się wygenerować unikalnego loginu');
-}
-function printPage(w,list){
-  w.document.write(`<!doctype html><html lang="pl"><meta charset="utf-8"><title>Dane dostępowe — Minerva</title><style>body{font-family:Arial,sans-serif;margin:0}section{padding:60px;page-break-after:always;max-width:640px;margin:auto}
-  h1{color:#1E2A78;margin:0 0 30px}h2{font-size:28px;margin:0 0 20px}p{font-size:18px;margin:12px 0}code{font-size:24px;background:#F1F5F9;padding:4px 10px;border-radius:6px;letter-spacing:1px}small{color:#555;display:block;margin-top:30px;font-size:14px}
-  .np{position:fixed;top:10px;right:10px;padding:10px 18px;font-size:15px;cursor:pointer}@media print{.np{display:none}}</style><body><button class="np" onclick="print()">Drukuj</button>
-  ${list.map(a=>`<section><h1>Minerva — dane dostępowe</h1><h2>${esc(a.name)}</h2><p>Rodzaj konta: <b>${ROLE[a.role]}</b></p><p>Login: <code>${esc(a.login)}</code></p><p>Hasło jednorazowego dostępu: <code>${esc(a.pass)}</code></p>
-  <small>Po pierwszym zalogowaniu system poprosi o ustawienie własnego hasła. Hasło jednorazowe wygasa po jego zmianie.</small></section>`).join('')}</body></html>`);w.document.close();
-}
-window.acctType=t=>{A.t=t;render()};
-window.submitAcct=async()=>{
-  const w=window.open('','_blank'),v=id=>$(id)?.value.trim();
-  try{
-    const name=v('aName');if(!name)throw new Error('Podaj imię i nazwisko');
-    const out=[];
-    if(A.t==='uczen'){
-      const s=await mk('uczen',name,{p_class:v('aClass')||null,p_birth:v('aBirth')||null,p_mother:v('aMother')||null,p_father:v('aFather')||null,p_guardian:v('aGuard')||null});out.push(s);
-      for(const k of ['aMother','aFather','aGuard'])if(v(k))out.push(await mk('rodzic',v(k),{p_child:s.id}));
-    }else{
-      const t=await mk(A.t,name,{});out.push(t);
-      const subs=[...document.querySelectorAll('.aSub:checked')].map(x=>x.value);
-      if(subs.length)await ok(sb.from('teacher_subjects').insert(subs.map(s=>({teacher_id:t.id,subject_id:s}))));
-      if(v('aHome'))await ok(sb.from('classes').update({homeroom_id:t.id}).eq('id',v('aHome')));
-    }
-    printPage(w,out);toast('Konta utworzone — wydruk otwarty w nowej karcie');await loadRef();render();
-  }catch(e){w?.close();toast(e.message,1)}
+  const ts=myT(); if(!ts.length)return '<div class="card">Brak przypisanych lekcji.</div>';
+  curT=curT&&ts.find(t=>t.id===curT)?curT:ts[0].id; const t=ts.find(x=>x.id===curT);
+  const date=$('#ad')?.value||new Date().toISOString().slice(0,10),ln=$('#al')?.value||1;
+  const {data}=await sb.from('attendance').select('*').eq('teaching_id',curT).eq('date',date).eq('lesson_no',ln);
+  const cur={};data.forEach(a=>cur[a.student_id]=a.status);
+  return `<div class="card"><h2>Sprawdzanie obecności</h2><div class="grid md:grid-cols-3 gap-2"><select onchange="curT=this.value;render()">${opts(ts,tl,curT)}</select><input id="ad" type="date" value="${date}" onchange="render()"><select id="al" onchange="render()">${[1,2,3,4,5,6,7,8,9,10].map(n=>`<option ${n==ln?'selected':''}>${n}</option>`).join('')}</select></div>
+   ${tbl(['Uczeń','Status'],classStudents(t.class_id).map(p=>`<tr><td>${esc(p.last_name+' '+p.first_name)}</td><td><select class="as" data-s="${p.id}">${Object.entries(AS).map(([k,l])=>`<option value="${k}" ${(cur[p.id]||'present')===k?'selected':''}>${l}</option>`).join('')}</select></td></tr>`))}
+   <button class="b mt-2" onclick="saveAtt()">Zapisz frekwencję</button></div>`;
 };
-async function vAccounts(){
-  const [pr,pc]=await Promise.all([ok(sb.from('profiles').select('*').order('full_name')),ok(sb.from('parent_children').select('*'))]);
-  const f=A.t==='uczen'?`<label class="lbl">Klasa</label><select id="aClass" class="inp"><option value="">— bez klasy —</option>${opts(classes)}</select>
-   <label class="lbl">Data urodzenia</label><input id="aBirth" type="date" class="inp"><label class="lbl">Imię i nazwisko matki</label><input id="aMother" class="inp">
-   <label class="lbl">Imię i nazwisko ojca</label><input id="aFather" class="inp"><label class="lbl">Opiekun / opiekun zastępczy (opcjonalnie)</label><input id="aGuard" class="inp">
-   <p class="text-xs text-slate-500 mt-2">Każda wpisana osoba dostanie własne konto rodzica powiązane z uczniem.</p>`
-  :`<label class="lbl">Nauczane przedmioty</label><div class="flex flex-wrap gap-x-4 gap-y-1 text-sm">${subjects.map(s=>`<label><input type="checkbox" class="aSub" value="${s.id}"> ${esc(s.name)}</label>`).join('')||'<span class="text-slate-500">Najpierw dodaj przedmioty w zakładce Placówka.</span>'}</div>
-   <label class="lbl">Klasa wychowawcza (opcjonalnie)</label><select id="aHome" class="inp"><option value="">— brak —</option>${opts(classes)}</select>`;
-  return title('Konta')+`<div class="card mb-5"><h3 class="font-extrabold text-indigoBrand">Nowe konto</h3>
-  <label class="lbl">Rodzaj konta</label><select class="inp" onchange="acctType(this.value)"><option value="uczen" ${A.t==='uczen'?'selected':''}>Uczeń (+ konta rodziców)</option><option value="nauczyciel" ${A.t==='nauczyciel'?'selected':''}>Nauczyciel</option><option value="dyrektor" ${A.t==='dyrektor'?'selected':''}>Dyrektor</option></select>
-  <label class="lbl">Imię i nazwisko</label><input id="aName" class="inp">${f}<button class="btn mt-4" onclick="submitAcct()">Utwórz konto i otwórz wydruk</button></div>
-  <div class="card"><div class="flex justify-between gap-2 mb-2"><h3 class="font-extrabold text-indigoBrand">Wszystkie konta (${pr.length})</h3><input class="inp max-w-xs" placeholder="Szukaj…" oninput="const q=this.value.toLowerCase();document.querySelectorAll('#acc tr[data-s]').forEach(r=>r.style.display=r.dataset.s.includes(q)?'':'none')"></div>
-  <div class="overflow-x-auto"><table class="w-full" id="acc"><tr><th>Imię i nazwisko</th><th>Rodzaj</th><th>Login</th><th>Klasa / uwagi</th><th></th></tr>${pr.map(p=>{
-    const kid=pc.find(x=>x.parent_id===p.id),sj=tsubs.filter(t=>t.teacher_id===p.id).map(t=>subj(t.subject_id)).join(', '),hr=classes.find(c=>c.homeroom_id===p.id);
-    return `<tr data-s="${esc((p.full_name+p.login+p.role).toLowerCase())}"><td class="font-semibold">${esc(p.full_name)}</td><td>${ROLE[p.role]}${p.must_change?' <span class="text-xs text-amber-600">(hasło jednorazowe)</span>':''}</td><td><code>${esc(p.login)}</code></td>
-    <td>${p.role==='uczen'?`<select class="inp !w-28" onchange="setClass('${p.id}',this.value)"><option value="">—</option>${opts(classes,p.class_id)}</select>`:p.role==='rodzic'?'dziecko: '+esc(kid?who(kid.child_id):'—'):esc(sj)+(hr?' • wychowawca '+esc(hr.name):'')}</td>
-    <td><button class="btn btn-sm btn-ghost" onclick="resetPw('${p.id}')">Resetuj hasło</button></td></tr>`}).join('')}</table></div></div>`;
-}
-window.setClass=async(id,c)=>{await ok(sb.from('profiles').update({class_id:c||null}).eq('id',id));await loadRef();toast('Zmieniono klasę')};
-window.resetPw=async id=>{
-  if(!confirm('Zresetować hasło? Użytkownik dostanie nowe hasło jednorazowe.'))return;
-  const w=window.open('','_blank');
-  try{const p=await ok(sb.from('profiles').select('*').eq('id',id).single()),pass=mkPass();
-    await ok(sb.rpc('reset_password',{p_user:id,p_password:pass}));printPage(w,[{name:p.full_name,role:p.role,login:p.login,pass}]);toast('Hasło zresetowane');render();
-  }catch(e){w?.close()}
+const saveAtt=()=>act(sb.from('attendance').upsert([...document.querySelectorAll('.as')].map(s=>({student_id:s.dataset.s,teaching_id:curT,date:v('ad'),lesson_no:+v('al'),status:s.value,updated_by:me.id})),{onConflict:'student_id,teaching_id,date,lesson_no'}),()=>alert('Zapisano'));
+
+// Usprawiedliwienia
+V.js=async()=>{
+  const {data}=await sb.from('justifications').select('*').order('created_at',{ascending:false});
+  const form=me.role==='parent'?`<div class="card"><h2>Usprawiedliw nieobecność / spóźnienie</h2><div class="grid md:grid-cols-2 gap-2"><select id="jc">${opts(KIDS.map(i=>P[i]),nm)}</select><input id="jd" type="date"></div>
+   <div class="flex flex-wrap gap-3 my-2 text-sm">${[1,2,3,4,5,6,7,8].map(n=>`<label><input type="checkbox" class="jl" value="${n}" style="width:auto"> lekcja ${n}</label>`).join('')}</div><textarea id="jr" rows="2" placeholder="Powód"></textarea><button class="b mt-2" onclick="sendJ()">Wyślij do wychowawcy</button></div>`:'';
+  const S={pending:'oczekuje',accepted:'przyjęte',rejected:'odrzucone'};
+  return form+`<div class="card"><h2>Usprawiedliwienia</h2>${tbl(['Uczeń','Data','Lekcje','Powód','Status',''],data.map(j=>`<tr><td>${esc(nm(j.student_id))}</td><td>${j.date}</td><td>${j.lessons.join(', ')}</td><td>${esc(j.reason)}</td><td>${S[j.status]}</td><td>${j.status==='pending'&&staff()?`<button class="b2" onclick="decide('${j.id}',true)">Przyjmij</button> <button class="b2" onclick="decide('${j.id}',false)">Odrzuć</button>`:''}</td></tr>`))}</div>`;
+};
+const sendJ=()=>{const l=[...document.querySelectorAll('.jl:checked')].map(x=>+x.value);if(!v('jd')||!l.length||!v('jr').trim())return alert('Wybierz dzień, lekcje i podaj powód.');
+  act(sb.from('justifications').insert({student_id:v('jc'),parent_id:me.id,date:v('jd'),lessons:l,reason:v('jr').trim()}),render)};
+const decide=(id,ok)=>act(sb.rpc('decide_justification',{p_id:id,p_accept:ok}),()=>{calcDots().then(nav);render()});
+
+// Klasa (wychowawca / dyrektor)
+V.cl=async()=>{
+  const cs=dir()?C:C.filter(c=>c.homeroom_teacher_id===me.id); if(!cs.length)return '';
+  curC=curC&&cs.find(c=>c.id===curC)?curC:cs[0].id; const sts=classStudents(curC),ids=sts.map(s=>s.id)||[];
+  const [g,n,a]=await Promise.all([sb.from('grades').select('*').in('student_id',ids),sb.from('notes').select('*').in('student_id',ids),sb.from('attendance').select('student_id,status').in('student_id',ids).neq('status','present')]);
+  return `<div class="card"><select onchange="curC=this.value;render()">${opts(cs,c=>'Klasa '+c.name,curC)}</select></div>`+sts.map(p=>{
+    const gs={};g.data.filter(x=>x.student_id===p.id).forEach(x=>(gs[sn(T.find(t=>t.id===x.teaching_id)?.subject_id)]??=[]).push(x.value));
+    const ab=a.data.filter(x=>x.student_id===p.id);
+    return `<div class="card"><h2>${esc(p.last_name+' '+p.first_name)}</h2><p class="text-sm">Oceny: ${Object.entries(gs).map(([s,l])=>`<b>${esc(s)}</b>: ${l.map(esc).join(', ')}`).join(' · ')||'—'}</p><p class="text-sm">Nieobecności: ${ab.filter(x=>x.status==='absent').length} · spóźnienia: ${ab.filter(x=>x.status==='late').length} · usprawiedliwione: ${ab.filter(x=>x.status==='excused').length}</p><p class="text-sm">Uwagi/pochwały: ${n.data.filter(x=>x.student_id===p.id).map(x=>(x.kind==='praise'?'👍 ':'⚠ ')+esc(x.body)).join(' | ')||'—'}</p></div>`}).join('');
 };
 
-/* ---------- dyrektor: placówka ---------- */
-async function vSchool(){
-  const T=dir.filter(d=>['nauczyciel','dyrektor'].includes(d.role)).sort(byName);
-  return title('Placówka i plany')+`<div class="grid md:grid-cols-2 gap-5">
-  <div class="card"><h3 class="font-extrabold text-indigoBrand mb-2">Przedmioty</h3><div class="flex gap-2"><input id="nS" class="inp" placeholder="Nazwa przedmiotu"><button class="btn" onclick="addSub()">Dodaj</button></div>
-   <div class="mt-3 space-y-1">${subjects.map(s=>`<div class="flex justify-between text-sm py-1 border-t border-slate-100">${esc(s.name)}<button class="text-red-400 text-xs" onclick="delKey('subjects','${s.id}')">usuń</button></div>`).join('')||'<p class="text-sm text-slate-500">Brak przedmiotów.</p>'}</div></div>
-  <div class="card"><h3 class="font-extrabold text-indigoBrand mb-2">Klasy i wychowawcy</h3><div class="flex gap-2"><input id="nC" class="inp" placeholder="np. 4a"><button class="btn" onclick="addClass()">Dodaj</button></div>
-   <div class="mt-3 space-y-1">${classes.map(c=>`<div class="flex items-center gap-2 text-sm py-1 border-t border-slate-100"><b class="w-12">${esc(c.name)}</b><select class="inp" onchange="setHome('${c.id}',this.value)"><option value="">— bez wychowawcy —</option>${T.map(t=>`<option value="${t.id}" ${t.id===c.homeroom_id?'selected':''}>${esc(t.full_name)}</option>`).join('')}</select><button class="text-red-400 text-xs" onclick="delKey('classes','${c.id}')">usuń</button></div>`).join('')||'<p class="text-sm text-slate-500">Brak klas.</p>'}</div></div>
-  <div class="card md:col-span-2"><h3 class="font-extrabold text-indigoBrand mb-2">Kto uczy którą klasę</h3>
-   <div class="grid sm:grid-cols-4 gap-2"><select id="asT" class="inp">${T.map(t=>`<option value="${t.id}">${esc(t.full_name)}</option>`).join('')}</select><select id="asC" class="inp">${opts(classes)}</select><select id="asS" class="inp">${opts(subjects)}</select><button class="btn" onclick="addAssign()">Przypisz</button></div>
-   <div class="mt-3">${assign.map(a=>`<div class="flex justify-between text-sm py-1 border-t border-slate-100"><span>${esc(who(a.teacher_id))} — ${esc(cls(a.class_id))} — ${esc(subj(a.subject_id))}</span><button class="text-red-400 text-xs" onclick="delAssign('${a.teacher_id}','${a.class_id}','${a.subject_id}')">usuń</button></div>`).join('')}</div>
-   <p class="text-xs text-slate-500 mt-3">Uczniów do klas przypisujesz w zakładce Konta, a plan lekcji ustawiasz w zakładce Plan lekcji.</p></div></div>`;
+// Plan lekcji
+V.pl=async()=>{
+  let cid=me.role==='student'?ST[me.id]?.class_id:me.role==='parent'?ST[sid]?.class_id:(curC||C[0]?.id);
+  const sel=staff()?`<div class="card"><select onchange="curC=this.value;render()">${opts(C,c=>'Klasa '+c.name,cid)}</select></div>`:'';
+  if(!cid)return sel+'<div class="card">Brak przypisanej klasy.</div>';
+  const {data}=await sb.from('timetable').select('*').eq('class_id',cid);
+  return sel+`<div class="card"><h2>Plan — klasa ${esc(cn(cid))}</h2>${tbl(['Lekcja',...DAYS.slice(1)],[1,2,3,4,5,6,7,8,9,10].map(n=>`<tr><td>${n}</td>${[1,2,3,4,5].map(d=>{const e=data.find(x=>x.weekday===d&&x.lesson_no===n),t=e&&T.find(x=>x.id===e.teaching_id);return `<td>${t?esc(sn(t.subject_id))+'<br><span class="text-xs text-slate-500">'+esc(nm(t.teacher_id))+'</span>':''}</td>`}).join('')}</tr>`))}</div>`;
+};
+
+// Administracja (dyrektor)
+V.ad=async()=>{
+  const users=Object.values(P).sort((a,b)=>a.role.localeCompare(b.role)||a.last_name.localeCompare(b.last_name));
+  const tch=users.filter(p=>['teacher','director'].includes(p.role)), cid=curC||C[0]?.id;
+  const {data:tt}=cid?await sb.from('timetable').select('*').eq('class_id',cid).order('weekday').order('lesson_no'):{data:[]};
+  return `<div class="card"><h2>Nowe konto</h2><select id="cr" onchange="crFields()"><option value="student">Dziecko (uczeń + konta rodziców)</option><option value="teacher">Nauczyciel</option><option value="director">Dyrektor</option></select>
+   <div class="grid md:grid-cols-2 gap-2 mt-2"><input id="cf" placeholder="Imię"><input id="cl" placeholder="Nazwisko"></div>
+   <div id="cs" class="grid md:grid-cols-2 gap-2 mt-2"><label class="text-sm">Klasa<select id="cc"><option value="">— brak —</option>${opts(C,c=>c.name)}</select></label><label class="text-sm">Data urodzenia<input id="cb" type="date"></label><input id="cm" placeholder="Imię i nazwisko matki"><input id="cfa" placeholder="Imię i nazwisko ojca"><input id="cg" class="md:col-span-2" placeholder="Opiekun / opiekun zastępczy (opcjonalnie)"></div>
+   <div id="ct" class="hidden mt-2 text-sm"><label>Nauczane przedmioty (Ctrl/Cmd = wiele)<select id="csub" multiple size="5">${opts(SUB,s=>s.name)}</select></label><label class="block mt-2">Klasa wychowawcza (opcjonalnie)<select id="chr"><option value="">— brak —</option>${opts(C,c=>c.name)}</select></label></div>
+   <button class="b mt-3" onclick="createAcc()">Utwórz i otwórz wydruk</button></div>
+  <div class="card"><h2>Przedmioty</h2><div class="flex gap-2"><input id="sbn" placeholder="Nazwa przedmiotu"><button class="b" onclick="addSub()">Dodaj</button></div><p class="text-sm mt-2">${SUB.map(s=>esc(s.name)).join(' · ')||'brak'}</p></div>
+  <div class="card"><h2>Klasy i wychowawcy</h2><div class="flex gap-2"><input id="cln" placeholder="Nazwa klasy, np. 3A"><button class="b" onclick="addClass()">Dodaj</button></div>
+   ${tbl(['Klasa','Wychowawca'],C.map(c=>`<tr><td>${esc(c.name)}</td><td><select onchange="setHome('${c.id}',this.value)"><option value="">—</option>${opts(tch,nm,c.homeroom_teacher_id)}</select></td></tr>`))}</div>
+  <div class="card"><h2>Przydziały: klasa – przedmiot – nauczyciel</h2><div class="grid md:grid-cols-4 gap-2"><select id="tc">${opts(C,c=>c.name)}</select><select id="ts">${opts(SUB,s=>s.name)}</select><select id="tt">${opts(tch,nm)}</select><button class="b" onclick="addTeach()">Przypisz</button></div>
+   ${tbl(['Klasa','Przedmiot','Nauczyciel',''],T.map(t=>`<tr><td>${esc(cn(t.class_id))}</td><td>${esc(sn(t.subject_id))}</td><td>${esc(nm(t.teacher_id))}</td><td><button class="b2" onclick="delRow('teaching','${t.id}')">Usuń</button></td></tr>`))}</div>
+  <div class="card"><h2>Plan lekcji</h2><select onchange="curC=this.value;render()">${opts(C,c=>'Klasa '+c.name,cid)}</select>
+   <div class="grid md:grid-cols-4 gap-2 mt-2"><select id="pd">${[1,2,3,4,5].map(d=>`<option value="${d}">${DAYS[d]}</option>`)}</select><select id="pn">${[1,2,3,4,5,6,7,8,9,10].map(n=>`<option>${n}</option>`)}</select><select id="pt">${opts(T.filter(t=>t.class_id===cid),t=>sn(t.subject_id)+' — '+nm(t.teacher_id))}</select><button class="b" onclick="addTT('${cid}')">Dodaj do planu</button></div>
+   ${tbl(['Dzień','Lekcja','Przedmiot',''],tt.map(e=>{const t=T.find(x=>x.id===e.teaching_id);return `<tr><td>${DAYS[e.weekday]}</td><td>${e.lesson_no}</td><td>${esc(sn(t?.subject_id))}</td><td><button class="b2" onclick="delRow('timetable','${e.id}')">Usuń</button></td></tr>`}))}</div>
+  <div class="card"><h2>Konta użytkowników</h2>${tbl(['Osoba','Rodzaj','Login','Klasa ucznia',''],users.map(p=>`<tr><td>${esc(nm(p.id))}</td><td>${RL[p.role]}</td><td>${esc(p.login)}</td><td>${p.role==='student'?`<select onchange="setClass('${p.id}',this.value)"><option value="">—</option>${opts(C,c=>c.name,ST[p.id]?.class_id)}</select>`:''}</td><td><button class="b2" onclick="resetPw('${p.id}')">Resetuj hasło</button></td></tr>`))}</div>`;
+};
+function crFields(){const s=v('cr')==='student';$('#cs').classList.toggle('hidden',!s);$('#ct').classList.toggle('hidden',s)}
+const reload=async()=>{await load();render()};
+const addSub=()=>v('sbn').trim()&&act(sb.from('subjects').insert({school_id:me.school_id,name:v('sbn').trim()}),reload);
+const addClass=()=>v('cln').trim()&&act(sb.from('classes').insert({school_id:me.school_id,name:v('cln').trim()}),reload);
+const setHome=(id,t)=>act(sb.from('classes').update({homeroom_teacher_id:t||null}).eq('id',id),load);
+const setClass=(id,c)=>act(sb.from('students').update({class_id:c||null}).eq('profile_id',id),load);
+const addTeach=()=>act(sb.from('teaching').insert({class_id:v('tc'),subject_id:v('ts'),teacher_id:v('tt')}),reload);
+const addTT=c=>act(sb.from('timetable').insert({class_id:c,teaching_id:v('pt'),weekday:+v('pd'),lesson_no:+v('pn')}),reload);
+const delRow=(t,id)=>confirm('Usunąć?')&&act(sb.from(t).delete().eq('id',id),reload);
+
+async function createAcc(){
+  const w=window.open('','_blank'); // otwarte od razu (blokada popupów)
+  const role=v('cr'),body={action:'create',role,first_name:v('cf'),last_name:v('cl')};
+  if(role==='student')Object.assign(body,{class_id:v('cc')||null,birth_date:v('cb')||null,mother:v('cm'),father:v('cfa'),guardian:v('cg')});
+  else Object.assign(body,{subject_ids:[...$('#csub').selectedOptions].map(o=>o.value),class_id:v('chr')||null});
+  const {data,error}=await sb.functions.invoke('admin-users',{body});
+  if(error||data?.error){w&&w.close();return alert(data?.error||error.message)}
+  printAccts(w,data.accounts);reload();
 }
-const refresh=async()=>{await loadRef();render()};
-window.addSub=async()=>{if(!$('nS').value.trim())return;await ok(sb.from('subjects').insert({name:$('nS').value.trim()}));refresh()};
-window.addClass=async()=>{if(!$('nC').value.trim())return;await ok(sb.from('classes').insert({name:$('nC').value.trim()}));refresh()};
-window.setHome=async(id,t)=>{await ok(sb.from('classes').update({homeroom_id:t||null}).eq('id',id));refresh()};
-window.delKey=async(t,id)=>{if(!confirm('Usunąć? Powiązane dane (oceny, plan) mogą zostać usunięte.'))return;await ok(sb.from(t).delete().eq('id',id));refresh()};
-window.addAssign=async()=>{await ok(sb.from('assignments').insert({teacher_id:$('asT').value,class_id:$('asC').value,subject_id:$('asS').value}));refresh()};
-window.delAssign=async(t,c,s)=>{await ok(sb.from('assignments').delete().match({teacher_id:t,class_id:c,subject_id:s}));refresh()};
+async function resetPw(id){
+  if(!confirm('Wygenerować nowe hasło jednorazowe? Stare przestanie działać.'))return;
+  const w=window.open('','_blank'),{data,error}=await sb.functions.invoke('admin-users',{body:{action:'reset',user_id:id}});
+  if(error||data?.error){w&&w.close();return alert(data?.error||error.message)}
+  printAccts(w,data.accounts);
+}
+function printAccts(w,a){
+  const rl={...RL,parent:'Rodzic / opiekun'};
+  w.document.write(`<!DOCTYPE html><meta charset="utf-8"><title>Dane dostępowe</title><style>body{font-family:'Open Sans',Arial,sans-serif;margin:0}.c{border:2px solid #1E2A78;border-radius:12px;padding:24px;margin:24px auto;max-width:520px;page-break-inside:avoid}.s{color:#1E2A78;font-weight:800;font-size:18px}h1{margin:6px 0 2px}.r{margin:12px 0;font-size:14px;color:#555}b.m{font-family:monospace;font-size:22px;background:#fef3c7;padding:2px 8px;border-radius:6px}p.n{font-size:12px;color:#777}.t{text-align:center;margin:16px}@media print{.t{display:none}}</style>
+  <div class="t"><button onclick="print()">Drukuj</button></div>`+a.map(x=>`<div class="c"><div class="s">${esc(school)} — Dziennik Minerva</div><h1>${esc(x.name)}</h1><div class="r">Rodzaj konta: <b>${rl[x.role]}</b></div><div class="r">Login: <b class="m">${esc(x.login)}</b></div><div class="r">Hasło jednorazowego dostępu: <b class="m">${esc(x.password)}</b></div><p class="n">Po pierwszym zalogowaniu na stronie /login system poprosi o ustawienie własnego hasła. Hasło jednorazowe działa tylko do tego momentu.</p></div>`).join(''));
+  w.document.close();
+}
+init();
 </script>
 </body>
 </html>
