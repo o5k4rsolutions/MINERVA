@@ -188,11 +188,11 @@ const LIVE={
  justifications:p=>{if(p.eventType==='INSERT'&&(dir()||isHome()))toast('Nowe usprawiedliwienie do rozpatrzenia','info',6000);if(p.eventType==='UPDATE'&&me.role==='parent')toast('Usprawiedliwienie: '+({accepted:'przyjęte',rejected:'odrzucone'}[p.new.status]||''),'info',5000)},
  timetable_changes:p=>{if(p.eventType==='INSERT'&&relCh(p.new)){toast(chMsg(p.new),'info',7000);beep();lastPl=Date.now()}},
  timetable:p=>{if(p.eventType==='INSERT'&&relCh({...p.new,kind:'x'})&&Date.now()-lastPl>4000){lastPl=Date.now();toast('Zmieniono plan lekcji','info',6000);beep()}},
- days_off:p=>{if(p.eventType==='INSERT'&&!dir()&&Date.now()-lastPl>4000){lastPl=Date.now();toast('Dzień wolny od zajęć: '+p.new.name+' ('+fdl(p.new.date)+')','info',7000);beep()}},
+ days_off:p=>{if(p.eventType==='INSERT'&&(!dir()||(p.new.created_by&&p.new.created_by!==me.id))&&Date.now()-lastPl>4000){lastPl=Date.now();toast('Dzień wolny od zajęć: '+p.new.name+' ('+fdl(p.new.date)+')','info',7000);beep()}},
  messages:()=>{},attendance:()=>{}};
-const relCh=k=>{if(dir()||k.kind==='moved_in')return false;if(me.role==='student')return ST[me.id]?.class_id===k.class_id;if(me.role==='parent')return KIDS.some(i=>ST[i]?.class_id===k.class_id);return T.find(t=>t.id===k.teaching_id)?.teacher_id===me.id||k.sub_teacher_id===me.id};
+const relCh=k=>{if(k.kind==='moved_in')return false;if(dir())return !!k.created_by&&k.created_by!==me.id;if(me.role==='student')return ST[me.id]?.class_id===k.class_id;if(me.role==='parent')return KIDS.some(i=>ST[i]?.class_id===k.class_id);return T.find(t=>t.id===k.teaching_id)?.teacher_id===me.id||k.sub_teacher_id===me.id};
 const chMsg=k=>'Zmiana w planie: '+fdl(k.date)+', lekcja '+k.lesson_no+' - '+({substitution:'zastępstwo',cancelled:'lekcja odwołana',moved_out:'lekcja przeniesiona'}[k.kind]||'zmiana');
-const plCount=async()=>{if(dir())return 0;const {data,error}=await sb.from('timetable_changes').select('*').gt('created_at',plSeen||me.prev_seen||new Date(0).toISOString());return error?0:(data||[]).filter(relCh).length};
+const plCount=async()=>{const {data,error}=await sb.from('timetable_changes').select('*').gt('created_at',plSeen||me.prev_seen||new Date(0).toISOString());return error?0:(data||[]).filter(relCh).length};
 const fatal=(t,m)=>{$('#main').innerHTML=`<div class="pn"><div class="pb"><h3 class="mh">${esc(t)}</h3><p>${esc(m)}</p><button class="btn mt-3" onclick="logout()">Wyloguj i wróć do logowania</button></div></div>`};
 async function init(){
   try{setFs(+localStorage.getItem('fs')||0)}catch{setFs(0)}
