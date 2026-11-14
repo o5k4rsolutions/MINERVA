@@ -52,7 +52,7 @@ tr{transition:background .2s}tr.hv:hover{background:#fffbeb}
 <div id="toasts"></div><div id="modal"></div>
 
 <script>
-const sb=supabase.createClient('https://YOUR-PROJECT.supabase.co','YOUR-ANON-KEY');
+const sb=supabase.createClient('https://tsoxtjxfskvgiruraoau.supabase.co','sb_publishable_oU23IIberCIeZksCjK5dFA_iMd0cNZB');
 const $=s=>document.querySelector(s), v=id=>$('#'+id).value;
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const fd=d=>new Date(d).toLocaleString('pl-PL',{dateStyle:'short',timeStyle:'short'});
@@ -94,7 +94,7 @@ async function init(){
   sb.auth.onAuthStateChange(ev=>{if(ev==='SIGNED_OUT')location.href='/login'});
   const {data:m,error}=await sb.from('profiles').select('*').eq('id',session.user.id).maybeSingle();
   if(error)return fatal('Błąd odczytu konta',error.message+' — sprawdź, czy w Supabase wykonano schema.sql (polityki RLS).');
-  if(!m)return fatal('Brak profilu użytkownika','Konto logowania istnieje, ale nie ma dla niego wpisu w tabeli profiles. Poproś dyrekcję o ponowne założenie konta.');
+  if(!m)return fatal('Brak profilu użytkownika','Konto logowania istnieje, ale nie ma dla niego wpisu. Poproś dyrekcję o ponowne założenie konta.');
   if(m.must_change_password)return location.href='/login';
   me=m;
   try{await load()}catch(e){return fatal('Błąd wczytywania danych',e.message)}
