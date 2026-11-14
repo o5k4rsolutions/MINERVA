@@ -186,7 +186,13 @@ const LIVE={
  grades:p=>{if(p.eventType==='INSERT'&&p.new.author_id!==me.id&&!staff()&&mine(p.new.student_id)){toast('Nowa ocena: '+p.new.value,'info',5000);beep()}},
  notes:p=>{if(p.eventType==='INSERT'&&p.new.author_id!==me.id&&!staff()&&mine(p.new.student_id))toast(p.new.kind==='praise'?'Nowa pochwała':'Nowa uwaga','info',5000)},
  justifications:p=>{if(p.eventType==='INSERT'&&(dir()||isHome()))toast('Nowe usprawiedliwienie do rozpatrzenia','info',6000);if(p.eventType==='UPDATE'&&me.role==='parent')toast('Usprawiedliwienie: '+({accepted:'przyjęte',rejected:'odrzucone'}[p.new.status]||''),'info',5000)},
+ timetable_changes:p=>{if(p.eventType==='INSERT'&&relCh(p.new)){toast(chMsg(p.new),'info',7000);beep();lastPl=Date.now()}},
+ timetable:p=>{if(p.eventType==='INSERT'&&relCh({...p.new,kind:'x'})&&Date.now()-lastPl>4000){lastPl=Date.now();toast('Zmieniono plan lekcji','info',6000);beep()}},
+ days_off:p=>{if(p.eventType==='INSERT'&&!dir()&&Date.now()-lastPl>4000){lastPl=Date.now();toast('Dzień wolny od zajęć: '+p.new.name+' ('+fdl(p.new.date)+')','info',7000);beep()}},
  messages:()=>{},attendance:()=>{}};
+const relCh=k=>{if(dir()||k.kind==='moved_in')return false;if(me.role==='student')return ST[me.id]?.class_id===k.class_id;if(me.role==='parent')return KIDS.some(i=>ST[i]?.class_id===k.class_id);return T.find(t=>t.id===k.teaching_id)?.teacher_id===me.id||k.sub_teacher_id===me.id};
+const chMsg=k=>'Zmiana w planie: '+fdl(k.date)+', lekcja '+k.lesson_no+' - '+({substitution:'zastępstwo',cancelled:'lekcja odwołana',moved_out:'lekcja przeniesiona'}[k.kind]||'zmiana');
+const plCount=async()=>{if(dir())return 0;const {data,error}=await sb.from('timetable_changes').select('*').gt('created_at',plSeen||me.prev_seen||new Date(0).toISOString());return error?0:(data||[]).filter(relCh).length};
 const fatal=(t,m)=>{$('#main').innerHTML=`<div class="pn"><div class="pb"><h3 class="mh">${esc(t)}</h3><p>${esc(m)}</p><button class="btn mt-3" onclick="logout()">Wyloguj i wróć do logowania</button></div></div>`};
 async function init(){
   try{setFs(+localStorage.getItem('fs')||0)}catch{setFs(0)}
@@ -205,7 +211,7 @@ async function init(){
   if(me.role==='student')sid=me.id;if(me.role==='parent')sid=KIDS[0]||null;
   await calcDots();nav();render();
   let to;const ch=sb.channel('live');
-  Object.keys(LIVE).forEach(t=>ch.on('postgres_changes',{event:'*',schema:'public',table:t},p=>{LIVE[t](p);clearTimeout(to);to=setTimeout(async()=>{await calcDots();nav();if(detail){if(t==='messages')openMsg(detail,true);return}if(!dirty&&!$('#modal').classList.contains('show'))render(true)},500)}));
+  Object.keys(LIVE).forEach(t=>ch.on('postgres_changes',{event:'*',schema:'public',table:t},p=>{LIVE[t](p);clearTimeout(to);to=setTimeout(async()=>{if(['timetable','timetable_changes','days_off'].includes(t))await load().catch(()=>{});await calcDots();nav();if(detail){if(t==='messages')openMsg(detail,true);return}if(!dirty&&!$('#modal').classList.contains('show'))render(true)},500)}));
   ch.subscribe(st=>{const e=$('#live');e.classList.remove('hidden');e.innerHTML=st==='SUBSCRIBED'?'<i class="ld on"></i>na żywo':'<i class="ld"></i>offline'});
   const idle=()=>!document.hidden&&!detail&&!dirty&&!$('#modal').classList.contains('show');
   setInterval(()=>{if(idle())refresh(true)},30000);
@@ -222,9 +228,9 @@ const inHome=s=>C.some(c=>c.homeroom_teacher_id===me.id&&c.id===ST[s]?.class_id)
 const jCount=async()=>{if(!(dir()||isHome()))return 0;const {data}=await sb.from('justifications').select('student_id').eq('status','pending');return(data||[]).filter(x=>dir()||inHome(x.student_id)).length};
 async function calcDots(){
   const since=me.prev_seen||new Date(0).toISOString(),h=t=>sb.from(t).select('*',{count:'exact',head:true});
-  const [m,a,g,n,j]=await Promise.all([h('message_recipients').eq('recipient_id',me.id).is('read_at',null),h('announcements').gt('created_at',since).neq('author_id',me.id),h('grades').gt('created_at',since).neq('author_id',me.id),h('notes').gt('created_at',since).neq('author_id',me.id),jCount()]);
+  const [m,a,g,n,j,pc]=await Promise.all([h('message_recipients').eq('recipient_id',me.id).is('read_at',null),h('announcements').gt('created_at',since).neq('author_id',me.id),h('grades').gt('created_at',since).neq('author_id',me.id),h('notes').gt('created_at',since).neq('author_id',me.id),jCount(),plCount()]);
   const keep=k=>dots[k]===0?0:undefined;
-  dots={msg:m.count,ann:keep('ann')??a.count,gr:staff()?0:keep('gr')??g.count,nt:staff()?0:keep('nt')??n.count,js:j};
+  dots={msg:m.count,ann:keep('ann')??a.count,gr:staff()?0:keep('gr')??g.count,nt:staff()?0:keep('nt')??n.count,js:j,pl:tab==='pl'?0:pc};if(tab==='pl')plSeen=new Date().toISOString();
 }
 function nav(){
   const tot=Object.values(dots).reduce((a,b)=>a+(b||0),0);document.title=(tot?`(${tot}) `:'')+'Dziennik - Minerva';
@@ -238,7 +244,7 @@ function nav(){
   $('#quick').innerHTML=[['msg','Wiadomości'],['ann','Ogłoszenia']].map(([k,l])=>`<button class="qk" title="${l}" onclick="go('${k}')">${ic(k)}${dots[k]?`<em>${dots[k]>99?'99+':dots[k]}</em>`:''}</button>`).join('');
   $('#ptitle').textContent=(t.find(x=>x[0]===tab)||[])[1]||'';
 }
-function go(k){if(attDirty&&tab==='at'){ask('Masz niezapisane zmiany frekwencji. Odrzucić je?','Odrzuć').then(ok=>{if(ok){attDirty=false;go(k)}});return}tab=k;detail=null;dirty=false;if(k==='ad')adTab=null;if(k==='gr'){gmode=gN||'list';gN=null}if(['ann','gr','nt'].includes(k))dots[k]=0;nav();render();scrollTo(0,0)}
+function go(k){if(attDirty&&tab==='at'){ask('Masz niezapisane zmiany frekwencji. Odrzucić je?','Odrzuć').then(ok=>{if(ok){attDirty=false;go(k)}});return}tab=k;detail=null;dirty=false;if(k==='ad')adTab=null;if(k==='gr'){gmode=gN||'list';gN=null}if(['ann','gr','nt'].includes(k))dots[k]=0;if(k==='pl')plSeen=new Date().toISOString();nav();render();scrollTo(0,0)}
 async function render(silent){
   const my=++rid;detail=null;if(silent!==true){dirty=false;$('#main').innerHTML=[1,2,3].map(()=>'<div class="pn pb"><div class="skel" style="width:40%"></div><div class="skel"></div><div class="skel" style="width:80%"></div></div>').join('')}
   try{
@@ -255,7 +261,7 @@ async function logout(){await sb.auth.signOut();location.href='/login'}
 const reload=async()=>{await load();dirty=false;await render(true)};
 
 const BELLS=[['07:45','08:30'],['08:35','09:20'],['09:25','10:10'],['10:20','11:05'],['11:20','12:05'],['12:20','13:05'],['13:10','13:55'],['14:00','14:45'],['14:50','15:35'],['15:40','16:25']];
-const BELLS0=BELLS.map(x=>[...x]);let CH=[],DOFF={},ATTLOCK={},ATTPRIV=false;
+const BELLS0=BELLS.map(x=>[...x]);let CH=[],DOFF={},ATTLOCK={},ATTPRIV=false,plSeen=null,lastPl=0;
 const mon=d=>{const x=new Date(d);x.setHours(12,0,0,0);x.setDate(x.getDate()-((x.getDay()+6)%7));return x};
 const addD=(d,n)=>{const x=new Date(d);x.setDate(x.getDate()+n);return x};
 const fshort=d=>pad(d.getDate())+'.'+pad(d.getMonth()+1)+'.'+d.getFullYear();
