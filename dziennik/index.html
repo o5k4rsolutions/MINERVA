@@ -96,6 +96,7 @@ tbody tr:nth-child(even) td{background:#fafbfd}tbody tr:hover td{background:#fff
 .ddb span.ph{background:none!important;border-radius:0!important}
 .lsn.x{opacity:.6;background:#fdeaea;border-top-color:#e08a8a}
 .gc.rp{opacity:.45;text-decoration:line-through}
+.evp{cursor:pointer}.evp:hover{filter:brightness(.95)}
 </style>
 </head>
 <body>
@@ -284,10 +285,10 @@ function entries(base,m,scope){
   return res.filter(scope)}
 const chTag=r=>(r.st==='cancel'?'<span class="tag r">odwołane</span>':r.st==='moved'?'<span class="tag y">przeniesione</span>':r.st==='in'?'<span class="tag b">przeniesione tu</span>':r.st==='sub'?`<span class="tag y">zastępstwo: ${esc(nm(r.sub))}</span>`:'')+(r.note&&r.st?`<div class="text-xs mu">${esc(r.note)}</div>`:'');
 function weekGrid(data,cell){
-  const days=[0,1,2,3,4].map(i=>addD(wk,i)),td=isoL(new Date()),ns=data.map(e=>e.n);
+  const days=[0,1,2,3,4].map(i=>addD(wk,i)),td=isoL(new Date()),ns=[...new Set(data.map(e=>e.n))].sort((a,b)=>a-b);
   if(!ns.length)return '<p class="em">Brak lekcji w planie.</p>';
   let h='<div class="overflow-x-auto"><div class="pw"><div></div>'+days.map((d,i)=>{const ho=hol(d);return `<div class="dh${ho?' hol':''}${isoL(d)===td?' tdy':''}"><b>${pad(d.getDate())}</b><div>${DAYS[i+1].toLowerCase()}</div>${ho?`<small>${ho}</small>`:''}</div>`}).join('');
-  for(let n=Math.min(...ns);n<=Math.max(...ns);n++){h+=`<div class="tm">${(BELLS[n-1]||[]).join('<br>')}</div>`;days.forEach(d=>{const ds=isoL(d),es=data.filter(x=>x.d===ds&&x.n===n);h+=hol(d)?'<div class="hol"></div>':es.length?'<div>'+es.map(e=>cell(e,T.find(x=>x.id===e.teaching_id),ds)).join('')+'</div>':'<div></div>'})}
+  for(const n of ns){h+=`<div class="tm">${(BELLS[n-1]||[]).join('<br>')}</div>`;days.forEach(d=>{const ds=isoL(d),es=data.filter(x=>x.d===ds&&x.n===n);h+=hol(d)?'<div class="hol"></div>':es.length?'<div>'+es.map(e=>cell(e,T.find(x=>x.id===e.teaching_id),ds)).join('')+'</div>':'<div></div>'})}
   return h+'</div></div>'}
 /* ---------- widoki ---------- */
 const V={};
@@ -343,15 +344,25 @@ function compose(){
   if(staff())o.push(['role:parent','Wszyscy rodzice','grupa'],['role:student','Wszyscy uczniowie','grupa'],...C.flatMap(c=>[[`class:${c.id}:parent`,`Rodzice klasy ${c.name}`,'grupa'],[`class:${c.id}:student`,`Uczniowie klasy ${c.name}`,'grupa']]));
   people.forEach(p=>o.push(['p:'+p.id,nm(p.id),RL[p.role]]));
   return pn('Nowa wiadomość',`<label class="lb">Do kogo (grupy lub pojedyncze osoby)</label>${dd('to',o,p0.to?['p:'+p0.to]:[],{multi:1,ph:'Wybierz odbiorców…'})}
-   <label class="lb mt-3">Temat</label><input type="text" id="sub" value="${esc(p0.subject||'')}"><label class="lb mt-3">Treść</label><textarea id="body" rows="7"></textarea><button class="btn mt-3" onclick="sendMsg()">Wyślij wiadomość</button>`,'','edit');
+   <div class="mt-2"><span class="lb">Wyślij kopię do:</span>${ck('cc_dir',false,'Dyrekcji')}${ck('cc_home',false,'Wychowawcy')}</div>
+   <label class="lb mt-3">Temat</label><input type="text" id="sub" value="${esc(p0.subject||'')}"><label class="lb mt-3">Treść</label><textarea id="body" rows="9">${esc(p0.body||'')}</textarea><button class="btn mt-3" onclick="sendMsg()">Wyślij wiadomość</button>`,'','edit');
 }
-const reply=(to,s)=>{pre={to,subject:'Re: '+decodeURIComponent(s).replace(/^Re: /,'')};mtab='new';rr()};
+const reply=async id=>{const {data:m}=await sb.from('messages').select('*').eq('id',id).single();if(!m)return warn('Nie można otworzyć wiadomości');
+  pre={to:m.sender_id,subject:'Re: '+m.subject.replace(/^Re: /,''),body:'\n\n\n--- '+nm(m.sender_id)+', '+fd(m.created_at)+' ---\n'+m.body};mtab='new';rr()};
 const markAll=()=>act(sb.from('message_recipients').update({read_at:new Date().toISOString()}).eq('recipient_id',me.id).is('read_at',null),async()=>{await calcDots();nav();rr()},'Oznaczono jako przeczytane');
 async function sendMsg(){
   const set=new Set();
   FV.to.forEach(k=>{if(k.startsWith('p:'))return set.add(k.slice(2));const[a,b,c]=k.split(':');Object.values(P).forEach(p=>{if(p.id===me.id)return;if(a==='role'&&p.role===b)set.add(p.id);if(a==='class'&&p.role===c&&inClass(p.id,b))set.add(p.id)})});
   if(!set.size||!v('sub').trim()||!v('body').trim())return warn('Wybierz odbiorców i uzupełnij temat oraz treść.');
-  await act(sb.rpc('send_message',{p_subject:v('sub').trim(),p_body:v('body').trim(),p_to:[...set]}),()=>{mtab='out';rr()},'Wysłano do '+set.size+' os.');
+  const clsOf=pid=>{const p=P[pid];return p.role==='student'?[ST[pid]?.class_id]:p.role==='parent'?PC.filter(r=>r.parent_id===pid).map(r=>ST[r.student_id]?.class_id):[]};
+  const cc=new Set();
+  if(FV.cc_dir)Object.values(P).filter(p=>p.role==='director').forEach(p=>cc.add(p.id));
+  if(FV.cc_home){const cl=new Set([...clsOf(me.id),...[...set].flatMap(clsOf)]);C.filter(c=>cl.has(c.id)&&c.homeroom_teacher_id).forEach(c=>cc.add(c.homeroom_teacher_id))}
+  cc.delete(me.id);
+  if((FV.cc_dir||FV.cc_home)&&!cc.size)warn('Nie znaleziono osób do kopii.');
+  const ccn=[...cc].map(nm),body=v('body').trim()+(cc.size?'\n\n[Kopia do: '+ccn.join(', ')+']':'');
+  cc.forEach(i=>set.add(i));
+  await act(sb.rpc('send_message',{p_subject:v('sub').trim(),p_body:body,p_to:[...set]}),()=>{mtab='out';rr()},'Wysłano do '+set.size+' os.');
 }
 async function openMsg(id,silent){
   const {data:m,error}=await sb.from('messages').select('*').eq('id',id).single();
@@ -361,7 +372,7 @@ async function openMsg(id,silent){
   const d=m.recalled_at?new Date(m.recalled_at):null;detail=id;rid++;
   $('#main').innerHTML=pn(esc(m.subject),`<p class="text-sm mu">Od: ${esc(nm(m.sender_id))} · ${fd(m.created_at)}</p>${rec}
    ${d?`<p class="mt-3 italic mu">Ta wiadomość została usunięta przez nadawcę ${d.toLocaleDateString('pl-PL')} o ${d.toLocaleTimeString('pl-PL',{hour:'2-digit',minute:'2-digit'})}.</p>`:`<p class="mt-3 whitespace-pre-wrap" style="max-width:70ch">${esc(m.body)}</p>`}
-   <div class="flex gap-2 mt-4">${!d&&m.sender_id!==me.id?`<button class="btn" onclick="reply('${m.sender_id}','${encodeURIComponent(m.subject).replace(/'/g,'%27')}')">Odpowiedz</button>`:''}${!d&&m.sender_id===me.id&&staff()?`<button class="gh red" onclick="recall('${id}')">Wycofaj wiadomość</button>`:''}</div>`,`<button class="gh sm" onclick="detail=null;render()">${ic('back')} Wróć</button>`);
+   <div class="flex gap-2 mt-4">${!d&&m.sender_id!==me.id?`<button class="btn" onclick="reply('${m.id}')">Odpowiedz</button>`:''}${!d&&m.sender_id===me.id&&staff()?`<button class="gh red" onclick="recall('${id}')">Wycofaj wiadomość</button>`:''}</div>`,`<button class="gh sm" onclick="detail=null;render()">${ic('back')} Wróć</button>`);
   calcDots().then(nav);
 }
 const recall=async id=>await ask('Wycofać wiadomość u wszystkich odbiorców? Zobaczą informację, że została usunięta.','Wycofaj')&&act(sb.rpc('recall_message',{p_id:id}),()=>openMsg(id,true),'Wiadomość wycofana');
@@ -446,9 +457,10 @@ V.at=async()=>{
   let ts=myT();if(!ts.length)return pn('Frekwencja','<p class="em">Brak przypisanych lekcji.</p>');
   attDirty=false;
   const dt=new Date(curD+'T12:00'),wdd=dt.getDay(),ho=hol(dt),wk5=wdd>=1&&wdd<=5;
-  const r1=wk5?await sb.from('timetable').select('*').eq('weekday',wdd).in('teaching_id',ts.map(t=>t.id)).order('lesson_no'):{data:[]};if(r1.error)throw r1.error;
-  const ids0=ts.map(x=>x.id),pl=ho?[]:entries(r1.data,mon(dt),r=>r.d===curD&&(ids0.includes(r.teaching_id)||r.sub===me.id)&&r.st!=='cancel'&&r.st!=='moved'&&!(r.st==='sub'&&r.sub!==me.id&&!dir())).map(r=>({teaching_id:r.teaching_id,lesson_no:r.n})).sort((a,b)=>a.lesson_no-b.lesson_no);
-  ts=[...ts,...T.filter(x=>!ids0.includes(x.id)&&pl.some(e=>e.teaching_id===x.id))];
+  const ids0=T.filter(x=>x.teacher_id===me.id).map(x=>x.id);
+  const r1=wk5&&ids0.length?await sb.from('timetable').select('*').eq('weekday',wdd).in('teaching_id',ids0).order('lesson_no'):{data:[]};if(r1.error)throw r1.error;
+  const pl=ho?[]:entries(r1.data,mon(dt),r=>r.d===curD&&(ids0.includes(r.teaching_id)||r.sub===me.id)&&r.st!=='cancel'&&r.st!=='moved'&&!(r.st==='sub'&&r.sub!==me.id)).map(r=>({teaching_id:r.teaching_id,lesson_no:r.n})).sort((a,b)=>a.lesson_no-b.lesson_no);
+  ts=[...ts,...T.filter(x=>!ts.some(y=>y.id===x.id)&&pl.some(e=>e.teaching_id===x.id))];
   if(!atManual&&pl.length&&!pl.some(e=>e.teaching_id===curT&&e.lesson_no===curL)){const h_=new Date(),nowM=h_.getHours()*60+h_.getMinutes(),tmin=q=>{const a=q.split(':');return +a[0]*60+ +a[1]},c0=curD===isoL(h_)&&pl.find(e=>{const b=BELLS[e.lesson_no-1];return b&&nowM>=tmin(b[0])-5&&nowM<=tmin(b[1])})||pl[0];curT=c0.teaching_id;curL=c0.lesson_no}
   if(!ts.find(x=>x.id===curT))curT=ts[0].id;
   const t=ts.find(x=>x.id===curT),sts=classStudents(t.class_id),ids=sts.map(p=>p.id),hv=atView==='hist';
@@ -470,7 +482,7 @@ V.at=async()=>{
   const foot=['Obecnych','Nieobecnych'].map((l,k)=>`<tr><td></td><td style="text-align:left">${l}</td>${cols.map(c=>c.my?`<td class="myc" id="${k?'cnt_a':'cnt_p'}">${k?sts.length-ip:ip}</td>`:`<td>${cnt(c,k)}</td>`).join('')}${hv?'<td></td>':''}</tr>`).join('');
   const cards=pl.map(e=>{const x=T.find(y=>y.id===e.teaching_id),on=!atManual&&e.teaching_id===curT&&e.lesson_no===curL;return `<button class="lc${on?' on':''}" onclick="atPick('${e.teaching_id}',${e.lesson_no})"><span class="av">${e.lesson_no}</span><span><b>${esc(cn(x?.class_id))} · ${esc(sn(x?.subject_id))}</b><small>${(BELLS[e.lesson_no-1]||[]).join(' - ')}</small></span></button>`}).join('');
   const L=[1,2,3,4,5,6,7,8,9,10].map(n=>[n,'Lekcja '+n]);
-  const clsOpts=[...new Set(myT().map(x=>x.class_id))].map(c=>[c,'Klasa '+cn(c)]);
+  const clsOpts=[...new Set(pl.map(e=>T.find(y=>y.id===e.teaching_id)?.class_id).filter(Boolean))].map(c=>[c,'Klasa '+cn(c)]);
   const top=pn('Sprawdzanie obecności',`<div class="flex flex-wrap items-center gap-2 mb-4"><button class="gh" onclick="attDay(-1)">${ic('back')}</button><div style="width:240px">${dp('at_d',curD,{on:attSel('at_d',x=>curD=x,()=>curD,dpb)})}</div><button class="gh" onclick="attDay(1)"><span style="display:inline-block;transform:scaleX(-1)">${ic('back')}</span></button><button class="gh" onclick="attDay(0)">Dziś</button><span class="text-sm mu ml-2">${dt.toLocaleDateString('pl-PL',{weekday:'long'})}${ho?' · '+ho:''}</span></div>
    <label class="lb">Twoje lekcje tego dnia - wybierz klasę i lekcję, dla której wpisujesz frekwencję</label><div class="mb-2" style="max-width:260px">${dd('atcf',[['','Wszystkie klasy'],...clsOpts],atCF,{on:x=>{atCF=x;applyCF()}})}</div><div class="flex flex-wrap gap-2">${cards||'<p class="mu text-sm" style="align-self:center">Brak Twoich lekcji w planie na ten dzień.</p>'}<button class="gh" onclick="atManual=!atManual;rr()">Inna lekcja…</button></div>
    ${atManual?`<div class="grid md:grid-cols-2 gap-3 mt-3" style="max-width:640px"><div><label class="lb">Klasa i przedmiot</label>${dd('at_t',ts.map(x=>[x.id,tl(x)]),curT,{on:attSel('at_t',x=>curT=x,()=>curT,ddb)})}</div><div><label class="lb">Lekcja</label>${dd('at_l',L,curL,{on:attSel('at_l',x=>curL=+x,()=>curL,ddb)})}</div></div>`:''}`,'','at');
@@ -793,11 +805,12 @@ const delTrip=async id=>await ask('Usunąć wycieczkę? Odwołane z jej powodu l
 /* ================= WPISY W PLANIE LEKCJI (sprawdzian, kartkówka, ...) ================= */
 const EVN={test:['Sprawdzian','r'],quiz:['Kartkówka','y'],homework:['Praca domowa','b'],task:['Zadanie','g'],project:['Projekt','']};
 let EVC=[],EVADD=false;
+const evTog=b=>{const d=b.nextElementSibling;if(d)d.style.display=d.style.display==='none'?'':'none'};
 const _wg=weekGrid;
 weekGrid=(data,cell)=>_wg(data,(e,t,ds)=>{
   const h=cell(e,t,ds),
-  L=EVC.filter(x=>x.class_id===e.class_id&&x.date===ds&&x.lesson_no===e.n).map(x=>{const k=EVN[x.kind]||['Inne',''],who=staff()&&x.student_ids?.length?' <span class="mu">('+x.student_ids.map(i=>esc(ln(i))).join(', ')+')</span>':'';
-    return `<div class="text-xs mt-1"><span class="tag ${k[1]}">${k[0]}</span> ${esc(x.title)}${who}${staff()&&(dir()||x.created_by===me.id)?` <a class="lk np" onclick="delEv('${x.id}')">usuń</a>`:''}</div>`}).join(''),
+  L=EVC.filter(x=>x.class_id===e.class_id&&x.date===ds&&x.lesson_no===e.n).map(x=>{const k=EVN[x.kind]||['Inne',''],who=staff()&&x.student_ids?.length?'<div class="mu">('+x.student_ids.map(i=>esc(ln(i))).join(', ')+')</div>':'';
+    return `<div class="text-xs mt-1"><span class="tag ${k[1]} evp" title="Kliknij, aby zobaczyć szczegóły" onclick="evTog(this)">${k[0]}</span><div style="display:none" class="mt-1">${esc(x.title)}${who}${staff()&&(dir()||x.created_by===me.id)?` <a class="lk np" onclick="delEv('${x.id}')">usuń</a>`:''}</div></div>`}).join(''),
   add=EVADD&&e.st!=='cancel'&&e.st!=='moved'&&(dir()||T.find(y=>y.id===e.teaching_id)?.teacher_id===me.id||e.sub===me.id)?`<div><a class="lk np" onclick="evAdd('${e.class_id}','${ds}',${e.n},'${e.teaching_id}')">+ wpis</a></div>`:'';
   return h.replace(/<\/div>$/,L+add+'</div>')});
 const _pl2=V.pl;
