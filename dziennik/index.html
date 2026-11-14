@@ -79,6 +79,7 @@ html[data-fs="1"]{font-size:17.5px}html[data-fs="2"]{font-size:19.5px}
 .lk{text-decoration:underline;font-size:.85rem;cursor:pointer;color:var(--in);font-weight:600}
 .pw{display:grid;grid-template-columns:64px repeat(5,minmax(140px,1fr));gap:6px;min-width:760px}.tm{font-size:.72rem;color:var(--mu);text-align:right;padding-top:.3rem}.dh{text-align:center;padding:.4rem;border-radius:10px 10px 0 0}.dh b{font-size:1.4rem}.dh.tdy{background:#fff4d6}.dh small{display:block;font-size:.7rem}
 .lsn{background:#e4f6c8;border-top:2px solid #8fc94a;padding:.45rem .55rem;font-size:.82rem;min-height:70px;border-radius:2px}.lt{font-weight:700;font-size:.78rem;text-align:right}
+.lsn.pk{cursor:pointer}.lsn.pk:hover{filter:brightness(.95);box-shadow:0 0 0 2px var(--am)}
 .hol{background:repeating-linear-gradient(135deg,#fdf0f0,#fdf0f0 6px,#fae3e3 6px,#fae3e3 12px)}
 .ab{width:26px;height:26px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:.7rem;flex-shrink:0}.ab.o{background:#2f7d3b}.ab.n{background:#c0392b}.ab.nu{background:#8e44ad}.ab.s{background:#c0642b}
 .fl{display:flex;justify-content:space-between;align-items:center;width:100%;padding:.6rem .8rem;border-radius:8px;border:0;background:none;font-weight:600;text-align:left}.fl:hover{background:#f1f4fa}.fl.on{background:#eef0fb;color:var(--in)}.fl em{font-style:normal;background:#ef4444;color:#fff;border-radius:999px;font-size:.68rem;padding:0 6px}
@@ -105,7 +106,7 @@ tbody tr:nth-child(even) td{background:#fafbfd}tbody tr:hover td{background:#fff
 <body>
 <div class="md:flex min-h-screen">
 <aside class="side md:w-60 md:h-screen md:sticky md:top-0 md:flex md:flex-col shrink-0">
-  <div class="p-4"><img src="https://dziennik-minerva.pages.dev/themes/logo-horizontal-white.svg" class="h-10 w-auto max-w-full" alt="Minerva"><div id="sch" class="text-xs text-white/60 truncate mt-2"></div></div>
+  <div class="p-4"><img src="https://dziennik-minerva.pages.dev/themes/logo-horizontal-white.svg" class="h-10 w-auto max-w-full" alt="Minerva"></div>
   <div class="px-4 pb-3 mb-2 border-b border-white/10"><div class="font-bold text-lg" id="ptl"></div><div id="pnm"></div><div id="pcl" class="text-xs text-white/60"></div></div><nav id="nav" class="md:flex-1 overflow-y-auto"></nav>
   <div class="p-4 border-t border-white/10"><div id="who" class="text-xs text-white/70"></div></div>
 </aside>
@@ -208,10 +209,10 @@ async function init(){
   if(!m)return fatal('Brak profilu użytkownika','Konto logowania istnieje, ale nie ma wpisu w tabeli profiles. Poproś dyrekcję o ponowne założenie konta.');
   if(m.must_change_password)return location.href='/login';
   me=m;try{await load()}catch(e){return fatal('Błąd wczytywania danych',e.message)}
-  $('#sch').textContent=school;$('#rfi').innerHTML=ic('sync');$('#who').textContent=`${nm(me.id)} · ${RL[me.role]}`;
+  $('#rfi').innerHTML=ic('sync');$('#who').textContent=`${nm(me.id)} · ${RL[me.role]}`;
   $('#ptl').textContent={student:'Panel ucznia',parent:'Panel rodzica',teacher:'Panel nauczyciela',director:'Panel dyrektora'}[me.role];
   const hcn=C.filter(c=>c.homeroom_teacher_id===me.id).map(c=>c.name);
-  $('#pnm').textContent=nm(me.id);$('#pcl').textContent=me.role==='student'?`Klasa ${cn(ST[me.id]?.class_id)} · ${school}`:me.role==='teacher'&&hcn.length?`Wychowawca klasy ${hcn.join(', ')} · ${school}`:school;
+  $('#pnm').textContent=nm(me.id);$('#pcl').textContent=me.role==='student'?`Klasa ${cn(ST[me.id]?.class_id)}`:me.role==='teacher'&&hcn.length?`Wychowawca klasy ${hcn.join(', ')}`:'';
   $('#um').innerHTML=`<span class="av" style="width:26px;height:26px;font-size:.7rem">${esc(me.first_name[0])}</span> ${esc(me.first_name)} ${ic('chev')}`;
   if(me.role==='student')sid=me.id;if(me.role==='parent')sid=KIDS[0]||null;
   await calcDots();nav();render();
@@ -644,29 +645,44 @@ async function setCell(d,n,tid){const e=TT.find(x=>x.weekday===d&&x.lesson_no===
   if(tid){const r=await sb.from('timetable').insert({class_id:curC,teaching_id:tid,weekday:d,lesson_no:n});if(r.error)return warn(r.error.message)}
   closeModal();toast('Zapisano plan');rr()}
 
+/* ---------- Zmiany w planie: wybór klasy/nauczyciela -> tydzień -> klik w lekcję ---------- */
+let chSel=null;
 const KL={substitution:['zastępstwo','y'],cancelled:['odwołanie','r'],moved_out:['przeniesienie','b']};
-AD.chg=back=>{
-  const L=[1,2,3,4,5,6,7,8,9,10].map(n=>[n,'Lekcja '+n]),tch=Object.values(P).filter(p=>['teacher','director'].includes(p.role)).sort((a,b)=>ln(a.id).localeCompare(ln(b.id),'pl')).map(p=>[p.id,ln(p.id)]);
+AD.chg=async back=>{
+  const tch=Object.values(P).filter(p=>['teacher','director'].includes(p.role)).sort((a,b)=>ln(a.id).localeCompare(ln(b.id),'pl'));
+  const opts=[...C.map(c=>['c:'+c.id,'Klasa '+c.name]),...tch.map(p=>['t:'+p.id,'Nauczyciel: '+ln(p.id)])];
+  if(!chSel||!opts.some(o=>o[0]===chSel))chSel=opts[0]?opts[0][0]:'';
+  const isT=chSel.startsWith('t:'),id=chSel.slice(2);
+  let data=[];
+  if(id){const tids=isT?T.filter(t=>t.teacher_id===id).map(t=>t.id):[];
+    if(!isT||tids.length){const q=sb.from('timetable').select('*'),r=await(isT?q.in('teaching_id',tids):q.eq('class_id',id));if(r.error)throw r.error;data=r.data}}
+  const es=id?entries(data,wk,isT?(r=>T.find(t=>t.id===r.teaching_id)?.teacher_id===id||r.sub===id):(r=>r.class_id===id)):[];
+  const grid=weekGrid(es,(e,t)=>{const pk=!e.st;
+    return `<div class="lsn${pk?' pk':''}${e.st==='cancel'||e.st==='moved'?' x':''}"${pk?` title="Kliknij, aby zmienić tę lekcję" onclick="chPick('${e.class_id}','${e.d}',${e.n},'${e.teaching_id}')"`:''}><div class="lt">${(BELLS[e.n-1]||[]).join(' - ')}</div><b>${esc(sn(e.subj||t?.subject_id))}</b><div class="text-xs">${isT?(e.st==='sub'?esc(nm(e.sub))+' · ':'')+'klasa '+esc(cn(e.class_id)):esc(nm(e.sub||t?.teacher_id))}</div>${chTag(e)}</div>`});
   const list=CH.filter(k=>k.kind!=='moved_in'&&k.date>=isoL(addD(new Date(),-7))).sort((a,b)=>a.date.localeCompare(b.date)||a.lesson_no-b.lesson_no);
-  return pn('Nowa zmiana w planie',`<div class="mb-3">${seg('ck',[['substitution','Zastępstwo'],['cancelled','Odwołanie lekcji'],['moved','Przeniesienie lekcji']],'substitution',k=>{$('#chs').style.display=k==='substitution'?'':'none';$('#chm').style.display=k==='moved'?'':'none'})}</div>
-   <div class="grid md:grid-cols-3 gap-3"><div><label class="lb">Klasa</label>${dd('cc2',C.map(c=>[c.id,'Klasa '+c.name]),'',{ph:'Wybierz klasę…'})}</div><div><label class="lb">Data lekcji</label>${dp('cd',isoL(new Date()))}</div><div><label class="lb">Lekcja</label>${dd('cn2',L,1)}</div></div>
-   <div id="chs" class="mt-3" style="max-width:380px"><label class="lb">Nauczyciel zastępujący</label>${dd('ct2',tch,'',{ph:'Wybierz nauczyciela…'})}<label class="lb mt-3">Przedmiot na zastępstwie (opcjonalnie)</label>${dd('cs2',[['','Ten sam przedmiot'],...SUB.map(x=>[x.id,x.name])],'')}</div>
-   <div id="chm" class="grid md:grid-cols-2 gap-3 mt-3" style="display:none;max-width:640px"><div><label class="lb">Przenieś na dzień</label>${dp('md','')}</div><div><label class="lb">Na lekcję</label>${dd('mn2',L,1)}</div></div>
-   <label class="lb mt-3">Notatka (opcjonalnie)</label><input type="text" id="cnt2" placeholder="np. choroba nauczyciela" style="max-width:480px"><div><button class="btn mt-3" onclick="saveChg()">Zapisz zmianę</button></div>`,back,'pl')
+  return pn('Nowa zmiana w planie',`<div style="max-width:360px" class="mb-3"><label class="lb">Klasa lub nauczyciel</label>${dd('chs0',opts,chSel,{on:x=>{chSel=x;rr()}})}</div><p class="text-sm mu mb-3">Przełączaj tygodnie strzałkami, a potem kliknij lekcję, którą chcesz odwołać, zastąpić lub przenieść.</p>${grid}`,wkNav(),'pl')
   +pn('Zaplanowane zmiany (od tygodnia wstecz)',list.length?tbl(['Data','Lekcja','Klasa','Przedmiot','Zmiana',''],list.map(k=>{const t=T.find(x=>x.id===k.teaching_id),to=k.kind==='moved_out'?CH.find(x=>x.grp===k.grp&&x.kind==='moved_in'):null,kd=KL[k.kind]||['-','']; return `<tr><td>${fdl(k.date)}</td><td>${k.lesson_no}</td><td>${esc(cn(k.class_id))}</td><td>${esc(sn(t?.subject_id))}</td><td><span class="tag ${kd[1]}">${kd[0]}</span> ${k.kind==='substitution'?esc(nm(k.sub_teacher_id))+(k.sub_subject_id?' (przedmiot: '+esc(sn(k.sub_subject_id))+')':''):''}${to?'na '+fdl(to.date)+', lekcja '+to.lesson_no:''}${k.note?`<div class="text-xs mu">${esc(k.note)}</div>`:''}</td><td><button class="gh sm red" onclick="delChg('${k.id}','${k.grp||''}')">${ic('trash')}</button></td></tr>`})):'<p class="em">Brak zaplanowanych zmian.</p>','','pl')};
 const delChg=async(id,g)=>await ask('Usunąć tę zmianę w planie?','Usuń')&&act(g?sb.from('timetable_changes').delete().eq('grp',g):sb.from('timetable_changes').delete().eq('id',id),reload,'Usunięto zmianę');
-async function saveChg(){const k=FV.ck,cid=FV.cc2,d=FV.cd,n=+FV.cn2,okd=q=>{const x=new Date(q+'T12:00');return x.getDay()%6!==0&&!hol(x)};
-  if(!cid||!d)return warn('Wybierz klasę i datę.');if(!okd(d))return warn('Ten dzień jest wolny od zajęć.');
+function chPick(cid,d,n,tid){
+  const t=T.find(x=>x.id===tid),L=[1,2,3,4,5,6,7,8,9,10].map(i=>[i,'Lekcja '+i]),
+   tch=Object.values(P).filter(p=>['teacher','director'].includes(p.role)).sort((a,b)=>ln(a.id).localeCompare(ln(b.id),'pl')).map(p=>[p.id,ln(p.id)]);
+  modal(`<div class="box"><h3 class="mh">${ic('pl')} Zmiana lekcji</h3>
+   <dl class="dl mb-3"><dt>Klasa</dt><dd>${esc(cn(cid))}</dd><dt>Data</dt><dd>${fdl(d)}</dd><dt>Lekcja</dt><dd>${n} (${(BELLS[n-1]||[]).join(' - ')})</dd><dt>Przedmiot</dt><dd>${esc(sn(t?.subject_id))}</dd><dt>Nauczyciel</dt><dd>${esc(nm(t?.teacher_id))}</dd></dl>
+   <label class="lb">Co chcesz zrobić?</label>
+   ${seg('ck',[['cancelled','Odwołaj'],['substitution','Zastępstwo'],['moved','Przenieś']],'cancelled',k=>{$('#chs').style.display=k==='substitution'?'':'none';$('#chm').style.display=k==='moved'?'':'none'})}
+   <div id="chs" class="mt-3" style="display:none"><label class="lb">Nauczyciel zastępujący</label>${dd('ct2',tch,'',{ph:'Wybierz nauczyciela…'})}<label class="lb mt-3">Przedmiot na zastępstwie (opcjonalnie)</label>${dd('cs2',[['','Ten sam przedmiot'],...SUB.map(x=>[x.id,x.name])],'')}</div>
+   <div id="chm" class="grid grid-cols-2 gap-3 mt-3" style="display:none"><div><label class="lb">Przenieś na dzień</label>${dp('md','')}</div><div><label class="lb">Na lekcję</label>${dd('mn2',L,n)}</div></div>
+   <label class="lb mt-3">Notatka (opcjonalnie)</label><input type="text" id="cnt2" placeholder="np. choroba nauczyciela">
+   <div class="flex gap-2 justify-end mt-4"><button class="gh" onclick="closeModal()">Anuluj</button><button class="btn" onclick="saveChg('${cid}','${d}',${n},'${tid}')">Zapisz zmianę</button></div></div>`)}
+function saveChg(cid,d,n,tid){const k=FV.ck,okd=q=>{const x=new Date(q+'T12:00');return x.getDay()%6!==0&&!hol(x)};
   if(k==='substitution'&&!FV.ct2)return warn('Wybierz nauczyciela zastępującego.');
   if(k==='moved'&&(!FV.md||!okd(FV.md)))return warn('Wybierz dzień roboczy (nie wolny), na który przenosisz lekcję.');
-  const wd=(new Date(d+'T12:00').getDay()+6)%7+1,{data:tt,error}=await sb.from('timetable').select('*').eq('class_id',cid).eq('weekday',wd).eq('lesson_no',n);if(error)return warn(error.message);
-  const e=tt[0];if(!e)return warn('W planie tej klasy nie ma lekcji w tym terminie.');
   if(CH.some(x=>x.class_id===cid&&x.date===d&&x.lesson_no===n&&x.kind!=='moved_in'))return warn('Ta lekcja ma już zmianę. Usuń ją najpierw.');
-  const b={school_id:me.school_id,class_id:cid,date:d,lesson_no:n,teaching_id:e.teaching_id,note:v('cnt2').trim()||null};let rows;
+  const b={school_id:me.school_id,class_id:cid,date:d,lesson_no:n,teaching_id:tid,note:v('cnt2').trim()||null};let rows;
   if(k==='substitution')rows=[{...b,kind:'substitution',sub_teacher_id:FV.ct2,sub_subject_id:FV.cs2||null}];
   else if(k==='cancelled')rows=[{...b,kind:'cancelled'}];
   else{const g=crypto.randomUUID();rows=[{...b,kind:'moved_out',grp:g},{...b,kind:'moved_in',date:FV.md,lesson_no:+FV.mn2,grp:g}]}
-  act(sb.from('timetable_changes').insert(rows),reload,'Zapisano zmianę')}
+  act(sb.from('timetable_changes').insert(rows),async()=>{closeModal();await reload()},'Zapisano zmianę')}
 AD.off=back=>pn('Nowy dzień wolny',`<p class="text-sm mu mb-3">Święta państwowe (np. 1 listopada, Boże Narodzenie, Wielkanoc) system wpisuje sam. Tutaj dodaj pozostałe dni wolne: ferie, dzień dyrektorski itp. Weekendy są pomijane.</p><div class="grid md:grid-cols-4 gap-3 items-end"><div><label class="lb">Od</label>${dp('od','')}</div><div><label class="lb">Do (opcjonalnie)</label>${dp('od2','')}</div><div><label class="lb">Nazwa</label><input type="text" id="odn" placeholder="np. Dzień dyrektorski"></div><div><button class="btn" onclick="addOff()">${ic('plus')} Dodaj</button></div></div>`,back,'cal')
  +pn('Dni wolne ustawione przez dyrekcję',Object.values(DOFF).length?tbl(['Data','Nazwa',''],Object.values(DOFF).sort((a,b)=>a.date.localeCompare(b.date)).map(x=>`<tr><td>${fdl(x.date)}</td><td>${esc(x.name)}</td><td><button class="gh sm red" onclick="delOff('${x.id}')">${ic('trash')}</button></td></tr>`)):'<p class="em">Brak.</p>','','cal');
 function addOff(){const a=FV.od,b=FV.od2||a,nmv=v('odn').trim();if(!a||!nmv)return warn('Podaj datę i nazwę.');if(b<a)return warn('Data końcowa jest przed początkową.');
