@@ -29,7 +29,7 @@
     <label class="block text-sm font-semibold">Powtórz hasło<input id="n2" type="password" autocomplete="new-password" minlength="8" required></label>
     <button class="b">Zapisz i wejdź</button>
   </form>
-  <p class="text-center text-xs text-slate-400 mt-6">Nie masz danych? Zgłoś się do administratora placówki.</p>
+  <p class="text-center text-xs text-slate-400 mt-6">Konta zakłada wyłącznie dyrekcja szkoły. Nie masz danych? Zgłoś się do sekretariatu.</p>
 </main>
 <script>
 const sb=supabase.createClient('https://tsoxtjxfskvgiruraoau.supabase.co','sb_publishable_oU23IIberCIeZksCjK5dFA_iMd0cNZB');
@@ -39,8 +39,9 @@ const showChange=()=>{$('#f1').classList.add('hidden');$('#f2').classList.remove
 
 (async()=>{ // już zalogowany?
   const {data:{session}}=await sb.auth.getSession(); if(!session)return;
-  const {data:p}=await sb.from('profiles').select('must_change_password').eq('id',session.user.id).single();
-  p?.must_change_password?showChange():location.href='/dziennik';
+  const {data:p,error}=await sb.from('profiles').select('must_change_password').eq('id',session.user.id).maybeSingle();
+  if(error||!p){await sb.auth.signOut();return err('Nie można odczytać profilu ('+(error?.message||'brak wpisu w profiles')+'). Wylogowano.')}
+  p.must_change_password?showChange():location.href='/dziennik';
 })();
 
 $('#f1').onsubmit=async e=>{
@@ -48,8 +49,9 @@ $('#f1').onsubmit=async e=>{
   const {data,error}=await sb.auth.signInWithPassword({email:$('#login').value.trim().toLowerCase()+DOMAIN,password:$('#pw').value});
   if(error)return err('Nieprawidłowy login lub hasło.');
   await sb.rpc('touch_login');
-  const {data:p}=await sb.from('profiles').select('must_change_password').eq('id',data.user.id).single();
-  p?.must_change_password?showChange():location.href='/dziennik';
+  const {data:p,error:pe}=await sb.from('profiles').select('must_change_password').eq('id',data.user.id).maybeSingle();
+  if(pe||!p){await sb.auth.signOut();return err('Zalogowano, ale nie można odczytać profilu ('+(pe?.message||'brak wpisu w profiles')+').')}
+  p.must_change_password?showChange():location.href='/dziennik';
 };
 $('#f2').onsubmit=async e=>{
   e.preventDefault();err('');
@@ -57,7 +59,7 @@ $('#f2').onsubmit=async e=>{
   if($('#n1').value===$('#pw').value)return err('Nowe hasło musi różnić się od jednorazowego.');
   const {error}=await sb.auth.updateUser({password:$('#n1').value});
   if(error)return err(error.message);
-  await sb.rpc('finish_password_change'); location.href='/dziennik';
+  const {error:e2}=await sb.rpc('finish_password_change'); if(e2)return err('Nie udało się zapisać zmiany hasła: '+e2.message); location.href='/dziennik';
 };
 </script>
 </body>
