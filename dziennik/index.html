@@ -37,18 +37,40 @@ tr{transition:background .2s}tr.hv:hover{background:#fffbeb}
 .msg-row{cursor:pointer}.av{display:inline-flex;width:32px;height:32px;border-radius:50%;background:#1E2A78;color:#fff;align-items:center;justify-content:center;font-size:.8rem;font-weight:700}
 .pill{border-radius:999px;padding:.3rem .9rem;font-weight:600;font-size:.85rem;transition:.2s}.pill.on{background:#1E2A78;color:#fff}
 .stat{cursor:pointer;text-align:center}.stat:hover{transform:translateY(-3px)}.stat b{font-size:2rem;color:#1E2A78;display:block}
+body{background:#EEF1F6}
+.side{background:#080B1A;color:#fff}
+.nv{display:flex;align-items:center;gap:.7rem;width:100%;padding:.7rem 1rem;color:#cbd5e1;font-weight:600;font-size:.9rem;border-left:3px solid transparent;transition:.2s;white-space:nowrap}
+.nv:hover{background:#ffffff12;color:#fff}.nv.on{background:#1E2A78;color:#fff;border-left-color:#F5A524}
+.nv em,.qk em{font-style:normal;background:#ef4444;color:#fff;border-radius:999px;font-size:.68rem;min-width:18px;height:18px;line-height:18px;text-align:center;padding:0 5px;margin-left:auto;animation:pu 1.6s infinite}
+.qk{position:relative;width:40px;height:40px;border-radius:50%;background:#fff;border:1px solid #e2e8f0;color:#1E2A78;display:inline-flex;align-items:center;justify-content:center;transition:.2s}.qk:hover{background:#F5A524;transform:translateY(-2px)}
+.qk em{position:absolute;top:-4px;right:-4px;margin:0}
+.ic{width:1.2em;height:1.2em;display:inline-block;vertical-align:-.22em;flex-shrink:0}
+.ld{display:inline-block;width:8px;height:8px;border-radius:50%;background:#94a3b8;margin-right:5px}.ld.on{background:#22c55e}
+.tag{display:inline-flex;gap:.3rem;align-items:center;padding:.1rem .55rem;border-radius:999px;font-size:.78rem;font-weight:600}.tag.g{background:#dcfce7;color:#166534}.tag.r{background:#fee2e2;color:#991b1b}
+.wg{background:#fff;border:1px solid #e2e8f0;border-radius:.75rem;overflow:hidden;animation:fu .45s both;box-shadow:0 1px 2px #0001}
+.wg>header{display:flex;align-items:center;gap:.5rem;padding:.6rem .9rem;background:linear-gradient(#f8fafc,#eef1f6);border-bottom:1px solid #e2e8f0;font-weight:700;font-size:.78rem;text-transform:uppercase;letter-spacing:.04em;color:#334155}
+.wg>header .ic{color:#F5A524}
+.card{border:1px solid #e2e8f0;box-shadow:0 1px 2px #0001;border-radius:.75rem}
+.card h2{font-size:.9rem;text-transform:uppercase;letter-spacing:.04em;padding-bottom:.4rem;margin-bottom:.7rem;border-bottom:2px solid #F5A524;display:inline-block}
+th{background:#eef1f5;font-weight:600;font-size:.75rem;text-transform:uppercase;color:#475569;border:1px solid #e2e8f0}
+td{border:1px solid #eef1f5}tr:nth-child(even) td{background:#f8fafc}tr.hv:hover td{background:#fffbeb}
+.b2{background:#fff;border:1px solid #cbd5e1;color:#1E2A78}.b2:hover{background:#F5A524;border-color:#F5A524}
 </style>
 </head>
 <body>
-<header class="bg-[#080B1A] text-white">
-  <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between gap-3">
-    <div class="flex items-center gap-2 min-w-0"><img src="https://dziennik-minerva.pages.dev/themes/icon-dark.svg" class="h-8" alt="">
-      <div class="leading-tight min-w-0"><div id="sch" class="font-bold truncate"></div><div id="who" class="text-xs text-white/60 truncate"></div></div></div>
-    <div class="flex items-center gap-2"><span id="live" class="text-xs text-white/60 hidden sm:inline"></span><span id="rfi" class="spin text-white/50 text-sm" title="Dane odświeżają się automatycznie">⟳</span><button class="b2" onclick="logout()">Wyloguj</button></div>
+<div class="md:flex min-h-screen">
+<aside class="side md:w-60 md:h-screen md:sticky md:top-0 md:flex md:flex-col shrink-0">
+  <div class="flex items-center gap-3 p-4"><img src="https://dziennik-minerva.pages.dev/themes/icon-dark.svg" class="h-9" alt=""><div class="leading-tight min-w-0"><div class="font-extrabold">Minerva</div><div id="sch" class="text-xs text-white/60 truncate"></div></div></div>
+  <nav id="nav" class="flex md:flex-col overflow-x-auto md:overflow-visible md:flex-1"></nav>
+  <div class="hidden md:block p-4 border-t border-white/10"><div id="who" class="text-xs text-white/70"></div></div>
+</aside>
+<div class="flex-1 min-w-0">
+  <div class="bg-white border-b border-slate-200 sticky top-0 z-30 px-4 md:px-6 h-16 flex items-center justify-between gap-3">
+    <h1 id="ptitle" class="font-extrabold text-xl text-[#1E2A78] truncate"></h1>
+    <div class="flex items-center gap-3"><span id="live" class="text-xs text-slate-500 hidden sm:inline"></span><span id="rfi" class="spin text-slate-400" title="Dane odświeżają się automatycznie"></span><div id="quick" class="flex gap-2"></div><button class="b2" id="lo" onclick="logout()"></button></div>
   </div>
-  <nav id="nav" class="max-w-6xl mx-auto px-4 pb-2 flex gap-1 overflow-x-auto text-white"></nav>
-</header>
-<main id="main" class="max-w-6xl mx-auto p-4"></main>
+  <main id="main" class="p-4 md:p-6 max-w-6xl"></main>
+</div></div>
 <div id="toasts"></div><div id="modal"></div>
 
 <script>
@@ -59,7 +81,7 @@ const fd=d=>new Date(d).toLocaleString('pl-PL',{dateStyle:'short',timeStyle:'sho
 const RL={director:'Dyrektor',teacher:'Nauczyciel',parent:'Rodzic/opiekun',student:'Uczeń'};
 const AS={present:'obecny',absent:'nieobecny',late:'spóźniony',excused:'usprawiedliwiony'};
 const DAYS=['','Pon','Wt','Śr','Czw','Pt'];
-let me,school,P={},C=[],SUB=[],T=[],ST={},PC=[],KIDS=[],tab='home',sid=null,dots={},curT=null,curC=null,rid=0,detail=null,mtab='in',pre={};
+let me,school,P={},C=[],SUB=[],T=[],ST={},PC=[],KIDS=[],tab='home',sid=null,dots={},curT=null,curC=null,rid=0,detail=null,mtab='in',pre={},gmode='list';
 const nm=id=>P[id]?P[id].first_name+' '+P[id].last_name:'—';
 const cn=id=>C.find(c=>c.id===id)?.name||'—', sn=id=>SUB.find(s=>s.id===id)?.name||'—';
 const tl=t=>cn(t.class_id)+' — '+sn(t.subject_id);
@@ -70,6 +92,23 @@ const opts=(a,f,sel)=>a.map(x=>`<option value="${x.id}" ${x.id===sel?'selected':
 const inClass=(pid,cid)=>P[pid]?.role==='student'?ST[pid]?.class_id===cid:PC.some(r=>r.parent_id===pid&&ST[r.student_id]?.class_id===cid);
 const classStudents=cid=>Object.values(P).filter(p=>p.role==='student'&&ST[p.id]?.class_id===cid).sort((a,b)=>a.last_name.localeCompare(b.last_name));
 const tbl=(h,rows)=>`<div class="overflow-x-auto"><table class="w-full"><tr>${h.map(x=>`<th>${x}</th>`).join('')}</tr>${rows.join('')}</table></div>`;
+const ICO={
+home:'<path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/>',
+msg:'<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/>',
+ann:'<path d="M3 11v2a1 1 0 001 1h3l7 4V6L7 10H4a1 1 0 00-1 1z"/><path d="M18 9a4 4 0 010 6"/>',
+gr:'<path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/>',
+nt:'<path d="M4 4h12l4 4v12H4z"/><path d="M8 12h8M8 16h5"/>',
+at:'<rect x="4" y="4" width="16" height="17" rx="2"/><path d="M8 2v4M16 2v4M4 10h16M9 15l2 2 4-4"/>',
+pl:'<rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/>',
+js:'<path d="M9 11l3 3 8-8"/><path d="M20 12v7a2 2 0 01-2 2H6a2 2 0 01-2-2V5a2 2 0 012-2h9"/>',
+cl:'<circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6M15 14.5c3 0 6 1.5 6 5.5"/>',
+ad:'<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/>',
+out:'<path d="M9 4H5a1 1 0 00-1 1v14a1 1 0 001 1h4M16 8l4 4-4 4M20 12H9"/>',
+sync:'<path d="M20 12a8 8 0 01-14 5.3M4 12a8 8 0 0114-5.3M18 3v4h-4M6 21v-4h4"/>',
+back:'<path d="M15 6l-6 6 6 6"/>',check:'<path d="M5 12l5 5 9-10"/>',edit:'<path d="M4 20h4l11-11-4-4L4 16z"/>',x:'<path d="M6 6l12 12M18 6L6 18"/>',
+thumb:'<path d="M7 11v9H4v-9zM7 11l4-8a2 2 0 012 2v4h6a2 2 0 012 2l-1.5 7a2 2 0 01-2 1.5H7"/>',
+warn:'<path d="M12 3l10 18H2z"/><path d="M12 10v5M12 18v.5"/>'};
+const ic=(k,c='')=>`<svg class="ic ${c}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${ICO[k]||''}</svg>`;
 const toast=(m,t='ok',ms=3500)=>{const e=document.createElement('div');e.className='toast '+t;e.textContent=m;$('#toasts').appendChild(e);setTimeout(()=>{e.classList.add('out');setTimeout(()=>e.remove(),300)},ms)};
 const warn=m=>toast(m,'bad',4500);
 const ask=(msg,okL='Tak')=>new Promise(r=>{const m=$('#modal');m.innerHTML=`<div class="box"><p class="font-semibold">${esc(msg)}</p><div class="flex gap-2 justify-end mt-4"><button class="b2" id="mn">Anuluj</button><button class="b" id="my">${okL}</button></div></div>`;m.classList.add('show');const c=x=>{m.classList.remove('show');r(x)};$('#mn').onclick=()=>c(false);$('#my').onclick=()=>c(true)});
@@ -81,11 +120,11 @@ const gv=x=>{const m=String(x).match(/^([1-6])([+-])?$/);return m?+m[1]+(m[2]===
 const avg=g=>{let a=0,w=0;g.forEach(x=>{const n=gv(x.value);if(n!==null){a+=n*x.weight;w+=x.weight}});return w?(a/w).toFixed(2):'—'};
 function countUp(){document.querySelectorAll('[data-n]').forEach(e=>{const n=+e.dataset.n,t0=performance.now();(function f(t){const k=Math.min(1,(t-t0)/600);e.textContent=Math.round(n*k);if(k<1)requestAnimationFrame(f)})(t0)})}
 const LIVE={
- message_recipients:async p=>{if(p.eventType!=='INSERT'||p.new.recipient_id!==me.id)return;const {data:m}=await sb.from('messages').select('subject,sender_id').eq('id',p.new.message_id).single();if(m){toast('✉ '+nm(m.sender_id)+': '+m.subject,'info',6000);beep()}},
- announcements:p=>{if(p.eventType==='INSERT'&&p.new.author_id!==me.id){toast('📢 Nowe ogłoszenie: '+p.new.title,'info',6000);beep()}},
- grades:p=>{if(p.eventType==='INSERT'&&p.new.author_id!==me.id){toast('⭐ Nowa ocena: '+p.new.value,'info',5000);beep()}},
- notes:p=>{if(p.eventType==='INSERT'&&p.new.author_id!==me.id)toast((p.new.kind==='praise'?'👍 Nowa pochwała':'⚠ Nowa uwaga'),'info',5000)},
- justifications:p=>{if(p.eventType==='INSERT'&&staff())toast('🗂 Nowe usprawiedliwienie do rozpatrzenia','info',6000);if(p.eventType==='UPDATE'&&me.role==='parent')toast('Usprawiedliwienie: '+({accepted:'przyjęte',rejected:'odrzucone'}[p.new.status]||''),'info',5000)},
+ message_recipients:async p=>{if(p.eventType!=='INSERT'||p.new.recipient_id!==me.id)return;const {data:m}=await sb.from('messages').select('subject,sender_id').eq('id',p.new.message_id).single();if(m){toast(nm(m.sender_id)+': '+m.subject,'info',6000);beep()}},
+ announcements:p=>{if(p.eventType==='INSERT'&&p.new.author_id!==me.id){toast('Nowe ogłoszenie: '+p.new.title,'info',6000);beep()}},
+ grades:p=>{if(p.eventType==='INSERT'&&p.new.author_id!==me.id){toast('Nowa ocena: '+p.new.value,'info',5000);beep()}},
+ notes:p=>{if(p.eventType==='INSERT'&&p.new.author_id!==me.id)toast((p.new.kind==='praise'?'Nowa pochwała':'Nowa uwaga'),'info',5000)},
+ justifications:p=>{if(p.eventType==='INSERT'&&staff())toast('Nowe usprawiedliwienie do rozpatrzenia','info',6000);if(p.eventType==='UPDATE'&&me.role==='parent')toast('Usprawiedliwienie: '+({accepted:'przyjęte',rejected:'odrzucone'}[p.new.status]||''),'info',5000)},
  messages:()=>{},attendance:()=>{}};
 
 const fatal=(t,m)=>{$('#main').innerHTML=`<div class="card"><h2>${esc(t)}</h2><p class="text-sm">${esc(m)}</p><button class="b mt-3" onclick="logout()">Wyloguj i wróć do logowania</button></div>`};
@@ -94,16 +133,16 @@ async function init(){
   sb.auth.onAuthStateChange(ev=>{if(ev==='SIGNED_OUT')location.href='/login'});
   const {data:m,error}=await sb.from('profiles').select('*').eq('id',session.user.id).maybeSingle();
   if(error)return fatal('Błąd odczytu konta',error.message+' — sprawdź, czy w Supabase wykonano schema.sql (polityki RLS).');
-  if(!m)return fatal('Brak profilu użytkownika','Konto logowania istnieje, ale nie ma dla niego wpisu. Poproś dyrekcję o ponowne założenie konta.');
+  if(!m)return fatal('Brak profilu użytkownika','Konto logowania istnieje, ale nie ma dla niego wpisu w tabeli profiles. Poproś dyrekcję o ponowne założenie konta.');
   if(m.must_change_password)return location.href='/login';
   me=m;
   try{await load()}catch(e){return fatal('Błąd wczytywania danych',e.message)}
-  $('#sch').textContent=school; $('#who').textContent=`${nm(me.id)} · ${RL[me.role]}`;
+  $('#sch').textContent=school;$('#rfi').innerHTML=ic('sync');$('#lo').innerHTML=ic('out')+' Wyloguj'; $('#who').textContent=`${nm(me.id)} · ${RL[me.role]}`;
   if(me.role==='student')sid=me.id; if(me.role==='parent')sid=KIDS[0]||null;
   await calcDots(); nav(); render();
   let to; const ch=sb.channel('live');
   Object.keys(LIVE).forEach(t=>ch.on('postgres_changes',{event:'*',schema:'public',table:t},p=>{LIVE[t](p);clearTimeout(to);to=setTimeout(async()=>{await calcDots();nav();if(detail){if(t==='messages')openMsg(detail,true);return}if(!typing())render(true)},500)}));
-  ch.subscribe(st=>{const e=$('#live');e.classList.remove('hidden');e.innerHTML=st==='SUBSCRIBED'?'<span style="color:#4ade80">●</span> na żywo':'<span style="color:#f87171">●</span> offline'});
+  ch.subscribe(st=>{const e=$('#live');e.classList.remove('hidden');e.innerHTML=st==='SUBSCRIBED'?'<i class="ld on"></i>na żywo':'<i class="ld"></i>offline'});
   setInterval(()=>{if(!document.hidden&&!detail&&!typing())refresh(true)},30000);
   document.addEventListener('visibilitychange',()=>{if(!document.hidden&&!detail&&!typing())refresh(true)});
   window.addEventListener('online',()=>refresh(true));
@@ -119,13 +158,16 @@ async function calcDots(){
   const keep=k=>dots[k]===0?0:undefined; // otwarta zakładka gasi kropkę do końca sesji
   dots={msg:m.count,ann:keep('ann')??a.count,gr:keep('gr')??g.count,nt:keep('nt')??n.count,js:staff()?(j.count):0};
 }
-function nav(){const tot=Object.values(dots).reduce((a,b)=>a+(b||0),0);document.title=(tot?`(${tot}) `:'')+'Dziennik — Minerva';
-  const t=[['home','Start'],['msg','Wiadomości'],['ann','Ogłoszenia'],['gr','Oceny'],['nt','Uwagi'],['at','Frekwencja'],['pl','Plan']];
+function nav(){
+  const tot=Object.values(dots).reduce((a,b)=>a+(b||0),0);document.title=(tot?`(${tot}) `:'')+'Dziennik — Minerva';
+  const t=[['home','Start'],['msg','Wiadomości'],['ann','Ogłoszenia'],['gr',staff()?'Oceny i przedmioty':'Oceny'],['nt','Uwagi i pochwały'],['at','Frekwencja'],['pl','Plan lekcji']];
   if(me.role==='parent'||(staff()&&(dir()||isHome())))t.push(['js','Usprawiedliwienia']);
-  if(staff()&&(dir()||isHome()))t.push(['cl','Klasa']); if(dir())t.push(['ad','Administracja']);
-  $('#nav').innerHTML=t.map(([k,l])=>`<button class="tab ${k===tab?'on':''}" onclick="go('${k}')">${l}${dots[k]?'<span class="dot"></span>':''}</button>`).join('');
+  if(staff()&&(dir()||isHome()))t.push(['cl','Moja klasa']); if(dir())t.push(['ad','Administracja']);
+  $('#nav').innerHTML=t.map(([k,l])=>`<button class="nv ${k===tab?'on':''}" onclick="go('${k}')">${ic(k)}<span>${l}</span>${dots[k]?`<em>${dots[k]>99?'99+':dots[k]}</em>`:''}</button>`).join('');
+  $('#quick').innerHTML=[['msg','Wiadomości'],['ann','Ogłoszenia'],['gr','Oceny']].map(([k,l])=>`<button class="qk" title="${l}" onclick="go('${k}')">${ic(k)}${dots[k]?`<em>${dots[k]>99?'99+':dots[k]}</em>`:''}</button>`).join('');
+  $('#ptitle').textContent=(t.find(x=>x[0]===tab)||[])[1]||'';
 }
-function go(k){tab=k;detail=null;if(['ann','gr','nt'].includes(k))dots[k]=0;nav();render()}
+function go(k){tab=k;detail=null;if(k==='gr')gmode='list';if(['ann','gr','nt'].includes(k))dots[k]=0;nav();render()}
 async function render(silent){
   const my=++rid;detail=null;
   if(silent!==true)$('#main').innerHTML='<div class="view">'+[1,2,3].map(()=>'<div class="card"><div class="skel" style="width:40%"></div><div class="skel"></div><div class="skel" style="width:80%"></div></div>').join('')+'</div>';
@@ -146,13 +188,28 @@ async function logout(){await sb.auth.signOut();location.href='/login'}
 /* ---------- widoki ---------- */
 const V={};
 V.home=async()=>{
-  const pup=me.role==='student'||me.role==='parent',ids=me.role==='student'?[me.id]:KIDS;
-  const [a,g]=await Promise.all([sb.from('announcements').select('*').order('created_at',{ascending:false}).limit(3),pup&&ids.length?sb.from('grades').select('*').in('student_id',ids).order('created_at',{ascending:false}).limit(5):Promise.resolve({data:[]})]);
-  const tiles=[['msg','✉','Nieprzeczytane wiadomości'],['ann','📢','Nowe ogłoszenia'],['gr','⭐','Nowe oceny'],['nt','📝','Nowe uwagi'],...(staff()?[['js','🗂','Do rozpatrzenia']]:[])];
-  return `<div class="card"><h2>Dzień dobry, ${esc(me.first_name)}!</h2><p class="text-sm text-slate-500">${esc(school)} · poprzednie logowanie: ${fd(me.prev_seen)}</p></div>
-  <div class="grid grid-cols-2 md:grid-cols-5 gap-3 mb-4">${tiles.map(([k,i,l],n)=>`<div class="card stat" style="animation:fu .45s ${.1+n*.07}s both;margin:0" onclick="go('${k}')"><div class="text-2xl">${i}</div><b data-n="${dots[k]||0}">0</b><small class="text-slate-500">${l}</small></div>`).join('')}</div>
-  <div class="card"><h2>Ostatnie ogłoszenia</h2>${(a.data||[]).map(x=>`<div class="py-2 border-b last:border-0"><b>${esc(x.title)}</b> <span class="text-xs text-slate-500">${esc(nm(x.author_id))} · ${fd(x.created_at)}</span><p class="text-sm">${esc(x.body.slice(0,160))}${x.body.length>160?'…':''}</p></div>`).join('')||'<p class="text-slate-500">Brak ogłoszeń.</p>'}</div>`
-  +(pup?`<div class="card"><h2>Ostatnie oceny</h2>${(g.data||[]).map(x=>`<div class="py-1 text-sm">${me.role==='parent'?esc(nm(x.student_id))+' · ':''}${esc(sn(T.find(t=>t.id===x.teaching_id)?.subject_id))}: <b class="bg-amber-100 rounded px-2">${esc(x.value)}</b> <span class="text-xs text-slate-500">${fd(x.created_at)}</span></div>`).join('')||'<p class="text-slate-500">Brak ocen.</p>'}</div>`:'');
+  const pup=me.role==='student'||me.role==='parent',ids=me.role==='student'?[me.id]:KIDS,wd=new Date().getDay(),cid=pup?ST[sid]?.class_id:null,E=Promise.resolve({data:[],count:0});
+  const [a,g,m,tt,ab,j]=await Promise.all([
+    sb.from('announcements').select('*').order('created_at',{ascending:false}).limit(4),
+    pup&&ids.length?sb.from('grades').select('*').in('student_id',ids).order('created_at',{ascending:false}).limit(6):E,
+    sb.from('message_recipients').select('read_at,messages(*)').eq('recipient_id',me.id).is('read_at',null).limit(20),
+    wd>=1&&wd<=5?sb.from('timetable').select('*').eq('weekday',wd).order('lesson_no'):E,
+    pup&&ids.length?sb.from('attendance').select('*').in('student_id',ids).neq('status','present').order('date',{ascending:false}).limit(5):E,
+    staff()?sb.from('justifications').select('*',{count:'exact',head:true}).eq('status','pending'):E]);
+  const mine=T.filter(t=>t.teacher_id===me.id).map(t=>t.id),n=(x,t)=>`<p class="text-slate-500 text-sm">${x}</p>`;
+  let k=0;const W=(t,i,body,cls='')=>`<section class="wg ${cls}" style="animation-delay:${(k++)*.07}s"><header>${ic(i)} ${t}</header><div class="p-3">${body}</div></section>`;
+  const les=(tt.data||[]).filter(e=>pup?e.class_id===cid:mine.includes(e.teaching_id));
+  const plan=les.length?les.map(e=>{const t=T.find(x=>x.id===e.teaching_id);return `<div class="flex items-center gap-3 py-2 border-b last:border-0"><span class="av">${e.lesson_no}</span><div><div class="font-semibold">${esc(sn(t?.subject_id))}</div><div class="text-xs text-slate-500">${pup?esc(nm(t?.teacher_id)):'klasa '+esc(cn(e.class_id))}</div></div></div>`}).join(''):n(wd>=1&&wd<=5?'Brak lekcji w planie na dziś.':'Dziś brak lekcji.');
+  const msgs=(m.data||[]).filter(r=>r.messages&&!r.messages.recalled_at).map(r=>r.messages).sort((x,y)=>y.created_at.localeCompare(x.created_at)).slice(0,4);
+  const side=pup?W('Ostatnie oceny','gr',(g.data||[]).map(x=>`<div class="py-1.5 text-sm border-b last:border-0">${me.role==='parent'?esc(nm(x.student_id))+' · ':''}${esc(sn(T.find(t=>t.id===x.teaching_id)?.subject_id))}: <b class="bg-amber-100 rounded px-2">${esc(x.value)}</b> <span class="text-xs text-slate-500">${fd(x.created_at)}</span></div>`).join('')||n('Brak ocen.'))
+   +W('Nieobecności i spóźnienia','at',(ab.data||[]).map(x=>`<div class="py-1.5 text-sm border-b last:border-0">${x.date} · lekcja ${x.lesson_no} · <span class="tag r">${AS[x.status]}</span></div>`).join('')||n('Brak wpisów.'))
+   :W('Do rozpatrzenia','js',`<div class="text-center"><b class="text-4xl text-[#1E2A78]">${j.count||0}</b><p class="text-sm text-slate-500">usprawiedliwień czeka na decyzję</p><button class="b2 mt-2" onclick="go('js')">Przejdź</button></div>`)
+   +W('Moje przedmioty','gr',myT().slice(0,6).map(t=>`<button class="b2 m-1" onclick="openT('${t.id}','one')">${esc(tl(t))}</button>`).join('')||n('Brak przydziałów.'));
+  return `<div class="mb-4"><div class="text-xl font-bold">Dzień dobry, ${esc(me.first_name)}!</div><div class="text-sm text-slate-500">${esc(school)} · ${new Date().toLocaleDateString('pl-PL',{weekday:'long',day:'numeric',month:'long'})} · poprzednie logowanie: ${fd(me.prev_seen)}</div></div>
+  <div class="grid lg:grid-cols-3 gap-4 items-start"><div class="space-y-4">${W('Dzisiejszy plan lekcji','pl',plan)}</div>
+  <div class="space-y-4">${W('Ogłoszenia','ann',(a.data||[]).map(x=>`<div class="py-2 border-b last:border-0"><b>${esc(x.title)}</b><div class="text-xs text-slate-500">${esc(nm(x.author_id))} · ${fd(x.created_at)}</div><p class="text-sm">${esc(x.body.slice(0,140))}${x.body.length>140?'…':''}</p></div>`).join('')||n('Brak ogłoszeń.'))}
+   ${W('Nieprzeczytane wiadomości','msg',msgs.map(x=>`<div class="py-2 border-b last:border-0 cursor-pointer" onclick="go('msg');openMsg('${x.id}')"><b>${esc(x.subject)}</b><div class="text-xs text-slate-500">${esc(nm(x.sender_id))} · ${fd(x.created_at)}</div></div>`).join('')||n('Brak nowych wiadomości.'))}</div>
+  <div class="space-y-4">${side}</div></div>`;
 };
 
 // Wiadomości
@@ -167,7 +224,7 @@ V.msg=async()=>{
     return `<tr class="msg-row hv" onclick="openMsg('${m.id}')"><td style="width:48px"><span class="av">${esc(ini)}</span></td><td><div class="${m.unread?'font-bold':''}">${m.unread?'<span class="dot" style="margin:0 6px 0 0"></span>':''}${m.recalled_at?'<i class="text-slate-400">(wycofana)</i> ':''}${esc(m.subject)}</div><div class="text-xs text-slate-500">${esc(who)}</div></td><td class="text-xs text-slate-500">${fd(m.created_at)}</td></tr>`};
   const list=(a,out)=>a.length?`<div class="overflow-x-auto"><table class="w-full">${a.map(m=>row(m,out)).join('')}</table></div>`:'<p class="text-slate-500 p-4 text-center">Brak wiadomości.</p>';
   return `<div class="card"><div class="flex flex-wrap gap-2 items-center">
-    ${[['in','Odebrane'+(unread?` (${unread})`:'')],['out','Wysłane'],['new','✎ Napisz']].map(([k,l])=>`<button class="pill ${mtab===k?'on':'bg-slate-100'}" onclick="mtab='${k}';render(true)">${l}</button>`).join('')}
+    ${[['in','Odebrane'+(unread?` (${unread})`:'')],['out','Wysłane'],['new',ic('edit')+' Napisz']].map(([k,l])=>`<button class="pill ${mtab===k?'on':'bg-slate-100'}" onclick="mtab='${k}';render(true)">${l}</button>`).join('')}
     ${mtab!=='new'?`<input placeholder="Szukaj…" style="max-width:220px;margin-left:auto" oninput="const q=this.value.toLowerCase();document.querySelectorAll('.msg-row').forEach(r=>r.style.display=r.textContent.toLowerCase().includes(q)?'':'none')">`:''}
     ${mtab==='in'&&unread?`<button class="b2" onclick="markAll()">Oznacz wszystkie jako przeczytane</button>`:''}</div></div>`
    +(mtab==='new'?compose():`<div class="card">${mtab==='in'?list(inbox):list(s.data,1)}</div>`);
@@ -194,10 +251,10 @@ async function openMsg(id,silent){
   const {data:m,error}=await sb.from('messages').select('*').eq('id',id).single();
   if(error||!m)return warn('Nie można otworzyć wiadomości');
   await sb.from('message_recipients').update({read_at:new Date().toISOString()}).eq('message_id',id).eq('recipient_id',me.id).is('read_at',null);
-  let rec='';if(m.sender_id===me.id){const {data}=await sb.from('message_recipients').select('recipient_id,read_at').eq('message_id',id);rec=`<p class="text-sm text-slate-500">Do: ${(data||[]).map(r=>esc(nm(r.recipient_id))+(r.read_at?' <span title="przeczytana" class="text-green-600">✓</span>':'')).join(', ')}</p>`}
+  let rec='';if(m.sender_id===me.id){const {data}=await sb.from('message_recipients').select('recipient_id,read_at').eq('message_id',id);rec=`<p class="text-sm text-slate-500">Do: ${(data||[]).map(r=>esc(nm(r.recipient_id))+(r.read_at?' '+ic('check','text-green-600'):'')).join(', ')}</p>`}
   const d=m.recalled_at?new Date(m.recalled_at):null;
   detail=id;rid++;
-  $('#main').innerHTML=`<div class="view${silent===true?' silent':''}"><div class="card"><button class="b2" onclick="detail=null;render()">← Wróć</button><h2 class="mt-3">${esc(m.subject)}</h2><p class="text-sm text-slate-500">Od: ${esc(nm(m.sender_id))} · ${fd(m.created_at)}</p>${rec}
+  $('#main').innerHTML=`<div class="view${silent===true?' silent':''}"><div class="card"><button class="b2" onclick="detail=null;render()">${ic('back')} Wróć</button><h2 class="mt-3">${esc(m.subject)}</h2><p class="text-sm text-slate-500">Od: ${esc(nm(m.sender_id))} · ${fd(m.created_at)}</p>${rec}
    ${d?`<p class="mt-3 italic text-slate-500">Ta wiadomość została usunięta przez nadawcę w dniu ${d.toLocaleDateString('pl-PL')} o godzinie ${d.toLocaleTimeString('pl-PL',{hour:'2-digit',minute:'2-digit'})}.</p>`:`<p class="mt-3 whitespace-pre-wrap">${esc(m.body)}</p>`}
    <div class="flex gap-2 mt-4">${!d&&m.sender_id!==me.id?`<button class="b" onclick="reply('${m.sender_id}','${encodeURIComponent(m.subject).replace(/'/g,'%27')}')">Odpowiedz</button>`:''}${!d&&m.sender_id===me.id&&staff()?`<button class="b" onclick="recall('${id}')">Wycofaj wiadomość</button>`:''}</div></div></div>`;
   calcDots().then(nav);
@@ -225,13 +282,16 @@ V.gr=async()=>{
     return `<div class="card"><h2>Oceny — ${esc(nm(sid))} (${esc(cn(ST[sid]?.class_id))})</h2>${tbl(['Przedmiot','Oceny','Średnia'],Object.entries(by).map(([s,g])=>`<tr><td>${esc(s)}</td><td>${g.map(x=>`<span title="${esc((x.comment||'')+' · waga '+x.weight+' · '+fd(x.created_at))}" class="inline-block bg-amber-100 rounded px-2 mr-1 font-bold">${esc(x.value)}</span>`).join('')}</td><td class="font-bold">${avg(g)}</td></tr>`))}</div>`;
   }
   const ts=myT(); if(!ts.length)return '<div class="card">Nie masz przypisanych klas i przedmiotów — dyrekcja ustawia je w Administracji.</div>';
-  curT=curT&&ts.find(t=>t.id===curT)?curT:ts[0].id; const t=ts.find(x=>x.id===curT),sts=classStudents(t.class_id);
-  const {data:g}=await sb.from('grades').select('*').eq('teaching_id',curT).order('created_at');
-  return `<div class="card"><select onchange="curT=this.value;render(true)">${opts(ts,tl,curT)}</select>
-   <div class="grid md:grid-cols-5 gap-2 mt-3"><select id="gs" class="md:col-span-2">${opts(sts,p=>p.last_name+' '+p.first_name)}</select><input id="gv" placeholder="Ocena (np. 5, 4+)"><input id="gw" type="number" min="1" max="10" value="1" title="Waga"><input id="gc" placeholder="Komentarz"></div>
-   <button class="b mt-2" onclick="addGrade()">Wstaw ocenę</button></div>
-   <div class="card">${tbl(['Uczeń','Oceny'],sts.map(p=>`<tr><td>${esc(p.last_name+' '+p.first_name)}</td><td>${g.filter(x=>x.student_id===p.id).map(x=>`<span class="inline-block bg-amber-100 rounded px-2 mr-1 font-bold" title="${esc(x.comment||'')} waga ${x.weight}">${esc(x.value)}${dir()||x.author_id===me.id?`<a class="ml-1 text-red-600 cursor-pointer" onclick="delGrade('${x.id}')">×</a>`:''}</span>`).join('')}</td></tr>`))}</div>`;
+  const t=ts.find(x=>x.id===curT);
+  if(!t||gmode==='list')return `<div class="card"><h2>Nauczane przedmioty</h2>${tbl(['Klasa','Przedmiot','Nauczyciel',''],ts.map(x=>`<tr class="hv"><td>${esc(cn(x.class_id))}</td><td>${esc(sn(x.subject_id))}</td><td>${esc(nm(x.teacher_id))}</td><td class="whitespace-nowrap"><button class="b2" onclick="openT('${x.id}','one')">Oceny</button> <button class="b2" onclick="openT('${x.id}','bulk')">Oceny seryjnie</button> <button class="b2" onclick="openT('${x.id}','at')">Frekwencja</button></td></tr>`))}</div>`;
+  const sts=classStudents(t.class_id),{data:g}=await sb.from('grades').select('*').eq('teaching_id',t.id).order('created_at');
+  const head=`<div class="card flex items-center gap-3"><button class="b2" onclick="gmode='list';render(true)">${ic('back')} Przedmioty</button><b>${esc(tl(t))}</b></div>`;
+  if(gmode==='bulk')return head+`<div class="card"><h2>Oceny seryjnie</h2><div class="grid md:grid-cols-3 gap-2 mb-3"><input id="bc" placeholder="Kategoria / komentarz (np. Sprawdzian)"><input id="bw" type="number" min="1" max="10" value="1" title="Waga"></div>${tbl(['Uczeń','Ocena'],sts.map(p=>`<tr><td>${esc(p.last_name+' '+p.first_name)}</td><td><input class="bg" data-s="${p.id}" placeholder="—" style="max-width:110px"></td></tr>`))}<button class="b mt-3" onclick="saveBulk()">Zapisz oceny</button></div>`;
+  return head+`<div class="card"><h2>Wstaw ocenę</h2><div class="grid md:grid-cols-5 gap-2"><select id="gs" class="md:col-span-2">${opts(sts,p=>p.last_name+' '+p.first_name)}</select><input id="gv" placeholder="Ocena (np. 5, 4+)"><input id="gw" type="number" min="1" max="10" value="1" title="Waga"><input id="gc" placeholder="Komentarz"></div><button class="b mt-2" onclick="addGrade()">Wstaw ocenę</button></div>
+   <div class="card">${tbl(['Uczeń','Oceny'],sts.map(p=>`<tr><td>${esc(p.last_name+' '+p.first_name)}</td><td>${g.filter(x=>x.student_id===p.id).map(x=>`<span class="inline-flex items-center bg-amber-100 rounded px-2 mr-1 font-bold" title="${esc(x.comment||'')} waga ${x.weight}">${esc(x.value)}${dir()||x.author_id===me.id?`<a class="ml-1 text-red-600 cursor-pointer" onclick="delGrade('${x.id}')">${ic('x')}</a>`:''}</span>`).join('')}</td></tr>`))}</div>`;
 };
+const openT=(id,m)=>{curT=id;if(m==='at')return go('at');gmode=m;if(tab!=='gr'){tab='gr';detail=null;nav()}render(true)};
+const saveBulk=()=>{const rows=[...document.querySelectorAll('.bg')].filter(i=>i.value.trim()).map(i=>({student_id:i.dataset.s,teaching_id:curT,value:i.value.trim(),weight:+v('bw')||1,comment:v('bc')||null,author_id:me.id}));if(!rows.length)return warn('Wpisz przynajmniej jedną ocenę.');act(sb.from('grades').insert(rows),()=>{gmode='one';render()},'Zapisano ocen: '+rows.length)};
 const addGrade=()=>v('gv').trim()&&act(sb.from('grades').insert({student_id:v('gs'),teaching_id:curT,value:v('gv').trim(),weight:+v('gw')||1,comment:v('gc')||null,author_id:me.id}),render,'Ocena dodana');
 const delGrade=async id=>await ask('Usunąć ocenę?','Usuń')&&act(sb.from('grades').delete().eq('id',id),render,'Ocena usunięta');
 
@@ -240,7 +300,7 @@ V.nt=async()=>{
   const q=sb.from('notes').select('*').order('created_at',{ascending:false}).limit(100); if(!staff())q.eq('student_id',sid);
   const {data}=await q;
   const form=staff()?`<div class="card"><h2>Dodaj uwagę / pochwałę</h2><div class="grid md:grid-cols-3 gap-2"><select id="ns">${opts(Object.values(P).filter(p=>p.role==='student'),p=>`${p.last_name} ${p.first_name} (${cn(ST[p.id]?.class_id)})`)}</select><select id="nk"><option value="remark">Uwaga</option><option value="praise">Pochwała</option></select></div><textarea id="nb" rows="2" class="mt-2" placeholder="Treść"></textarea><button class="b mt-2" onclick="addNote()">Dodaj</button></div>`:'';
-  return form+`<div class="card"><h2>Uwagi i pochwały</h2>${tbl(['Data','Uczeń','Rodzaj','Treść','Autor',''],data.map(n=>`<tr><td>${fd(n.created_at)}</td><td>${esc(nm(n.student_id))}</td><td>${n.kind==='praise'?'👍 pochwała':'⚠ uwaga'}</td><td>${esc(n.body)}</td><td>${esc(nm(n.author_id))}</td><td>${dir()||n.author_id===me.id?`<button class="b2" onclick="delNote('${n.id}')">Usuń</button>`:''}</td></tr>`))}</div>`;
+  return form+`<div class="card"><h2>Uwagi i pochwały</h2>${tbl(['Data','Uczeń','Rodzaj','Treść','Autor',''],data.map(n=>`<tr><td>${fd(n.created_at)}</td><td>${esc(nm(n.student_id))}</td><td>${n.kind==='praise'?'<span class="tag g">'+ic('thumb')+' Pochwała</span>':'<span class="tag r">'+ic('warn')+' Uwaga</span>'}</td><td>${esc(n.body)}</td><td>${esc(nm(n.author_id))}</td><td>${dir()||n.author_id===me.id?`<button class="b2" onclick="delNote('${n.id}')">Usuń</button>`:''}</td></tr>`))}</div>`;
 };
 const addNote=()=>v('nb').trim()&&act(sb.from('notes').insert({student_id:v('ns'),kind:v('nk'),body:v('nb').trim(),author_id:me.id}),render,'Dodano wpis');
 const delNote=id=>act(sb.from('notes').delete().eq('id',id),render);
@@ -283,7 +343,7 @@ V.cl=async()=>{
   return `<div class="card"><select onchange="curC=this.value;render(true)">${opts(cs,c=>'Klasa '+c.name,curC)}</select></div>`+sts.map(p=>{
     const gs={};g.data.filter(x=>x.student_id===p.id).forEach(x=>(gs[sn(T.find(t=>t.id===x.teaching_id)?.subject_id)]??=[]).push(x.value));
     const ab=a.data.filter(x=>x.student_id===p.id);
-    return `<div class="card"><h2>${esc(p.last_name+' '+p.first_name)}</h2><p class="text-sm">Oceny: ${Object.entries(gs).map(([s,l])=>`<b>${esc(s)}</b>: ${l.map(esc).join(', ')}`).join(' · ')||'—'}</p><p class="text-sm">Nieobecności: ${ab.filter(x=>x.status==='absent').length} · spóźnienia: ${ab.filter(x=>x.status==='late').length} · usprawiedliwione: ${ab.filter(x=>x.status==='excused').length}</p><p class="text-sm">Uwagi/pochwały: ${n.data.filter(x=>x.student_id===p.id).map(x=>(x.kind==='praise'?'👍 ':'⚠ ')+esc(x.body)).join(' | ')||'—'}</p></div>`}).join('');
+    return `<div class="card"><h2>${esc(p.last_name+' '+p.first_name)}</h2><p class="text-sm">Oceny: ${Object.entries(gs).map(([s,l])=>`<b>${esc(s)}</b>: ${l.map(esc).join(', ')}`).join(' · ')||'—'}</p><p class="text-sm">Nieobecności: ${ab.filter(x=>x.status==='absent').length} · spóźnienia: ${ab.filter(x=>x.status==='late').length} · usprawiedliwione: ${ab.filter(x=>x.status==='excused').length}</p><p class="text-sm">Uwagi/pochwały: ${n.data.filter(x=>x.student_id===p.id).map(x=>(x.kind==='praise'?ic('thumb','text-green-600'):ic('warn','text-red-600'))+' '+esc(x.body)).join(' | ')||'—'}</p></div>`}).join('');
 };
 
 // Plan lekcji
