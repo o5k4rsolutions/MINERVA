@@ -135,7 +135,7 @@ const inClass=(pid,cid)=>P[pid]?.role==='student'?ST[pid]?.class_id===cid:PC.som
 const classStudents=cid=>Object.values(P).filter(p=>p.role==='student'&&ST[p.id]?.class_id===cid).sort((a,b)=>a.last_name.localeCompare(b.last_name,'pl'));
 const tbl=(h,rows,cls='')=>`<div class="overflow-x-auto"><table class="${cls}"><thead><tr>${h.map(x=>`<th>${x}</th>`).join('')}</tr></thead><tbody>${rows.join('')}</tbody></table></div>`;
 const pn=(t,b,r='',i='')=>`<section class="pn"><div class="ph"><h3>${i?ic(i):''}${t}</h3><div class="flex gap-2 items-center flex-wrap">${r}</div></div><div class="pb">${b}</div></section>`;
-const ICO={home:'<path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/>',msg:'<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/>',ann:'<path d="M3 11v2a1 1 0 001 1h3l7 4V6L7 10H4a1 1 0 00-1 1z"/><path d="M18 9a4 4 0 010 6"/>',gr:'<path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/>',nt:'<path d="M4 4h12l4 4v12H4z"/><path d="M8 12h8M8 16h5"/>',at:'<rect x="4" y="4" width="16" height="17" rx="2"/><path d="M8 2v4M16 2v4M4 10h16M9 15l2 2 4-4"/>',pl:'<rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/>',js:'<path d="M9 11l3 3 8-8"/><path d="M20 12v7a2 2 0 01-2 2H6a2 2 0 01-2-2V5a2 2 0 012-2h9"/>',cl:'<circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6M15 14.5c3 0 6 1.5 6 5.5"/>',ad:'<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/>',out:'<path d="M9 4H5a1 1 0 00-1 1v14a1 1 0 001 1h4M16 8l4 4-4 4M20 12H9"/>',sync:'<path d="M20 12a8 8 0 01-14 5.3M4 12a8 8 0 0114-5.3M18 3v4h-4M6 21v-4h4"/>',back:'<path d="M15 6l-6 6 6 6"/>',check:'<path d="M5 12l5 5 9-10"/>',edit:'<path d="M4 20h4l11-11-4-4L4 16z"/>',x:'<path d="M6 6l12 12M18 6L6 18"/>',thumb:'<path d="M7 11v9H4v-9zM7 11l4-8a2 2 0 012 2v4h6a2 2 0 012 2l-1.5 7a2 2 0 01-2 1.5H7"/>',warn:'<path d="M12 3l10 18H2z"/><path d="M12 10v5M12 18v.5"/>',chev:'<path d="M6 9l6 6 6-6"/>',cal:'<rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/>',plus:'<path d="M12 5v14M5 12h14"/>',trash:'<path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/>',user:'<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/>',print:'<path d="M7 9V3h10v6M7 17H4v-7h16v7h-3M7 14h10v7H7z"/>',key:'<circle cx="8" cy="15" r="4"/><path d="M11 12l9-9M16 7l3 3"/>',book:'<path d="M4 5a2 2 0 012-2h13v16H6a2 2 0 00-2 2z"/><path d="M4 19V5"/>',tr:'<path d="M4 21V4M4 4h12l-2 4 2 4H4"/>',ev:'<rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4M9 15l2 2 4-4"/>'};
+const ICO={home:'<path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/>',msg:'<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/>',ann:'<path d="M3 11v2a1 1 0 001 1h3l7 4V6L7 10H4a1 1 0 00-1 1z"/><path d="M18 9a4 4 0 010 6"/>',gr:'<path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/>',nt:'<path d="M4 4h12l4 4v12H4z"/><path d="M8 12h8M8 16h5"/>',at:'<rect x="4" y="4" width="16" height="17" rx="2"/><path d="M8 2v4M16 2v4M4 10h16M9 15l2 2 4-4"/>',pl:'<rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/>',js:'<path d="M9 11l3 3 8-8"/><path d="M20 12v7a2 2 0 01-2 2H6a2 2 0 01-2-2V5a2 2 0 012-2h9"/>',cl:'<circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6M15 14.5c3 0 6 1.5 6 5.5"/>',ad:'<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/>',out:'<path d="M9 4H5a1 1 0 00-1 1v14a1 1 0 001 1h4M16 8l4 4-4 4M20 12H9"/>',sync:'<path d="M20 12a8 8 0 01-14 5.3M4 12a8 8 0 0114-5.3M18 3v4h-4M6 21v-4h4"/>',back:'<path d="M15 6l-6 6 6 6"/>',check:'<path d="M5 12l5 5 9-10"/>',edit:'<path d="M4 20h4l11-11-4-4L4 16z"/>',x:'<path d="M6 6l12 12M18 6L6 18"/>',thumb:'<path d="M7 11v9H4v-9zM7 11l4-8a2 2 0 012 2v4h6a2 2 0 012 2l-1.5 7a2 2 0 01-2 1.5H7"/>',warn:'<path d="M12 3l10 18H2z"/><path d="M12 10v5M12 18v.5"/>',chev:'<path d="M6 9l6 6 6-6"/>',cal:'<rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/>',plus:'<path d="M12 5v14M5 12h14"/>',trash:'<path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/>',user:'<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/>',print:'<path d="M7 9V3h10v6M7 17H4v-7h16v7h-3M7 14h10v7H7z"/>',key:'<circle cx="8" cy="15" r="4"/><path d="M11 12l9-9M16 7l3 3"/>',book:'<path d="M4 5a2 2 0 012-2h13v16H6a2 2 0 00-2 2z"/><path d="M4 19V5"/>',tr:'<path d="M4 21V4M4 4h12l-2 4 2 4H4"/>'};
 const ic=(k,c='')=>`<svg class="ic ${c}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${ICO[k]||''}</svg>`;
 const toast=(m,t='ok',ms=3500)=>{const e=document.createElement('div');e.className='toast '+t;e.textContent=m;$('#toasts').appendChild(e);setTimeout(()=>{e.classList.add('out');setTimeout(()=>e.remove(),300)},ms)};
 const warn=m=>toast(m,'bad',4500);
@@ -148,7 +148,7 @@ document.addEventListener('click',e=>{const b=e.target.closest('button.btn');if(
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){closePop();closeModal()}});
 document.addEventListener('input',e=>{if(e.target.closest('#main,#modal'))dirty=true});
 
-/* ---------- własne kontrolki (zamiast systemowych) ---------- */
+/* ---------- własne kontrolki ---------- */
 const FV={},DD={};
 const lab=(o,k)=>(o.find(x=>String(x[0])===String(k))||[,''])[1];
 function dd(id,o,val,x={}){DD[id]={o,x};FV[id]=x.multi?[...(val||[])]:(val??'');return `<div class="dd" id="dd_${id}">${ddb(id)}</div>`}
@@ -235,7 +235,7 @@ async function calcDots(){
 }
 function nav(){
   const tot=Object.values(dots).reduce((a,b)=>a+(b||0),0);document.title=(tot?`(${tot}) `:'')+'Dziennik - Minerva';
-  const t=[['home','Start',''],['gr','Oceny','Dziennik'],['at','Frekwencja','Dziennik'],['pl','Plan lekcji','Dziennik'],['ev','Terminarz','Dziennik'],['nt','Uwagi i pochwały','Dziennik']];
+  const t=[['home','Start',''],['gr','Oceny','Dziennik'],['at','Frekwencja','Dziennik'],['pl','Plan lekcji','Dziennik'],['nt','Uwagi i pochwały','Dziennik']];
   if(me.role==='parent'||(staff()&&(dir()||isHome())))t.push(['js','Usprawiedliwienia','Dziennik']);
   if(staff()&&(dir()||isHome()))t.push(['cl','Moja klasa','Dziennik']);
   t.push(['msg','Wiadomości','Komunikacja'],['ann','Ogłoszenia','Komunikacja']);if(dir())t.push(['ad','Administracja','Szkoła']);
@@ -250,7 +250,7 @@ async function render(silent){
   const my=++rid;detail=null;if(silent!==true){dirty=false;$('#main').innerHTML=[1,2,3].map(()=>'<div class="pn pb"><div class="skel" style="width:40%"></div><div class="skel"></div><div class="skel" style="width:80%"></div></div>').join('')}
   try{
     let kids='';
-    if(me.role==='parent'&&KIDS.length>1&&['gr','nt','at','pl','ev'].includes(tab))kids=`<div class="pn pb flex items-center gap-3"><span class="lb" style="margin:0">Dziecko</span><div style="min-width:240px">${dd('kid',KIDS.map(i=>[i,nm(i)]),sid,{on:x=>{sid=x;rr()}})}</div></div>`;
+    if(me.role==='parent'&&KIDS.length>1&&['gr','nt','at','pl'].includes(tab))kids=`<div class="pn pb flex items-center gap-3"><span class="lb" style="margin:0">Dziecko</span><div style="min-width:240px">${dd('kid',KIDS.map(i=>[i,nm(i)]),sid,{on:x=>{sid=x;rr()}})}</div></div>`;
     const h=await V[tab]();if(my!==rid)return;
     $('#main').innerHTML=kids+h;
   }catch(e){if(my===rid)$('#main').innerHTML=`<div class="pn pb">Nie udało się wczytać danych. <button class="btn ml-3" onclick="render()">Spróbuj ponownie</button><p class="text-xs mu mt-2">${esc(e.message||e)}</p></div>`}
@@ -416,15 +416,12 @@ const gPick=n=>{FV.gnum=n;$$('.gp').forEach((b,i)=>b.classList.toggle('sel',i+1=
 V.nt=async()=>{
   const q=sb.from('notes').select('*').order('created_at',{ascending:false}).limit(150);if(!staff())q.eq('student_id',sid);
   const {data,error}=await q;if(error)throw error;
-  const sts=Object.values(P).filter(p=>p.role==='student').sort((a,b)=>ln(a.id).localeCompare(ln(b.id),'pl'));
   FV.ns='';const nco=(dir()?C:C.filter(c=>c.homeroom_teacher_id===me.id||T.some(t=>t.teacher_id===me.id&&t.class_id===c.id))).map(c=>[c.id,'Klasa '+c.name]);
   const form=staff()?pn('Dodaj uwagę lub pochwałę',`<label class="lb">1. Klasa</label><div style="max-width:300px">${dd('nc',nco,'',{ph:'Wybierz klasę…',on:x=>{$('#nsw').innerHTML=dd('ns',classStudents(x).map((p,i)=>[p.id,(i+1)+'. '+ln(p.id)]),'',{ph:'Wybierz ucznia…'})}})}</div><label class="lb mt-3">2. Uczeń (lista numerowana)</label><div id="nsw" style="max-width:300px"><span class="mu text-sm">Najpierw wybierz klasę.</span></div><label class="lb mt-3">3. Rodzaj wpisu</label>${seg('nk',[['remark','Uwaga'],['praise','Pochwała']],'',()=>{})}<label class="lb mt-3">4. Treść</label><textarea id="nb" rows="3"></textarea><button class="btn mt-3" onclick="addNote()">Dodaj wpis</button>`,'','nt'):'';
   const rows=data.filter(n=>ntF==='all'||n.kind===ntF);
   return form+pn('Wpisy',`<div class="mb-3">${seg('nf',[['all','Wszystkie'],['remark','Uwagi'],['praise','Pochwały']],ntF,k=>{ntF=k;rr()})}</div>`+(rows.length?tbl(['Data','Uczeń','Rodzaj','Treść','Autor',''],rows.map(n=>`<tr><td style="white-space:nowrap">${fd(n.created_at)}</td><td>${esc(nm(n.student_id))}</td><td>${n.kind==='praise'?'<span class="tag g">'+ic('thumb')+' Pochwała</span>':'<span class="tag r">'+ic('warn')+' Uwaga</span>'}</td><td>${esc(n.body)}</td><td>${esc(nm(n.author_id))}</td><td>${staff()&&(dir()||n.author_id===me.id)?`<button class="gh sm red" onclick="delNote('${n.id}')">${ic('trash')}</button>`:''}</td></tr>`)):'<p class="em">Brak wpisów.</p>'));
 };
 const addNote=()=>{if(!FV.nc)return warn('Wybierz klasę.');if(!FV.ns)return warn('Wybierz ucznia.');if(!FV.nk)return warn('Wybierz: uwaga czy pochwała.');if(!v('nb').trim())return warn('Wpisz treść.');act(sb.from('notes').insert({student_id:FV.ns,kind:FV.nk,body:v('nb').trim(),author_id:me.id}),rr,'Dodano wpis')};
-const ntStu=()=>{const c=FV.nc;$('#nst').innerHTML=c?(classStudents(c).map(p=>`<button type="button" class="ck${FV.ns===p.id?' on':''}" onclick="ntPick('${p.id}')"><i>${ic('check')}</i>${esc(ln(p.id))}</button>`).join('')||'<span class="mu text-sm">Brak uczniów w klasie.</span>'):''};
-const ntPick=id=>{FV.ns=id;ntStu();$('#nsel').textContent=nm(id);dirty=true};
 const delNote=async id=>await ask('Usunąć wpis?','Usuń')&&act(sb.from('notes').delete().eq('id',id),rr,'Usunięto');
 
 // Frekwencja
@@ -656,7 +653,6 @@ async function delPerson(id){const p=P[id],ex=p.role==='student'?' Zostaną usun
   if(error||data?.error){warn(data?.error||error.message);return editPerson(id)}
   closeModal();toast('Konto usunięte');reload()}
 AD.new=back=>{
-  const tch=['teacher','director'];
   return pn('Nowe konto',`<div class="mb-3">${seg('cr',[['student','Uczeń (z rodzicami)'],['teacher','Nauczyciel'],['director','Dyrektor']],'student',k=>{$('#cs').style.display=k==='student'?'':'none';$('#ct').style.display=k==='teacher'?'':'none'})}</div>
    <div class="grid md:grid-cols-2 gap-3"><div><label class="lb">Imię</label><input type="text" id="cf"></div><div><label class="lb">Nazwisko</label><input type="text" id="cl"></div></div>
    <div id="cs" class="grid md:grid-cols-2 gap-3 mt-3"><div><label class="lb">Klasa</label>${dd('cc',[['','- brak -'],...C.map(c=>[c.id,'Klasa '+c.name])],'')}</div><div><label class="lb">Data urodzenia</label>${dp('cb','')}</div><div><label class="lb">Matka</label><input type="text" id="cm" placeholder="Imię i nazwisko"></div><div><label class="lb">Ojciec</label><input type="text" id="cfa" placeholder="Imię i nazwisko"></div><div class="md:col-span-2"><label class="lb">Opiekun zastępczy (opcjonalnie)</label><input type="text" id="cg"></div></div>
@@ -689,7 +685,7 @@ function showAccts(a){
 function setFs(n){document.documentElement.dataset.fs=n;try{localStorage.setItem('fs',n)}catch{}$$('#fs button').forEach((b,i)=>b.classList.toggle('on',i==n))}
 function userMenu(b){const p=$('#pop');if(p.className==='show'&&p.dataset.f==='um')return closePop();p.dataset.f='um';p.innerHTML=`<div class="pl"><div class="px-3 py-2 text-xs mu">${esc(nm(me.id))} · ${RL[me.role]}</div><div class="pi" onclick="closePop();refresh()">${ic('sync')} Odśwież dane</div><div class="pi" onclick="logout()">${ic('out')} Wyloguj</div></div>`;place(b,220)}
 
-/* ================= OCENY: dodawanie, poprawy, +/-, punkty, procenty ================= */
+/* ================= OCENY ================= */
 const gfix=()=>$$('#main .gc,#modal .gc').forEach(b=>{const m=(b.getAttribute('onclick')||'').match(/gDet\('([^']+)'/),g=m&&GR[m[1]];if(!g)return;
   if(!/^[1-6][+-]?$/.test(g.value))b.className=b.className.replace(/\bg\d+\b/,'g0');if(g.replaced_by)b.classList.add('rp')});
 ['#main','#modal'].forEach(s=>new MutationObserver(gfix).observe($(s),{childList:true,subtree:true}));
@@ -758,7 +754,7 @@ V.gr=async()=>{let h=await _gr();
    else if(gmode==='one'&&h.includes('class="gt"')){const t=myT().find(x=>x.id===curT);if(t)h+=await termTch(t)}}catch(e){}
   return h};
 
-/* ================= LOGOWANIA (dyrekcja) ================= */
+/* ================= LOGOWANIA ================= */
 const _lt=setInterval(async()=>{if(typeof me==='undefined'||!me)return;clearInterval(_lt);
   try{if(sessionStorage.getItem('lg')===me.id)return;sessionStorage.setItem('lg',me.id);await sb.from('login_log').insert({user_id:me.id,school_id:me.school_id})}catch{}},600);
 let lgR='staff';
@@ -794,33 +790,31 @@ function saveTrip(){const f=FV.trf,d=FV.trd||f;if(!FV.trc||!f||!v('trt').trim())
   act(sb.rpc('create_trip',{p_class:FV.trc,p_title:v('trt').trim(),p_from:f,p_to:d,p_l1:+FV.trl1,p_l2:+FV.trl2,p_note:v('trn').trim()||null}),reload,'Dodano wycieczkę, lekcje odwołane')}
 const delTrip=async id=>await ask('Usunąć wycieczkę? Odwołane z jej powodu lekcje zostaną przywrócone w planie.','Usuń')&&act(sb.rpc('delete_trip',{p_id:id}),reload,'Wycieczka usunięta');
 
-/* ================= TERMINARZ ================= */
-const EVK={test:['Sprawdzian','r'],quiz:['Kartkówka','y'],other:['Inne','b']};
-function evSub(cid){
-  const ts=T.filter(t=>t.class_id===cid&&(dir()||t.teacher_id===me.id)),ids=[...new Set(ts.map(t=>t.subject_id))];
-  $('#evsubw').innerHTML=dd('evsub',[['','- bez przedmiotu -'],...ids.map(i=>[i,sn(i)])],'',{ph:'Przedmiot (opcjonalnie)'});
-  $('#evpw').innerHTML=dd('evs',classStudents(cid).map((p,i)=>[p.id,(i+1)+'. '+ln(p.id)]),[],{multi:1,ph:'Wybierz uczniów…'})}
-V.ev=async()=>{
-  const pup=!staff(),cid=pup?ST[sid]?.class_id:null,mc=new Set(myT().map(t=>t.class_id));
-  const {data,error}=await sb.from('events').select('*').gte('date',isoL(addD(new Date(),-7))).order('date');if(error)throw error;
-  const rows=data.filter(e=>pup?(e.class_id===cid&&(!e.student_ids?.length||e.student_ids.includes(sid))):(dir()||mc.has(e.class_id)||e.created_by===me.id));
-  let form='';
-  if(staff()){
-    const cls=(dir()?C:C.filter(c=>mc.has(c.id))).map(c=>[c.id,'Klasa '+c.name]),L=[1,2,3,4,5,6,7,8,9,10].map(n=>[String(n),'Lekcja '+n]);
-    form=pn('Nowy wpis w terminarzu',cls.length?`<div class="mb-3">${seg('evk',[['test','Sprawdzian'],['quiz','Kartkówka'],['other','Inne']],'test',()=>{})}</div>
-     <div class="grid md:grid-cols-3 gap-3"><div><label class="lb">Klasa</label>${dd('evc',cls,'',{ph:'Wybierz klasę…',on:evSub})}</div><div><label class="lb">Przedmiot</label><div id="evsubw"><span class="mu text-sm">Najpierw wybierz klasę.</span></div></div><div><label class="lb">Data</label>${dp('evd',isoL(new Date()))}</div>
-     <div><label class="lb">Lekcja (opcjonalnie)</label>${dd('evl',[['','- dowolna -'],...L],'')}</div><div class="md:col-span-2"><label class="lb">Temat / opis</label><input type="text" id="evt" placeholder="np. Ułamki - dział 3"></div></div>
-     <label class="lb mt-3">Dla kogo</label>${seg('evw',[['all','Cała klasa'],['pick','Wybrani uczniowie']],'all',k=>{$('#evpw').style.display=k==='pick'?'':'none'})}
-     <div id="evpw" class="mt-2" style="display:none;max-width:360px"><span class="mu text-sm">Najpierw wybierz klasę.</span></div>
-     <div><button class="btn mt-3" onclick="saveEv()">Dodaj do terminarza</button></div>`:'<p class="em">Brak przypisanych klas.</p>','','ev')}
-  const td=isoL(new Date());
-  return form+pn('Nadchodzące i ostatnie wpisy',rows.length?tbl(['Data','Rodzaj','Klasa','Przedmiot','Temat','Dla kogo',''],rows.map(e=>{const k=EVK[e.kind]||EVK.other,who=e.student_ids?.length?e.student_ids.map(i=>esc(ln(i))).slice(0,3).join(', ')+(e.student_ids.length>3?' +'+(e.student_ids.length-3):''):'cała klasa';
-    return `<tr class="${e.date===td?'today':''}"><td style="white-space:nowrap">${fdl(e.date)}${e.lesson_no?` <span class="mu text-xs">(lekcja ${e.lesson_no})</span>`:''}</td><td><span class="tag ${k[1]}">${k[0]}</span></td><td>${esc(cn(e.class_id))}</td><td>${e.subject_id?esc(sn(e.subject_id)):'-'}</td><td>${esc(e.title)}</td><td class="text-sm">${who}</td><td>${staff()&&(dir()||e.created_by===me.id)?`<button class="gh sm red" onclick="delEv('${e.id}')">${ic('trash')}</button>`:''}</td></tr>`})):'<p class="em">Brak wpisów w terminarzu.</p>','','ev')};
-function saveEv(){
-  if(!FV.evc)return warn('Wybierz klasę.');if(!v('evt').trim())return warn('Wpisz temat lub opis.');if(!FV.evd)return warn('Wybierz datę.');
-  const pick=FV.evw==='pick';if(pick&&!(FV.evs||[]).length)return warn('Wybierz uczniów albo ustaw „Cała klasa”.');
-  act(sb.from('events').insert({school_id:me.school_id,class_id:FV.evc,kind:FV.evk,title:v('evt').trim(),date:FV.evd,lesson_no:+FV.evl||null,subject_id:FV.evsub||null,student_ids:pick?FV.evs:null,created_by:me.id}),rr,'Dodano do terminarza')}
-const delEv=async id=>await ask('Usunąć wpis z terminarza?','Usuń')&&act(sb.from('events').delete().eq('id',id),rr,'Usunięto');
+/* ================= WPISY W PLANIE LEKCJI (sprawdzian, kartkówka, ...) ================= */
+const EVN={test:['Sprawdzian','r'],quiz:['Kartkówka','y'],homework:['Praca domowa','b'],task:['Zadanie','g'],project:['Projekt','']};
+let EVC=[],EVADD=false;
+const _wg=weekGrid;
+weekGrid=(data,cell)=>_wg(data,(e,t,ds)=>{
+  const h=cell(e,t,ds),
+  L=EVC.filter(x=>x.class_id===e.class_id&&x.date===ds&&x.lesson_no===e.n).map(x=>{const k=EVN[x.kind]||['Inne',''],who=staff()&&x.student_ids?.length?' <span class="mu">('+x.student_ids.map(i=>esc(ln(i))).join(', ')+')</span>':'';
+    return `<div class="text-xs mt-1"><span class="tag ${k[1]}">${k[0]}</span> ${esc(x.title)}${who}${staff()&&(dir()||x.created_by===me.id)?` <a class="lk np" onclick="delEv('${x.id}')">usuń</a>`:''}</div>`}).join(''),
+  add=EVADD&&e.st!=='cancel'&&e.st!=='moved'&&(dir()||T.find(y=>y.id===e.teaching_id)?.teacher_id===me.id||e.sub===me.id)?`<div><a class="lk np" onclick="evAdd('${e.class_id}','${ds}',${e.n},'${e.teaching_id}')">+ wpis</a></div>`:'';
+  return h.replace(/<\/div>$/,L+add+'</div>')});
+const _pl2=V.pl;
+V.pl=async()=>{
+  const pup=!staff(),cid=pup?ST[sid]?.class_id:null,r=await sb.from('events').select('*').gte('date',isoL(wk)).lte('date',isoL(addD(wk,4)));
+  EVC=(r.data||[]).filter(e=>!pup||(e.class_id===cid&&(!e.student_ids?.length||e.student_ids.includes(sid))));EVADD=staff();
+  try{return await _pl2()}finally{EVADD=false;EVC=[]}};
+function evAdd(cid,d,n,tid){const t=T.find(x=>x.id===tid);
+  modal(`<div class="box"><h3 class="mh">Wpis do planu · klasa ${esc(cn(cid))}, lekcja ${n}</h3><p class="text-sm mu mb-3">${fdl(d)} · ${esc(sn(t?.subject_id))}</p>
+   <label class="lb">Rodzaj</label>${seg('evk',Object.entries(EVN).map(([k,x])=>[k,x[0]]),'test',()=>{})}
+   <label class="lb mt-3">Opis</label><textarea id="evt" rows="3"></textarea>
+   <label class="lb mt-3">Dla kogo</label>${seg('evw',[['all','Cała klasa'],['pick','Wybrani uczniowie']],'all',k=>{$('#evpw').style.display=k==='pick'?'':'none'})}
+   <div id="evpw" class="mt-2" style="display:none">${dd('evs',classStudents(cid).map((p,i)=>[p.id,(i+1)+'. '+ln(p.id)]),[],{multi:1,ph:'Wybierz uczniów…'})}</div>
+   <div class="flex gap-2 justify-end mt-4"><button class="gh" onclick="closeModal()">Anuluj</button><button class="btn" onclick="saveEv2('${cid}','${d}',${n},'${tid}')">Zapisz</button></div></div>`)}
+function saveEv2(cid,d,n,tid){const pick=FV.evw==='pick';if(pick&&!(FV.evs||[]).length)return warn('Wybierz uczniów albo ustaw „Cała klasa”.');
+  act(sb.from('events').insert({school_id:me.school_id,class_id:cid,kind:FV.evk,title:v('evt').trim()||EVN[FV.evk][0],date:d,lesson_no:n,subject_id:T.find(x=>x.id===tid)?.subject_id||null,student_ids:pick?FV.evs:null,created_by:me.id}),()=>{closeModal();rr()},'Dodano wpis')}
+const delEv=async id=>await ask('Usunąć wpis?','Usuń')&&act(sb.from('events').delete().eq('id',id),rr,'Usunięto');
 
 init();
 </script>
