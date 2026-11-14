@@ -994,7 +994,12 @@ const _ep=editPerson;editPerson=function(id){_ep(id);if(P[id]?.role!=='parent')r
   sb.from('parent_bots').select('*').eq('parent_id',id).maybeSingle().then(({data:b})=>{const bx=$('#modal .box');if(!bx)return;const s=document.createElement('div');s.className='sec';
     s.innerHTML=`<b>Bot AI (symulowany rodzic)</b>${ck('bot_on',b?.enabled,'Bot włączony - reaguje na oceny')}<label class="lb mt-2">Charakter (opcjonalnie)</label><input type="text" id="bot_p" value="${esc(b?.persona||'')}" placeholder="np. nerwowy, dociekliwy, uprzejmy"><div class="flex flex-wrap gap-2 mt-3"><button class="btn sm" onclick="botSave('${id}')">Zapisz bota</button>${[['grade','Pytanie o ocenę'],['excuse','Usprawiedliwienie'],['retake','Prośba o poprawę'],['complaint','Skarga do wychowawcy']].map(([k,l])=>`<button class="gh sm" onclick="botRun('${id}','${k}',this)">${l}</button>`).join('')}</div>`;
     bx.insertBefore(s,bx.lastElementChild)})};
-const botSave=id=>act(sb.from('parent_bots').upsert({parent_id:id,enabled:!!FV.bot_on,persona:v('bot_p').trim()||null}),null,'Zapisano bota');
+async function botSave(id){const row={parent_id:id,enabled:!!FV.bot_on,persona:v('bot_p').trim()||null};
+  const r=await sb.from('parent_bots').upsert(row,{onConflict:'parent_id'});
+  if(r.error)return warn('Nie zapisano bota: '+r.error.message+' (uruchom bots.sql w Supabase)');
+  const c=await sb.from('parent_bots').select('*').eq('parent_id',id).maybeSingle();
+  if(c.error||!c.data)return warn('Zapis nie dotarł do bazy - sprawdź uprawnienia (RLS) i konto dyrektora.');
+  toast('Bot zapisany: '+(c.data.enabled?'włączony':'wyłączony'))}
 async function botRun(id,scenario,b){b.classList.add('busy');const {data,error}=await sb.functions.invoke('parent-bot',{body:{action:'run',parent_id:id,scenario}});b.classList.remove('busy');
   if(error||data?.error)return warn(data?.error||error.message);toast('Bot: '+(data.info||'wykonano'))}
 /* bot sam reaguje na oceny wystawione przez zalogowanego nauczyciela */
