@@ -355,7 +355,17 @@ V.msg=async()=>{
   return `<div class="grid md:grid-cols-[210px_1fr] gap-4 items-start">${left}<div>${mtab==='new'?compose():list}</div></div>`;
 };
 const msortBy=k=>{msort=[k,msort[0]===k?-msort[1]:1];rr()};
-const delSel=async()=>{const ids=MIDS.filter(i=>FV['ms_'+i]);if(!ids.length)return warn('Zaznacz wiadomości do usunięcia.');if(await ask(`Usunąć zaznaczone wiadomości (${ids.length})?`,'Usuń'))act(sb.from('message_recipients').delete().eq('recipient_id',me.id).in('message_id',ids),async()=>{await calcDots();nav();rr()},'Usunięto')};
+const delSel=async()=>{const ids=MIDS.filter(i=>FV['ms_'+i]);if(!ids.length)return warn('Zaznacz wiadomości do usunięcia.');
+  if(!await ask(`Usunąć zaznaczone wiadomości (${ids.length})?`,'Usuń'))return;
+  const r=await sb.from('message_recipients').delete().eq('recipient_id',me.id).in('message_id',ids).select();
+  if(r.error)return warn('Błąd usuwania: '+r.error.message);
+  if(!r.data.length)return warn('Nic nie usunięto - baza nie pozwala na usuwanie (uruchom delete_messages.sql w Supabase).');
+  await calcDots();nav();toast('Usunięto wiadomości: '+r.data.length);rr()};
+const delOne=async id=>{if(!await ask('Usunąć tę wiadomość ze skrzynki?','Usuń'))return;
+  const r=await sb.from('message_recipients').delete().eq('recipient_id',me.id).eq('message_id',id).select();
+  if(r.error)return warn('Błąd usuwania: '+r.error.message);
+  if(!r.data.length)return warn('Nic nie usunięto - uruchom delete_messages.sql w Supabase.');
+  detail=null;mtab='in';await calcDots();nav();toast('Wiadomość usunięta');rr()};
 function compose(){
   const p0=pre;pre={};
   const people=Object.values(P).filter(p=>p.id!==me.id&&(staff()||['teacher','director'].includes(p.role))).sort((a,b)=>ln(a.id).localeCompare(ln(b.id),'pl'));
@@ -391,7 +401,7 @@ async function openMsg(id,silent){
   const d=m.recalled_at?new Date(m.recalled_at):null;detail=id;rid++;
   $('#main').innerHTML=pn(esc(m.subject),`<p class="text-sm mu">Od: ${esc(nm(m.sender_id))} · ${fd(m.created_at)}</p>${rec}
    ${d?`<p class="mt-3 italic mu">Ta wiadomość została usunięta przez nadawcę ${d.toLocaleDateString('pl-PL')} o ${d.toLocaleTimeString('pl-PL',{hour:'2-digit',minute:'2-digit'})}.</p>`:`<p class="mt-3 whitespace-pre-wrap" style="max-width:70ch">${esc(m.body)}</p>`}
-   <div class="flex gap-2 mt-4">${!d&&m.sender_id!==me.id?`<button class="btn" onclick="reply('${m.id}')">Odpowiedz</button>`:''}${!d&&m.sender_id===me.id&&staff()?`<button class="gh red" onclick="recall('${id}')">Wycofaj wiadomość</button>`:''}</div>`,`<button class="gh sm" onclick="detail=null;render()">${ic('back')} Wróć</button>`);
+   <div class="flex gap-2 mt-4">${!d&&m.sender_id!==me.id?`<button class="btn" onclick="reply('${m.id}')">Odpowiedz</button>`:''}${m.sender_id!==me.id?`<button class="gh red" onclick="delOne('${id}')">${ic('trash')} Usuń</button>`:''}${!d&&m.sender_id===me.id&&staff()?`<button class="gh red" onclick="recall('${id}')">Wycofaj wiadomość</button>`:''}</div>`,`<button class="gh sm" onclick="detail=null;render()">${ic('back')} Wróć</button>`);
   calcDots().then(nav);
 }
 const recall=async id=>await ask('Wycofać wiadomość u wszystkich odbiorców? Zobaczą informację, że została usunięta.','Wycofaj')&&act(sb.rpc('recall_message',{p_id:id}),()=>openMsg(id,true),'Wiadomość wycofana');
@@ -989,24 +999,6 @@ async function absSave(){
   act(sb.from('timetable_changes').insert(rows),reload,'Zapisano nieobecność i '+rows.length+' zmian w planie')}
 const absDel=async id=>await ask('Usunąć zgłoszenie nieobecności? (zmiany w planie usuń osobno w „Zmiany w planie”)','Usuń')&&act(sb.from('teacher_absences').delete().eq('id',id),reload,'Usunięto');
 
-/* 7. Boty rodziców (AI przez funkcję Supabase "parent-bot") */
-const _ep=editPerson;editPerson=function(id){_ep(id);if(P[id]?.role!=='parent')return;
-  sb.from('parent_bots').select('*').eq('parent_id',id).maybeSingle().then(({data:b})=>{const bx=$('#modal .box');if(!bx)return;const s=document.createElement('div');s.className='sec';
-    s.innerHTML=`<b>Bot AI (symulowany rodzic)</b>${ck('bot_on',b?.enabled,'Bot włączony - reaguje na oceny')}<label class="lb mt-2">Charakter (opcjonalnie)</label><input type="text" id="bot_p" value="${esc(b?.persona||'')}" placeholder="np. nerwowy, dociekliwy, uprzejmy"><div class="flex flex-wrap gap-2 mt-3"><button class="btn sm" onclick="botSave('${id}')">Zapisz bota</button>${[['grade','Pytanie o ocenę'],['excuse','Usprawiedliwienie'],['retake','Prośba o poprawę'],['complaint','Skarga do wychowawcy']].map(([k,l])=>`<button class="gh sm" onclick="botRun('${id}','${k}',this)">${l}</button>`).join('')}</div>`;
-    bx.insertBefore(s,bx.lastElementChild)})};
-async function botSave(id){const row={parent_id:id,enabled:!!FV.bot_on,persona:v('bot_p').trim()||null};
-  const r=await sb.from('parent_bots').upsert(row,{onConflict:'parent_id'});
-  if(r.error)return warn('Nie zapisano bota: '+r.error.message+' (uruchom bots.sql w Supabase)');
-  const c=await sb.from('parent_bots').select('*').eq('parent_id',id).maybeSingle();
-  if(c.error||!c.data)return warn('Zapis nie dotarł do bazy - sprawdź uprawnienia (RLS) i konto dyrektora.');
-  toast('Bot zapisany: '+(c.data.enabled?'włączony':'wyłączony'))}
-async function botErr(error,data){let m=data?.error||error?.message||'nieznany błąd';
-  try{const c=error?.context;if(c&&c.json){const b=await c.clone().json();m=b.error||b.message||JSON.stringify(b)+' [HTTP '+c.status+']'}}catch(e){}
-  return m}
-async function botRun(id,scenario,b){b.classList.add('busy');const {data,error}=await sb.functions.invoke('parent-bot',{body:{action:'run',parent_id:id,scenario}});b.classList.remove('busy');
-  if(error||data?.error)return warn('Bot: '+await botErr(error,data));toast('Bot: '+(data.info||'wykonano'))}
-/* bot sam reaguje na oceny wystawione przez zalogowanego nauczyciela */
-const _lg=LIVE.grades;LIVE.grades=p=>{_lg(p);if(p.eventType==='INSERT'&&staff()&&p.new.author_id===me.id)sb.functions.invoke('parent-bot',{body:{action:'grade',grade_id:p.new.id}}).then(r=>{if(r.error)botErr(r.error,r.data).then(m=>console.warn('parent-bot:',m))}).catch(()=>{})};
 
 init();
 </script>
