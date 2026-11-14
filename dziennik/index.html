@@ -47,6 +47,7 @@ tr.hv{cursor:pointer}tr.hv:hover td{background:#fffaf0}tr.today td{background:#f
 .gc.lg{height:36px;min-width:36px;font-size:1.1rem;vertical-align:middle}
 .g1{background:#dc2626}.g2{background:#ea580c}.g3{background:#ca8a04}.g4{background:#65a30d}.g5{background:#16a34a}.g6{background:#0d9488}
 .tag{display:inline-flex;gap:.3rem;align-items:center;padding:.1rem .55rem;border-radius:999px;font-size:.78rem;font-weight:600;background:#e8ecf4;color:#334155}.tag.g{background:#dcfce7;color:#166534}.tag.r{background:#fee2e2;color:#991b1b}.tag.y{background:#fef3c7;color:#92400e}.tag.b{background:#dbeafe;color:#1e40af}
+.tag.p{background:#8e44ad;color:#fff;text-transform:uppercase;letter-spacing:.02em}
 .st{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:.75rem;margin-bottom:1rem}.st div{background:#fff;border:1px solid var(--ln);border-radius:12px;padding:.8rem 1rem}.st b{font-size:1.7rem;color:var(--in);display:block;line-height:1.2}.st span{font-size:.8rem;color:var(--mu)}
 .side{background:#080B1A;color:#fff}
 .nv{display:flex;align-items:center;gap:.7rem;width:100%;padding:.65rem 1rem;color:#cbd5e1;font-weight:600;font-size:.9rem;border:0;border-left:3px solid transparent;background:none;text-align:left;white-space:nowrap}.nv:hover{background:#ffffff12;color:#fff}.nv.on{background:var(--in);color:#fff;border-left-color:var(--am)}
@@ -97,13 +98,14 @@ tbody tr:nth-child(even) td{background:#fafbfd}tbody tr:hover td{background:#fff
 .lsn.x{opacity:.6;background:#fdeaea;border-top-color:#e08a8a}
 .gc.rp{opacity:.45;text-decoration:line-through}
 .evp{cursor:pointer}.evp:hover{filter:brightness(.95)}
-.lsn{position:relative}.subtag{background:#8e44ad;color:#fff;border-radius:999px;padding:.1rem .6rem;font-size:.72rem;font-weight:700;letter-spacing:.03em;text-transform:uppercase;display:inline-block}.sdb{width:26px;height:26px;border-radius:50%;border:0;background:#3a3f55;color:#fff;display:inline-flex;align-items:center;justify-content:center;vertical-align:middle;margin-left:.4rem}
+.cmp{display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-top:.8rem}.cmp>div{border:1px solid var(--ln);border-radius:10px;padding:.7rem .8rem;background:#f7f9fc}.cmp>div.is{background:#f5ebfa;border-color:#d9b8e8}.cmp .lb{margin-bottom:.35rem}
+@media(max-width:480px){.cmp{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
 <div class="md:flex min-h-screen">
 <aside class="side md:w-60 md:h-screen md:sticky md:top-0 md:flex md:flex-col shrink-0">
-  <div class="flex items-center gap-3 p-4"><img src="https://dziennik-minerva.pages.dev/themes/icon-dark.svg" class="h-9" alt=""><div class="leading-tight min-w-0"><div class="font-extrabold">Minerva</div><div id="sch" class="text-xs text-white/60 truncate"></div></div></div>
+  <div class="p-4"><img src="https://dziennik-minerva.pages.dev/themes/logo-horizontal-white.svg" class="h-10 w-auto max-w-full" alt="Minerva"><div id="sch" class="text-xs text-white/60 truncate mt-2"></div></div>
   <div class="px-4 pb-3 mb-2 border-b border-white/10"><div class="font-bold text-lg" id="ptl"></div><div id="pnm"></div><div id="pcl" class="text-xs text-white/60"></div></div><nav id="nav" class="md:flex-1 overflow-y-auto"></nav>
   <div class="p-4 border-t border-white/10"><div id="who" class="text-xs text-white/70"></div></div>
 </aside>
@@ -137,7 +139,7 @@ const inClass=(pid,cid)=>P[pid]?.role==='student'?ST[pid]?.class_id===cid:PC.som
 const classStudents=cid=>Object.values(P).filter(p=>p.role==='student'&&ST[p.id]?.class_id===cid).sort((a,b)=>a.last_name.localeCompare(b.last_name,'pl'));
 const tbl=(h,rows,cls='')=>`<div class="overflow-x-auto"><table class="${cls}"><thead><tr>${h.map(x=>`<th>${x}</th>`).join('')}</tr></thead><tbody>${rows.join('')}</tbody></table></div>`;
 const pn=(t,b,r='',i='')=>`<section class="pn"><div class="ph"><h3>${i?ic(i):''}${t}</h3><div class="flex gap-2 items-center flex-wrap">${r}</div></div><div class="pb">${b}</div></section>`;
-const ICO={home:'<path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/>',msg:'<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/>',ann:'<path d="M3 11v2a1 1 0 001 1h3l7 4V6L7 10H4a1 1 0 00-1 1z"/><path d="M18 9a4 4 0 010 6"/>',gr:'<path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/>',nt:'<path d="M4 4h12l4 4v12H4z"/><path d="M8 12h8M8 16h5"/>',at:'<rect x="4" y="4" width="16" height="17" rx="2"/><path d="M8 2v4M16 2v4M4 10h16M9 15l2 2 4-4"/>',pl:'<rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/>',js:'<path d="M9 11l3 3 8-8"/><path d="M20 12v7a2 2 0 01-2 2H6a2 2 0 01-2-2V5a2 2 0 012-2h9"/>',cl:'<circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6M15 14.5c3 0 6 1.5 6 5.5"/>',ad:'<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/>',out:'<path d="M9 4H5a1 1 0 00-1 1v14a1 1 0 001 1h4M16 8l4 4-4 4M20 12H9"/>',sync:'<path d="M20 12a8 8 0 01-14 5.3M4 12a8 8 0 0114-5.3M18 3v4h-4M6 21v-4h4"/>',back:'<path d="M15 6l-6 6 6 6"/>',check:'<path d="M5 12l5 5 9-10"/>',edit:'<path d="M4 20h4l11-11-4-4L4 16z"/>',x:'<path d="M6 6l12 12M18 6L6 18"/>',thumb:'<path d="M7 11v9H4v-9zM7 11l4-8a2 2 0 012 2v4h6a2 2 0 012 2l-1.5 7a2 2 0 01-2 1.5H7"/>',warn:'<path d="M12 3l10 18H2z"/><path d="M12 10v5M12 18v.5"/>',chev:'<path d="M6 9l6 6 6-6"/>',cal:'<rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/>',plus:'<path d="M12 5v14M5 12h14"/>',trash:'<path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/>',user:'<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/>',print:'<path d="M7 9V3h10v6M7 17H4v-7h16v7h-3M7 14h10v7H7z"/>',key:'<circle cx="8" cy="15" r="4"/><path d="M11 12l9-9M16 7l3 3"/>',book:'<path d="M4 5a2 2 0 012-2h13v16H6a2 2 0 00-2 2z"/><path d="M4 19V5"/>',tr:'<path d="M4 21V4M4 4h12l-2 4 2 4H4"/>'};
+const ICO={home:'<path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/>',msg:'<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/>',ann:'<path d="M3 11v2a1 1 0 001 1h3l7 4V6L7 10H4a1 1 0 00-1 1z"/><path d="M18 9a4 4 0 010 6"/>',gr:'<path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/>',nt:'<path d="M4 4h12l4 4v12H4z"/><path d="M8 12h8M8 16h5"/>',at:'<rect x="4" y="4" width="16" height="17" rx="2"/><path d="M8 2v4M16 2v4M4 10h16M9 15l2 2 4-4"/>',pl:'<rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/>',js:'<path d="M9 11l3 3 8-8"/><path d="M20 12v7a2 2 0 01-2 2H6a2 2 0 01-2-2V5a2 2 0 012-2h9"/>',cl:'<circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6M15 14.5c3 0 6 1.5 6 5.5"/>',ad:'<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/>',out:'<path d="M9 4H5a1 1 0 00-1 1v14a1 1 0 001 1h4M16 8l4 4-4 4M20 12H9"/>',sync:'<path d="M20 12a8 8 0 01-14 5.3M4 12a8 8 0 0114-5.3M18 3v4h-4M6 21v-4h4"/>',back:'<path d="M15 6l-6 6 6 6"/>',check:'<path d="M5 12l5 5 9-10"/>',edit:'<path d="M4 20h4l11-11-4-4L4 16z"/>',x:'<path d="M6 6l12 12M18 6L6 18"/>',thumb:'<path d="M7 11v9H4v-9zM7 11l4-8a2 2 0 012 2v4h6a2 2 0 012 2l-1.5 7a2 2 0 01-2 1.5H7"/>',warn:'<path d="M12 3l10 18H2z"/><path d="M12 10v5M12 18v.5"/>',chev:'<path d="M6 9l6 6 6-6"/>',cal:'<rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/>',plus:'<path d="M12 5v14M5 12h14"/>',trash:'<path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/>',user:'<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/>',print:'<path d="M7 9V3h10v6M7 17H4v-7h16v7h-3M7 14h10v7H7z"/>',key:'<circle cx="8" cy="15" r="4"/><path d="M11 12l9-9M16 7l3 3"/>',book:'<path d="M4 5a2 2 0 012-2h13v16H6a2 2 0 00-2 2z"/><path d="M4 19V5"/>',tr:'<path d="M4 21V4M4 4h12l-2 4 2 4H4"/>',up:'<path d="M12 16V4M7 9l5-5 5 5M4 20h16"/>'};
 const ic=(k,c='')=>`<svg class="ic ${c}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${ICO[k]||''}</svg>`;
 const toast=(m,t='ok',ms=3500)=>{const e=document.createElement('div');e.className='toast '+t;e.textContent=m;$('#toasts').appendChild(e);setTimeout(()=>{e.classList.add('out');setTimeout(()=>e.remove(),300)},ms)};
 const warn=m=>toast(m,'bad',4500);
@@ -279,18 +281,27 @@ function entries(base,m,scope){
   const rng=[0,1,2,3,4].map(i=>isoL(addD(m,i))),res=[];
   rng.forEach((d,i)=>base.filter(e=>e.weekday===i+1).forEach(e=>res.push({d,n:e.lesson_no,class_id:e.class_id,teaching_id:e.teaching_id})));
   CH.filter(k=>rng.includes(k.date)).forEach(k=>{
-    const x=res.find(r=>r.d===k.date&&r.n===k.lesson_no&&r.class_id===k.class_id&&r.teaching_id===k.teaching_id&&!r.st),v0={d:k.date,n:k.lesson_no,class_id:k.class_id,teaching_id:k.teaching_id,note:k.note};
+    const x=res.find(r=>r.d===k.date&&r.n===k.lesson_no&&r.class_id===k.class_id&&r.teaching_id===k.teaching_id&&!r.st),v0={d:k.date,n:k.lesson_no,class_id:k.class_id,teaching_id:k.teaching_id,note:k.note,grp:k.grp};
     if(k.kind==='moved_in'){res.push({...v0,st:'in'});return}
     if(k.kind==='substitution'){if(x){x.st='sub';x.sub=k.sub_teacher_id;x.subj=k.sub_subject_id;x.note=k.note}else res.push({...v0,st:'sub',sub:k.sub_teacher_id,subj:k.sub_subject_id});return}
-    if(x){x.st=k.kind==='cancelled'?'cancel':'moved';x.note=k.note}});
+    if(x){x.st=k.kind==='cancelled'?'cancel':'moved';x.note=k.note;x.grp=k.grp}});
   return res.filter(scope)}
-const SUBM={},subKey=r=>r.d+'|'+r.n+'|'+r.class_id+'|'+r.teaching_id;
-function subDet(k){const r=SUBM[k];if(!r)return;const t=T.find(x=>x.id===r.teaching_id),b=BELLS[r.n-1]||[];
-  modal(`<div class="box"><h3 class="mh"><span class="subtag">Zastępstwo</span> ${fdl(r.d)}, lekcja ${r.n}</h3><p class="text-sm mu mb-3">Klasa ${esc(cn(r.class_id))}${b.length?' · '+b.join(' - '):''}</p>
-   <b class="text-sm" style="color:var(--in)">Powinno być</b><dl class="dl mt-1 mb-3"><dt>Przedmiot</dt><dd>${esc(sn(t?.subject_id))}</dd><dt>Nauczyciel</dt><dd>${esc(nm(t?.teacher_id))}</dd></dl>
-   <b class="text-sm" style="color:#8e44ad">Jest</b><dl class="dl mt-1"><dt>Przedmiot</dt><dd>${esc(sn(r.subj||t?.subject_id))}</dd><dt>Nauczyciel</dt><dd>${esc(nm(r.sub))}</dd>${r.note?`<dt>Uwaga</dt><dd>${esc(r.note)}</dd>`:''}</dl>
+/* tag zmiany w planie + link do szczegółów (co powinno być, a co jest) */
+const ENT={};
+const chTag=r=>{if(!r.st)return'';const key=r.d+'|'+r.n+'|'+r.class_id+'|'+r.teaching_id+'|'+r.st;ENT[key]=r;
+  const tg={cancel:'<span class="tag r">odwołane</span>',moved:'<span class="tag y">przeniesione</span>',in:'<span class="tag b">przeniesione tu</span>',sub:'<span class="tag p">zastępstwo</span>'}[r.st]||'';
+  return `<div class="mt-1">${tg}</div>`+(r.note?`<div class="text-xs mu">${esc(r.note)}</div>`:'')+`<a class="lk np" onclick="event.stopPropagation();chDet('${key}')">szczegóły</a>`};
+function chDet(key){const r=ENT[key];if(!r)return;
+  const t=T.find(x=>x.id===r.teaching_id),hrs=(BELLS[r.n-1]||[]).join(' - '),pl=`<b>${esc(sn(t?.subject_id))}</b><div>${esc(nm(t?.teacher_id))}</div>`;
+  let ttl='',was=pl,is='',tag='';
+  if(r.st==='sub'){ttl='Zastępstwo';tag='p';is=`<b>${esc(sn(r.subj||t?.subject_id))}</b><div>${esc(nm(r.sub))}</div>`}
+  else if(r.st==='cancel'){ttl='Lekcja odwołana';tag='r';is='<b>Lekcja odwołana</b><div class="mu">Uczniowie nie mają tej lekcji.</div>'}
+  else if(r.st==='moved'){ttl='Lekcja przeniesiona';tag='y';const d=CH.find(x=>x.grp&&x.grp===r.grp&&x.kind==='moved_in');is='<b>Lekcja przeniesiona</b>'+(d?`<div>na ${fdl(d.date)}, lekcja ${d.lesson_no} (${(BELLS[d.lesson_no-1]||[]).join(' - ')})</div>`:'')}
+  else{ttl='Lekcja przeniesiona tu';tag='b';const s=CH.find(x=>x.grp&&x.grp===r.grp&&x.kind==='moved_out');was='<b>Brak lekcji</b><div class="mu">W planie nie ma tu zajęć.</div>';is=`${pl}${s?`<div class="mu">przeniesiona z ${fdl(s.date)}, lekcja ${s.lesson_no}</div>`:''}`}
+  modal(`<div class="box"><h3 class="mh"><span class="tag ${tag}">${ttl}</span></h3>
+   <dl class="dl"><dt>Data</dt><dd>${fdl(r.d)}</dd><dt>Lekcja</dt><dd>${r.n}${hrs?' ('+hrs+')':''}</dd><dt>Klasa</dt><dd>${esc(cn(r.class_id))}</dd>${r.note?`<dt>Notatka</dt><dd>${esc(r.note)}</dd>`:''}</dl>
+   <div class="cmp"><div><div class="lb">Powinno być (według planu)</div>${was}</div><div class="is"><div class="lb">Jest</div>${is}</div></div>
    <div class="flex justify-end mt-4"><button class="btn" onclick="closeModal()">Zamknij</button></div></div>`)}
-const chTag=r=>(r.st==='cancel'?'<span class="tag r">odwołane</span>':r.st==='moved'?'<span class="tag y">przeniesione</span>':r.st==='in'?'<span class="tag b">przeniesione tu</span>':r.st==='sub'?(SUBM[subKey(r)]=r,`<span class="subtag">Zastępstwo</span><button class="sdb" title="Szczegóły zastępstwa" onclick="event.stopPropagation();subDet('${subKey(r)}')"><span style="display:inline-block;transform:scaleX(-1)">${ic('back')}</span></button>`):\'\')+(r.note&&r.st?`<div class="text-xs mu">${esc(r.note)}</div>`:'');
 function weekGrid(data,cell){
   const days=[0,1,2,3,4].map(i=>addD(wk,i)),td=isoL(new Date()),ns=[...new Set(data.map(e=>e.n))].sort((a,b)=>a-b);
   if(!ns.length)return '<p class="em">Brak lekcji w planie.</p>';
@@ -310,7 +321,7 @@ V.home=async()=>{
     staff()?jCount().then(c=>({count:c})):E]);
   const mt=T.filter(t=>t.teacher_id===me.id).map(t=>t.id),n=x=>`<p class="mu text-sm">${x}</p>`,row=h=>`<div class="py-2 border-b last:border-0" style="border-color:var(--ln)">${h}</div>`,lk=(k,l)=>`<a class="lk" onclick="go('${k}')">${l}</a>`;
   const les=hd?[]:entries(tt.data||[],mon(now),r=>r.d===isoL(now)&&(pup?r.class_id===cid:mt.includes(r.teaching_id)||r.sub===me.id)).sort((a,b)=>a.n-b.n);
-  const plan=(hd?`<p class="tag r mb-2">${hd}</p>`:'')+(les.length?les.map(e=>{const t=T.find(x=>x.id===e.teaching_id),dead=e.st==='cancel'||e.st==='moved',nogo=pup||dead||(e.st==='sub'&&e.sub!==me.id&&!dir());return `<div class="flex items-center gap-3 py-2 border-b last:border-0" style="border-color:var(--ln)${nogo?'':';cursor:pointer'}${dead?';opacity:.55':''}" ${nogo?'':`title="Sprawdź obecność" onclick="curT='${e.teaching_id}';curL=${e.n};curD=isoL(new Date());atManual=false;go('at')"`}><span class="av">${e.n}</span><div class="flex-1"><div class="font-semibold"${dead?' style="text-decoration:line-through"':''}>${esc(sn(e.subj||t?.subject_id))}</div><div class="text-xs mu">${pup?esc(nm(e.sub||t?.teacher_id)):'klasa '+esc(cn(e.class_id))}</div>${chTag(e)}</div><div class="text-xs mu">${(BELLS[e.n-1]||[]).join('-')}</div></div>`}).join(''):n(wd>=1&&wd<=5&&!hd?'Brak lekcji w planie na dziś.':'Dziś brak lekcji.'));
+  const plan=(hd?`<p class="tag r mb-2">${hd}</p>`:'')+(les.length?les.map(e=>{const t=T.find(x=>x.id===e.teaching_id),dead=e.st==='cancel'||e.st==='moved',nogo=pup||dead||(e.st==='sub'&&e.sub!==me.id&&!dir());return `<div class="flex items-center gap-3 py-2 border-b last:border-0" style="border-color:var(--ln)${nogo?'':';cursor:pointer'}${dead?';opacity:.55':''}" ${nogo?'':`title="Sprawdź obecność" onclick="curT='${e.teaching_id}';curL=${e.n};curD=isoL(new Date());atManual=false;go('at')"`}><span class="av">${e.n}</span><div class="flex-1"><div class="font-semibold"${dead?' style="text-decoration:line-through"':''}>${esc(sn(e.subj||t?.subject_id))}</div><div class="text-xs mu">${pup||e.st==='sub'?esc(nm(e.sub||t?.teacher_id)):'klasa '+esc(cn(e.class_id))}${!pup&&e.st==='sub'?' · klasa '+esc(cn(e.class_id)):''}</div>${chTag(e)}</div><div class="text-xs mu">${(BELLS[e.n-1]||[]).join('-')}</div></div>`}).join(''):n(wd>=1&&wd<=5&&!hd?'Brak lekcji w planie na dziś.':'Dziś brak lekcji.'));
   const msgs=(m.data||[]).filter(r=>r.messages&&!r.messages.recalled_at).map(r=>r.messages).sort((x,y)=>y.created_at.localeCompare(x.created_at)).slice(0,4);
   const newG=(g.data||[]).filter(x=>x.created_at>since);newG.forEach(x=>GR[x.id]=x);
   const today=isoL(now),imp=[hd?row(`<b>${hd}</b><div class="text-xs mu">Dzień wolny od zajęć</div>`):'',...(a.data||[]).filter(x=>x.created_at.slice(0,10)===today).map(x=>row(`<b>${esc(x.title)}</b>`))].join('')||n('Brak informacji.');
@@ -565,7 +576,7 @@ V.pl=async()=>{
   if(!cid&&!mineT)return sel+pn('Plan zajęć','<p class="em">Brak przypisanej klasy.</p>');
   const q=sb.from('timetable').select('*');const {data,error}=await(mineT?q.in('teaching_id',T.filter(t=>t.teacher_id===ptid).map(t=>t.id)):q.eq('class_id',cid));if(error)throw error;
   const ids=T.filter(t=>t.teacher_id===ptid).map(t=>t.id),es=entries(data,wk,mineT?(r=>ids.includes(r.teaching_id)||r.sub===ptid):(r=>r.class_id===cid));
-  return sel+pn(mineT?(ptid===me.id?'Mój plan zajęć':'Plan nauczyciela - '+esc(nm(ptid))):'Plan zajęć - klasa '+esc(cn(cid)),weekGrid(es,(e,t)=>`<div class="lsn${e.st==='cancel'||e.st==='moved'?' x':''}"><div class="lt">${(BELLS[e.n-1]||[]).join(' - ')}</div><b>${esc(sn(e.subj||t?.subject_id))}</b><div class="text-xs">${mineT?'klasa '+esc(cn(e.class_id)):esc(nm(e.sub||t?.teacher_id))}</div>${chTag(e)}</div>`),wkNav()+`<button class="btn sm np" onclick="window.print()">${ic('print')} Drukuj</button>`,'pl');
+  return sel+pn(mineT?(ptid===me.id?'Mój plan zajęć':'Plan nauczyciela - '+esc(nm(ptid))):'Plan zajęć - klasa '+esc(cn(cid)),weekGrid(es,(e,t)=>`<div class="lsn${e.st==='cancel'||e.st==='moved'?' x':''}"><div class="lt">${(BELLS[e.n-1]||[]).join(' - ')}</div><b>${esc(sn(e.subj||t?.subject_id))}</b><div class="text-xs">${mineT?(e.st==='sub'?esc(nm(e.sub))+' · ':'')+'klasa '+esc(cn(e.class_id)):esc(nm(e.sub||t?.teacher_id))}</div>${chTag(e)}</div>`),wkNav()+`<button class="btn sm np" onclick="window.print()">${ic('print')} Drukuj</button>`,'pl');
 };
 
 /* ---------- Administracja ---------- */
@@ -573,7 +584,7 @@ V.ad=async()=>{
   const back=`<button class="gh sm" onclick="adTab=null;rr()">${ic('back')} Administracja</button>`;
   if(!adTab){const n=(k)=>Object.values(P).filter(p=>p.role===k).length;
     const tl2=(k,i,t,d)=>`<button class="tile" onclick="adTab='${k}';rr()">${ic(i)}<b>${t}</b><span>${d}</span></button>`;
-    return `<p class="mu mb-4">Wybierz, czym chcesz zarządzać.</p><div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">${tl2('ppl','user','Osoby i konta',`${n('teacher')+n('director')} pracowników · ${n('student')} uczniów · ${n('parent')} rodziców`)}${tl2('cls','cl','Klasy i wychowawcy',`${C.length} klas`)}${tl2('sub','book','Przedmioty',`${SUB.length} przedmiotów`)}${tl2('plan','pl','Plan lekcji','Ustaw lekcje klasy dzień po dniu')}${tl2('chg','pl','Zmiany w planie','Zastępstwa, odwołania i przeniesienia lekcji')}${tl2('off','cal','Dni wolne i święta','Dodatkowe dni wolne od szkoły')}${tl2('bells','at','Godziny lekcji','Czas każdej lekcji w placówce')}${tl2('logins','key','Logowania','Kto i kiedy się logował')}${tl2('new','plus','Nowe konto','Uczeń z rodzicami, nauczyciel, dyrektor')}${tl2('imp','cl','Import uczniów','Masowe dodawanie uczniów do klas')}</div>`}
+    return `<p class="mu mb-4">Wybierz, czym chcesz zarządzać.</p><div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">${tl2('ppl','user','Osoby i konta',`${n('teacher')+n('director')} pracowników · ${n('student')} uczniów · ${n('parent')} rodziców`)}${tl2('cls','cl','Klasy i wychowawcy',`${C.length} klas`)}${tl2('sub','book','Przedmioty',`${SUB.length} przedmiotów`)}${tl2('plan','pl','Plan lekcji','Ustaw lekcje klasy dzień po dniu')}${tl2('chg','pl','Zmiany w planie','Zastępstwa, odwołania i przeniesienia lekcji')}${tl2('off','cal','Dni wolne i święta','Dodatkowe dni wolne od szkoły')}${tl2('bells','at','Godziny lekcji','Czas każdej lekcji w placówce')}${tl2('logins','key','Logowania','Kto i kiedy się logował')}${tl2('new','plus','Nowe konto','Uczeń z rodzicami, nauczyciel, dyrektor')}${tl2('imp','up','Import uczniów','Masowe wgrywanie uczniów do klas (lista lub plik CSV)')}</div>`}
   return AD[adTab](back);
 };
 const AD={};
@@ -677,24 +688,6 @@ AD.new=back=>{
    <div id="cs" class="grid md:grid-cols-2 gap-3 mt-3"><div><label class="lb">Klasa</label>${dd('cc',[['','- brak -'],...C.map(c=>[c.id,'Klasa '+c.name])],'')}</div><div><label class="lb">Data urodzenia</label>${dp('cb','')}</div><div><label class="lb">Matka</label><input type="text" id="cm" placeholder="Imię i nazwisko"></div><div><label class="lb">Ojciec</label><input type="text" id="cfa" placeholder="Imię i nazwisko"></div><div class="md:col-span-2"><label class="lb">Opiekun zastępczy (opcjonalnie)</label><input type="text" id="cg"></div></div>
    <div id="ct" class="grid md:grid-cols-3 gap-3 mt-3" style="display:none"><div><label class="lb">Przedmioty</label>${dd('csub',SUB.map(s=>[s.id,s.name]),[],{multi:1,ph:'Wybierz przedmioty…'})}</div><div><label class="lb">Uczy w klasach</label>${dd('ccl',C.map(c=>[c.id,'Klasa '+c.name]),[],{multi:1,ph:'Wybierz klasy…'})}</div><div><label class="lb">Wychowawca klasy</label>${dd('chr',[['','- nie -'],...C.map(c=>[c.id,'Klasa '+c.name])],'')}</div></div>
    <button class="btn mt-4" onclick="createAcc()">Utwórz konto i pokaż dane do wydruku</button>`,back,'plus')};
-AD.imp=back=>pn('Import uczniów',`<p class="text-sm mu mb-3">Wklej listę (jeden uczeń w wierszu) albo wczytaj plik CSV/TXT. Format: <b>Imię Nazwisko</b> lub kolumny rozdzielone średnikiem/tabulatorem: <b>Imię;Nazwisko;Klasa;Matka;Ojciec</b> (klasa, matka, ojciec opcjonalne). Gdy w wierszu brak klasy lub nazwa nie pasuje, używana jest klasa domyślna.</p>
- <div style="max-width:300px" class="mb-3"><label class="lb">Klasa domyślna</label>${dd('imc',[['','- brak -'],...C.map(c=>[c.id,'Klasa '+c.name])],'')}</div>
- <input type="file" accept=".csv,.txt,text/plain" class="mb-3 text-sm" onchange="impFile(this)">
- <textarea id="imt" rows="10" placeholder="Jan Kowalski&#10;Anna;Nowak;3A;Maria Nowak;Piotr Nowak"></textarea>
- <button class="btn mt-3" onclick="runImp()">Utwórz konta uczniów</button><p id="imp" class="text-sm mu mt-2"></p>`,back,'plus');
-const impFile=i=>{const f=i.files[0];if(f)f.text().then(t=>{$('#imt').value=t;dirty=true})};
-const impParse=()=>v('imt').split(/\r?\n/).map(l=>l.trim()).filter(Boolean).map(l=>{let a=/[;\t,]/.test(l)?l.split(/[;\t,]/).map(x=>x.trim()):null;if(!a){const w=l.split(/\s+/);a=[w[0],w.slice(1).join(' ')]}
- const c=C.find(c=>c.name.toLowerCase()===(a[2]||'').toLowerCase());return{first:a[0]||'',last:a[1]||'',cls:c?c.id:(FV.imc||null),mother:a[3]||'',father:a[4]||''}}).filter((r,i)=>!(i===0&&/^imi/i.test(r.first)&&/^nazw/i.test(r.last)));
-async function runImp(){const rows=impParse().filter(r=>r.first&&r.last);if(!rows.length)return warn('Brak poprawnych wierszy (potrzebne imię i nazwisko).');
-  const nc=rows.filter(r=>!r.cls).length;
-  if(!await ask('Utworzyć konta uczniów: '+rows.length+(nc?' (bez klasy: '+nc+')':'')+'?','Utwórz'))return;
-  const acc=[],bad=[],st=$('#imp');
-  for(let i=0;i<rows.length;i++){const r=rows[i];if(st)st.textContent=`Tworzenie ${i+1}/${rows.length}…`;
-    const {data,error}=await sb.functions.invoke('admin-users',{body:{action:'create',role:'student',first_name:r.first,last_name:r.last,class_id:r.cls,birth_date:null,mother:r.mother,father:r.father,guardian:''}});
-    if(error||data?.error)bad.push(r.first+' '+r.last+': '+(data?.error||error.message));else acc.push(...data.accounts)}
-  if(bad.length)warn('Błędy ('+bad.length+'): '+bad.slice(0,3).join('; '));
-  if(acc.length){showAccts(acc);toast('Utworzono kont: '+acc.length)}
-  await reload()}
 async function createAcc(){
   const role=FV.cr,body={action:'create',role,first_name:v('cf').trim(),last_name:v('cl').trim()};
   if(!body.first_name||!body.last_name)return warn('Podaj imię i nazwisko.');
@@ -708,6 +701,48 @@ async function createAcc(){
     if(np){const rows=FV.ccl.flatMap(c=>FV.csub.map(s=>({class_id:c,subject_id:s,teacher_id:np.id})));const r=await sb.from('teaching').insert(rows);if(r.error)warn('Konto utworzone, ale nie dodano przydziałów: '+r.error.message)}}
   adTab='ppl';reload();
 }
+
+/* ---------- Masowy import uczniów do klas ---------- */
+AD.imp=back=>pn('Import uczniów do klas',`<p class="text-sm mu mb-3">Wklej listę uczniów (jedna osoba w wierszu, np. skopiowaną z Excela) albo wgraj plik CSV/TXT. Kolumny oddzielone średnikiem, przecinkiem lub tabulatorem, w kolejności:<br><b>imię; nazwisko; klasa; data urodzenia; matka; ojciec; opiekun</b><br>Wymagane są tylko imię i nazwisko. Jeśli w wierszu nie ma klasy, uczeń trafi do klasy wybranej poniżej. Data: RRRR-MM-DD lub DD.MM.RRRR. Pierwszy wiersz z nagłówkiem („imię…”) zostanie pominięty.</p>
+  <div class="grid md:grid-cols-2 gap-3 mb-3"><div><label class="lb">Klasa domyślna</label>${dd('impc',[['','- brak (klasa tylko z listy) -'],...C.map(c=>[c.id,'Klasa '+c.name])],'')}</div><div><label class="lb">Plik CSV / TXT</label><input type="file" id="impf" accept=".csv,.txt,.tsv,text/plain,text/csv" class="inp" onchange="impFile(this)"></div></div>
+  <div class="mb-3">${ck('impn',true,'Utwórz brakujące klasy (z nazw w liście)')}</div>
+  <label class="lb">Lista uczniów</label><textarea id="impt" rows="10" placeholder="Anna;Kowalska;2A;2012-05-14;Maria Kowalska;Jan Kowalski&#10;Piotr;Nowak;2A"></textarea>
+  <div class="flex gap-2 mt-3 flex-wrap"><button class="btn" onclick="impRun()">${ic('up')} Importuj uczniów</button><button class="gh" onclick="impSample()">Wstaw przykład</button></div>
+  <div id="impo" class="mt-3 text-sm"></div><p class="text-xs mu mt-3">Dla każdego ucznia powstanie konto (oraz konta rodziców, jeśli podano matkę/ojca/opiekuna). Po zakończeniu pokaże się wydruk loginów i haseł jednorazowych.</p>`,back,'up');
+function impFile(i){const f=i.files[0];if(!f)return;const r=new FileReader();
+  r.onload=()=>{let t=r.result;if(t.includes('\uFFFD')){const r2=new FileReader();r2.onload=()=>{$('#impt').value=r2.result;dirty=true};r2.readAsText(f,'windows-1250')}else{$('#impt').value=t;dirty=true}};r.readAsText(f,'utf-8')}
+const impSample=()=>{$('#impt').value='Anna;Kowalska;2A;2012-05-14;Maria Kowalska;Jan Kowalski\nPiotr;Nowak;2A;03.11.2012;Ewa Nowak;\nZofia;Wiśniewska;3B';dirty=true};
+function impParse(txt,defName){const rows=[],errs=[];
+  txt.split(/\r?\n/).forEach((l,i)=>{l=l.trim();if(!l)return;
+    const d=l.includes('\t')?'\t':l.includes(';')?';':',',c=l.split(d).map(x=>x.trim().replace(/^"|"$/g,'').trim());
+    if(i===0&&/^imi[eę]/i.test(c[0]))return;
+    if(!c[0]||!c[1]){errs.push('Wiersz '+(i+1)+': brak imienia lub nazwiska');return}
+    let b=c[3]||'';const m=b.match(/^(\d{1,2})[.\/-](\d{1,2})[.\/-](\d{4})$/);
+    if(m)b=m[3]+'-'+pad(+m[2])+'-'+pad(+m[1]);else if(b&&!/^\d{4}-\d{2}-\d{2}$/.test(b)){errs.push('Wiersz '+(i+1)+': niepoprawna data urodzenia „'+b+'”');return}
+    rows.push({n:i+1,first_name:c[0],last_name:c[1],cls:(c[2]||defName||'').trim(),birth_date:b||null,mother:c[4]||'',father:c[5]||'',guardian:c[6]||''})});
+  return{rows,errs}}
+async function impRun(){
+  const o=$('#impo'),defName=FV.impc?cn(FV.impc):'',{rows,errs}=impParse(v('impt'),defName);
+  if(errs.length){o.innerHTML='<div class="tag r mb-2">Popraw błędy:</div><ul class="list-disc ml-5">'+errs.map(e=>`<li>${esc(e)}</li>`).join('')+'</ul>';return warn('Lista zawiera błędy.')}
+  if(!rows.length)return warn('Wklej listę uczniów albo wgraj plik.');
+  const byName={};C.forEach(c=>byName[c.name.trim().toLowerCase()]=c.id);
+  const missing=[...new Set(rows.map(r=>r.cls).filter(n=>n&&!byName[n.toLowerCase()]))];
+  if(missing.length&&!FV.impn){o.innerHTML='<div class="tag r mb-2">Nie ma takich klas:</div> '+missing.map(esc).join(', ');return warn('Brak klas: '+missing.join(', ')+'. Zaznacz „Utwórz brakujące klasy” lub popraw listę.')}
+  const noCls=rows.filter(r=>!r.cls).length;
+  if(!await ask(`Utworzyć konta dla ${rows.length} uczniów${missing.length?' i nowe klasy: '+missing.join(', '):''}?${noCls?' ('+noCls+' bez klasy)':''}`,'Importuj'))return;
+  for(const n of missing){const r=await sb.from('classes').insert({school_id:me.school_id,name:n}).select().single();if(r.error)return warn('Nie udało się dodać klasy '+n+': '+r.error.message);byName[n.toLowerCase()]=r.data.id}
+  const accts=[],fails=[];let done=0;
+  for(const r of rows){
+    o.innerHTML=`<div class="tag y">Importowanie… ${done}/${rows.length}</div> <span class="mu">${esc(r.first_name+' '+r.last_name)}</span>`;
+    try{const {data,error}=await sb.functions.invoke('admin-users',{body:{action:'create',role:'student',first_name:r.first_name,last_name:r.last_name,class_id:r.cls?byName[r.cls.toLowerCase()]:null,birth_date:r.birth_date,mother:r.mother,father:r.father,guardian:r.guardian}});
+      if(error||data?.error)fails.push(`Wiersz ${r.n} (${r.first_name} ${r.last_name}): ${data?.error||error.message}`);else{(data.accounts||[]).forEach(a=>accts.push(a))}}
+    catch(e){fails.push(`Wiersz ${r.n} (${r.first_name} ${r.last_name}): ${e.message||e}`)}
+    done++}
+  const ok=rows.length-fails.length;
+  o.innerHTML=`<div class="tag ${fails.length?'y':'g'}">Zaimportowano: ${ok} z ${rows.length}</div>`+(fails.length?'<ul class="list-disc ml-5 mt-2">'+fails.map(f=>`<li>${esc(f)}</li>`).join('')+'</ul>':'');
+  await load().catch(()=>{});
+  if(accts.length){showAccts(accts);toast('Zaimportowano uczniów: '+ok)}
+  else warn('Nie utworzono żadnego konta.')}
 async function resetPw(id){
   if(!await ask('Wygenerować nowe hasło jednorazowe? Stare przestanie działać.','Resetuj'))return editPerson(id);
   const {data,error}=await sb.functions.invoke('admin-users',{body:{action:'reset',user_id:id}});
@@ -830,16 +865,20 @@ const delTrip=async id=>await ask('Usunąć wycieczkę? Odwołane z jej powodu l
 /* ================= WPISY W PLANIE LEKCJI (sprawdzian, kartkówka, ...) ================= */
 const EVN={test:['Sprawdzian','r'],quiz:['Kartkówka','y'],homework:['Praca domowa','b'],task:['Zadanie','g'],project:['Projekt','']};
 let EVC=[],EVADD=false;const EVM={};
-const evDet=id=>{const x=EVM[id];if(!x)return;const k=EVN[x.kind]||['Inne',''],t=T.find(y=>y.class_id===x.class_id&&y.subject_id===x.subject_id),b=BELLS[x.lesson_no-1]||[];
- modal(`<div class="box"><h3 class="mh"><span class="tag ${k[1]}">${k[0]}</span></h3><dl class="dl"><dt>Nauczyciel</dt><dd>${esc(nm(x.created_by||t?.teacher_id))}</dd><dt>Lekcja</dt><dd>${esc(sn(x.subject_id))}, klasa ${esc(cn(x.class_id))}<br>${fdl(x.date)}, lekcja ${x.lesson_no}${b.length?' ('+b.join(' - ')+')':''}</dd><dt>Co to</dt><dd>${k[0]}</dd><dt>Opis</dt><dd>${esc(x.title)}</dd>${staff()&&x.student_ids?.length?`<dt>Uczniowie</dt><dd>${x.student_ids.map(i=>esc(ln(i))).join(', ')}</dd>`:''}</dl>
- <div class="flex gap-2 justify-end mt-4">${staff()&&(dir()||x.created_by===me.id)?`<button class="gh red" onclick="closeModal();delEv('${id}')">${ic('trash')} Usuń</button>`:''}<button class="btn" onclick="closeModal()">Zamknij</button></div></div>`)};
 const _wg=weekGrid;
 weekGrid=(data,cell)=>_wg(data,(e,t,ds)=>{
   const h=cell(e,t,ds),
-  L=EVC.filter(x=>x.class_id===e.class_id&&x.date===ds&&x.lesson_no===e.n).map(x=>{const k=EVN[x.kind]||['Inne',''],who=staff()&&x.student_ids?.length?'<div class="mu">('+x.student_ids.map(i=>esc(ln(i))).join(', ')+')</div>':'';
-    EVM[x.id]=x;return `<div class="text-xs mt-1"><span class="tag ${k[1]} evp" title="Szczegóły" onclick="evDet('${x.id}')">${k[0]}</span></div>`}).join(''),
+  L=EVC.filter(x=>x.class_id===e.class_id&&x.date===ds&&x.lesson_no===e.n).map(x=>{EVM[x.id]=x;const k=EVN[x.kind]||['Inne',''];
+    return `<div class="text-xs mt-1"><span class="tag ${k[1]} evp" title="Kliknij, aby zobaczyć szczegóły" onclick="event.stopPropagation();evShow('${x.id}')">${k[0]}</span></div>`}).join(''),
   add=EVADD&&e.st!=='cancel'&&e.st!=='moved'&&(dir()||T.find(y=>y.id===e.teaching_id)?.teacher_id===me.id||e.sub===me.id)?`<div><a class="lk np" onclick="evAdd('${e.class_id}','${ds}',${e.n},'${e.teaching_id}')">+ wpis</a></div>`:'';
   return h.replace(/<\/div>$/,L+add+'</div>')});
+/* okienko szczegółów wpisu: Nauczyciel / Lekcja / Co to / Opis */
+function evShow(id){const x=EVM[id];if(!x)return;const k=EVN[x.kind]||['Inne',''],hrs=(BELLS[x.lesson_no-1]||[]).join(' - '),
+  who=staff()&&x.student_ids?.length?`<dt>Dla kogo</dt><dd>${x.student_ids.map(i=>esc(ln(i))).join(', ')}</dd>`:`<dt>Dla kogo</dt><dd>cała klasa</dd>`,
+  can=staff()&&(dir()||x.created_by===me.id);
+  modal(`<div class="box"><h3 class="mh"><span class="tag ${k[1]}">${k[0]}</span> ${esc(sn(x.subject_id))}</h3>
+   <dl class="dl"><dt>Nauczyciel</dt><dd>${esc(nm(x.created_by))}</dd><dt>Lekcja</dt><dd>${esc(sn(x.subject_id))}, lekcja ${x.lesson_no}${hrs?' ('+hrs+')':''}<div class="mu">${fdl(x.date)} · klasa ${esc(cn(x.class_id))}</div></dd><dt>Co to</dt><dd>${k[0]}</dd><dt>Opis</dt><dd class="whitespace-pre-wrap">${esc(x.title||'-')}</dd>${who}</dl>
+   <div class="flex gap-2 justify-end mt-4">${can?`<button class="gh red" onclick="delEv('${id}')">${ic('trash')} Usuń wpis</button>`:''}<button class="btn" onclick="closeModal()">Zamknij</button></div></div>`)}
 const _pl2=V.pl;
 V.pl=async()=>{
   const pup=!staff(),cid=pup?ST[sid]?.class_id:null,r=await sb.from('events').select('*').gte('date',isoL(wk)).lte('date',isoL(addD(wk,4)));
