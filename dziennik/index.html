@@ -1000,10 +1000,13 @@ async function botSave(id){const row={parent_id:id,enabled:!!FV.bot_on,persona:v
   const c=await sb.from('parent_bots').select('*').eq('parent_id',id).maybeSingle();
   if(c.error||!c.data)return warn('Zapis nie dotarł do bazy - sprawdź uprawnienia (RLS) i konto dyrektora.');
   toast('Bot zapisany: '+(c.data.enabled?'włączony':'wyłączony'))}
+async function botErr(error,data){let m=data?.error||error?.message||'nieznany błąd';
+  try{const c=error?.context;if(c&&c.json){const b=await c.clone().json();m=b.error||b.message||JSON.stringify(b)+' [HTTP '+c.status+']'}}catch(e){}
+  return m}
 async function botRun(id,scenario,b){b.classList.add('busy');const {data,error}=await sb.functions.invoke('parent-bot',{body:{action:'run',parent_id:id,scenario}});b.classList.remove('busy');
-  if(error||data?.error)return warn(data?.error||error.message);toast('Bot: '+(data.info||'wykonano'))}
+  if(error||data?.error)return warn('Bot: '+await botErr(error,data));toast('Bot: '+(data.info||'wykonano'))}
 /* bot sam reaguje na oceny wystawione przez zalogowanego nauczyciela */
-const _lg=LIVE.grades;LIVE.grades=p=>{_lg(p);if(p.eventType==='INSERT'&&staff()&&p.new.author_id===me.id)sb.functions.invoke('parent-bot',{body:{action:'grade',grade_id:p.new.id}}).catch(()=>{})};
+const _lg=LIVE.grades;LIVE.grades=p=>{_lg(p);if(p.eventType==='INSERT'&&staff()&&p.new.author_id===me.id)sb.functions.invoke('parent-bot',{body:{action:'grade',grade_id:p.new.id}}).then(r=>{if(r.error)botErr(r.error,r.data).then(m=>console.warn('parent-bot:',m))}).catch(()=>{})};
 
 init();
 </script>
