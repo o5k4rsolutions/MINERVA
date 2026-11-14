@@ -97,6 +97,7 @@ tbody tr:nth-child(even) td{background:#fafbfd}tbody tr:hover td{background:#fff
 .lsn.x{opacity:.6;background:#fdeaea;border-top-color:#e08a8a}
 .gc.rp{opacity:.45;text-decoration:line-through}
 .evp{cursor:pointer}.evp:hover{filter:brightness(.95)}
+.lsn{position:relative}.subtag{background:#8e44ad;color:#fff;border-radius:999px;padding:.1rem .6rem;font-size:.72rem;font-weight:700;letter-spacing:.03em;text-transform:uppercase;display:inline-block}.sdb{width:26px;height:26px;border-radius:50%;border:0;background:#3a3f55;color:#fff;display:inline-flex;align-items:center;justify-content:center;vertical-align:middle;margin-left:.4rem}
 </style>
 </head>
 <body>
@@ -283,7 +284,13 @@ function entries(base,m,scope){
     if(k.kind==='substitution'){if(x){x.st='sub';x.sub=k.sub_teacher_id;x.subj=k.sub_subject_id;x.note=k.note}else res.push({...v0,st:'sub',sub:k.sub_teacher_id,subj:k.sub_subject_id});return}
     if(x){x.st=k.kind==='cancelled'?'cancel':'moved';x.note=k.note}});
   return res.filter(scope)}
-const chTag=r=>(r.st==='cancel'?'<span class="tag r">odwołane</span>':r.st==='moved'?'<span class="tag y">przeniesione</span>':r.st==='in'?'<span class="tag b">przeniesione tu</span>':r.st==='sub'?`<span class="tag y">zastępstwo: ${esc(nm(r.sub))}</span>`:'')+(r.note&&r.st?`<div class="text-xs mu">${esc(r.note)}</div>`:'');
+const SUBM={},subKey=r=>r.d+'|'+r.n+'|'+r.class_id+'|'+r.teaching_id;
+function subDet(k){const r=SUBM[k];if(!r)return;const t=T.find(x=>x.id===r.teaching_id),b=BELLS[r.n-1]||[];
+  modal(`<div class="box"><h3 class="mh"><span class="subtag">Zastępstwo</span> ${fdl(r.d)}, lekcja ${r.n}</h3><p class="text-sm mu mb-3">Klasa ${esc(cn(r.class_id))}${b.length?' · '+b.join(' - '):''}</p>
+   <b class="text-sm" style="color:var(--in)">Powinno być</b><dl class="dl mt-1 mb-3"><dt>Przedmiot</dt><dd>${esc(sn(t?.subject_id))}</dd><dt>Nauczyciel</dt><dd>${esc(nm(t?.teacher_id))}</dd></dl>
+   <b class="text-sm" style="color:#8e44ad">Jest</b><dl class="dl mt-1"><dt>Przedmiot</dt><dd>${esc(sn(r.subj||t?.subject_id))}</dd><dt>Nauczyciel</dt><dd>${esc(nm(r.sub))}</dd>${r.note?`<dt>Uwaga</dt><dd>${esc(r.note)}</dd>`:''}</dl>
+   <div class="flex justify-end mt-4"><button class="btn" onclick="closeModal()">Zamknij</button></div></div>`)}
+const chTag=r=>(r.st==='cancel'?'<span class="tag r">odwołane</span>':r.st==='moved'?'<span class="tag y">przeniesione</span>':r.st==='in'?'<span class="tag b">przeniesione tu</span>':r.st==='sub'?(SUBM[subKey(r)]=r,`<span class="subtag">Zastępstwo</span><button class="sdb" title="Szczegóły zastępstwa" onclick="event.stopPropagation();subDet('${subKey(r)}')"><span style="display:inline-block;transform:scaleX(-1)">${ic('back')}</span></button>`):\'\')+(r.note&&r.st?`<div class="text-xs mu">${esc(r.note)}</div>`:'');
 function weekGrid(data,cell){
   const days=[0,1,2,3,4].map(i=>addD(wk,i)),td=isoL(new Date()),ns=[...new Set(data.map(e=>e.n))].sort((a,b)=>a-b);
   if(!ns.length)return '<p class="em">Brak lekcji w planie.</p>';
@@ -566,7 +573,7 @@ V.ad=async()=>{
   const back=`<button class="gh sm" onclick="adTab=null;rr()">${ic('back')} Administracja</button>`;
   if(!adTab){const n=(k)=>Object.values(P).filter(p=>p.role===k).length;
     const tl2=(k,i,t,d)=>`<button class="tile" onclick="adTab='${k}';rr()">${ic(i)}<b>${t}</b><span>${d}</span></button>`;
-    return `<p class="mu mb-4">Wybierz, czym chcesz zarządzać.</p><div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">${tl2('ppl','user','Osoby i konta',`${n('teacher')+n('director')} pracowników · ${n('student')} uczniów · ${n('parent')} rodziców`)}${tl2('cls','cl','Klasy i wychowawcy',`${C.length} klas`)}${tl2('sub','book','Przedmioty',`${SUB.length} przedmiotów`)}${tl2('plan','pl','Plan lekcji','Ustaw lekcje klasy dzień po dniu')}${tl2('chg','pl','Zmiany w planie','Zastępstwa, odwołania i przeniesienia lekcji')}${tl2('off','cal','Dni wolne i święta','Dodatkowe dni wolne od szkoły')}${tl2('bells','at','Godziny lekcji','Czas każdej lekcji w placówce')}${tl2('logins','key','Logowania','Kto i kiedy się logował')}${tl2('new','plus','Nowe konto','Uczeń z rodzicami, nauczyciel, dyrektor')}</div>`}
+    return `<p class="mu mb-4">Wybierz, czym chcesz zarządzać.</p><div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">${tl2('ppl','user','Osoby i konta',`${n('teacher')+n('director')} pracowników · ${n('student')} uczniów · ${n('parent')} rodziców`)}${tl2('cls','cl','Klasy i wychowawcy',`${C.length} klas`)}${tl2('sub','book','Przedmioty',`${SUB.length} przedmiotów`)}${tl2('plan','pl','Plan lekcji','Ustaw lekcje klasy dzień po dniu')}${tl2('chg','pl','Zmiany w planie','Zastępstwa, odwołania i przeniesienia lekcji')}${tl2('off','cal','Dni wolne i święta','Dodatkowe dni wolne od szkoły')}${tl2('bells','at','Godziny lekcji','Czas każdej lekcji w placówce')}${tl2('logins','key','Logowania','Kto i kiedy się logował')}${tl2('new','plus','Nowe konto','Uczeń z rodzicami, nauczyciel, dyrektor')}${tl2('imp','cl','Import uczniów','Masowe dodawanie uczniów do klas')}</div>`}
   return AD[adTab](back);
 };
 const AD={};
@@ -670,6 +677,24 @@ AD.new=back=>{
    <div id="cs" class="grid md:grid-cols-2 gap-3 mt-3"><div><label class="lb">Klasa</label>${dd('cc',[['','- brak -'],...C.map(c=>[c.id,'Klasa '+c.name])],'')}</div><div><label class="lb">Data urodzenia</label>${dp('cb','')}</div><div><label class="lb">Matka</label><input type="text" id="cm" placeholder="Imię i nazwisko"></div><div><label class="lb">Ojciec</label><input type="text" id="cfa" placeholder="Imię i nazwisko"></div><div class="md:col-span-2"><label class="lb">Opiekun zastępczy (opcjonalnie)</label><input type="text" id="cg"></div></div>
    <div id="ct" class="grid md:grid-cols-3 gap-3 mt-3" style="display:none"><div><label class="lb">Przedmioty</label>${dd('csub',SUB.map(s=>[s.id,s.name]),[],{multi:1,ph:'Wybierz przedmioty…'})}</div><div><label class="lb">Uczy w klasach</label>${dd('ccl',C.map(c=>[c.id,'Klasa '+c.name]),[],{multi:1,ph:'Wybierz klasy…'})}</div><div><label class="lb">Wychowawca klasy</label>${dd('chr',[['','- nie -'],...C.map(c=>[c.id,'Klasa '+c.name])],'')}</div></div>
    <button class="btn mt-4" onclick="createAcc()">Utwórz konto i pokaż dane do wydruku</button>`,back,'plus')};
+AD.imp=back=>pn('Import uczniów',`<p class="text-sm mu mb-3">Wklej listę (jeden uczeń w wierszu) albo wczytaj plik CSV/TXT. Format: <b>Imię Nazwisko</b> lub kolumny rozdzielone średnikiem/tabulatorem: <b>Imię;Nazwisko;Klasa;Matka;Ojciec</b> (klasa, matka, ojciec opcjonalne). Gdy w wierszu brak klasy lub nazwa nie pasuje, używana jest klasa domyślna.</p>
+ <div style="max-width:300px" class="mb-3"><label class="lb">Klasa domyślna</label>${dd('imc',[['','- brak -'],...C.map(c=>[c.id,'Klasa '+c.name])],'')}</div>
+ <input type="file" accept=".csv,.txt,text/plain" class="mb-3 text-sm" onchange="impFile(this)">
+ <textarea id="imt" rows="10" placeholder="Jan Kowalski&#10;Anna;Nowak;3A;Maria Nowak;Piotr Nowak"></textarea>
+ <button class="btn mt-3" onclick="runImp()">Utwórz konta uczniów</button><p id="imp" class="text-sm mu mt-2"></p>`,back,'plus');
+const impFile=i=>{const f=i.files[0];if(f)f.text().then(t=>{$('#imt').value=t;dirty=true})};
+const impParse=()=>v('imt').split(/\r?\n/).map(l=>l.trim()).filter(Boolean).map(l=>{let a=/[;\t,]/.test(l)?l.split(/[;\t,]/).map(x=>x.trim()):null;if(!a){const w=l.split(/\s+/);a=[w[0],w.slice(1).join(' ')]}
+ const c=C.find(c=>c.name.toLowerCase()===(a[2]||'').toLowerCase());return{first:a[0]||'',last:a[1]||'',cls:c?c.id:(FV.imc||null),mother:a[3]||'',father:a[4]||''}}).filter((r,i)=>!(i===0&&/^imi/i.test(r.first)&&/^nazw/i.test(r.last)));
+async function runImp(){const rows=impParse().filter(r=>r.first&&r.last);if(!rows.length)return warn('Brak poprawnych wierszy (potrzebne imię i nazwisko).');
+  const nc=rows.filter(r=>!r.cls).length;
+  if(!await ask('Utworzyć konta uczniów: '+rows.length+(nc?' (bez klasy: '+nc+')':'')+'?','Utwórz'))return;
+  const acc=[],bad=[],st=$('#imp');
+  for(let i=0;i<rows.length;i++){const r=rows[i];if(st)st.textContent=`Tworzenie ${i+1}/${rows.length}…`;
+    const {data,error}=await sb.functions.invoke('admin-users',{body:{action:'create',role:'student',first_name:r.first,last_name:r.last,class_id:r.cls,birth_date:null,mother:r.mother,father:r.father,guardian:''}});
+    if(error||data?.error)bad.push(r.first+' '+r.last+': '+(data?.error||error.message));else acc.push(...data.accounts)}
+  if(bad.length)warn('Błędy ('+bad.length+'): '+bad.slice(0,3).join('; '));
+  if(acc.length){showAccts(acc);toast('Utworzono kont: '+acc.length)}
+  await reload()}
 async function createAcc(){
   const role=FV.cr,body={action:'create',role,first_name:v('cf').trim(),last_name:v('cl').trim()};
   if(!body.first_name||!body.last_name)return warn('Podaj imię i nazwisko.');
@@ -804,13 +829,15 @@ const delTrip=async id=>await ask('Usunąć wycieczkę? Odwołane z jej powodu l
 
 /* ================= WPISY W PLANIE LEKCJI (sprawdzian, kartkówka, ...) ================= */
 const EVN={test:['Sprawdzian','r'],quiz:['Kartkówka','y'],homework:['Praca domowa','b'],task:['Zadanie','g'],project:['Projekt','']};
-let EVC=[],EVADD=false;
-const evTog=b=>{const d=b.nextElementSibling;if(d)d.style.display=d.style.display==='none'?'':'none'};
+let EVC=[],EVADD=false;const EVM={};
+const evDet=id=>{const x=EVM[id];if(!x)return;const k=EVN[x.kind]||['Inne',''],t=T.find(y=>y.class_id===x.class_id&&y.subject_id===x.subject_id),b=BELLS[x.lesson_no-1]||[];
+ modal(`<div class="box"><h3 class="mh"><span class="tag ${k[1]}">${k[0]}</span></h3><dl class="dl"><dt>Nauczyciel</dt><dd>${esc(nm(x.created_by||t?.teacher_id))}</dd><dt>Lekcja</dt><dd>${esc(sn(x.subject_id))}, klasa ${esc(cn(x.class_id))}<br>${fdl(x.date)}, lekcja ${x.lesson_no}${b.length?' ('+b.join(' - ')+')':''}</dd><dt>Co to</dt><dd>${k[0]}</dd><dt>Opis</dt><dd>${esc(x.title)}</dd>${staff()&&x.student_ids?.length?`<dt>Uczniowie</dt><dd>${x.student_ids.map(i=>esc(ln(i))).join(', ')}</dd>`:''}</dl>
+ <div class="flex gap-2 justify-end mt-4">${staff()&&(dir()||x.created_by===me.id)?`<button class="gh red" onclick="closeModal();delEv('${id}')">${ic('trash')} Usuń</button>`:''}<button class="btn" onclick="closeModal()">Zamknij</button></div></div>`)};
 const _wg=weekGrid;
 weekGrid=(data,cell)=>_wg(data,(e,t,ds)=>{
   const h=cell(e,t,ds),
   L=EVC.filter(x=>x.class_id===e.class_id&&x.date===ds&&x.lesson_no===e.n).map(x=>{const k=EVN[x.kind]||['Inne',''],who=staff()&&x.student_ids?.length?'<div class="mu">('+x.student_ids.map(i=>esc(ln(i))).join(', ')+')</div>':'';
-    return `<div class="text-xs mt-1"><span class="tag ${k[1]} evp" title="Kliknij, aby zobaczyć szczegóły" onclick="evTog(this)">${k[0]}</span><div style="display:none" class="mt-1">${esc(x.title)}${who}${staff()&&(dir()||x.created_by===me.id)?` <a class="lk np" onclick="delEv('${x.id}')">usuń</a>`:''}</div></div>`}).join(''),
+    EVM[x.id]=x;return `<div class="text-xs mt-1"><span class="tag ${k[1]} evp" title="Szczegóły" onclick="evDet('${x.id}')">${k[0]}</span></div>`}).join(''),
   add=EVADD&&e.st!=='cancel'&&e.st!=='moved'&&(dir()||T.find(y=>y.id===e.teaching_id)?.teacher_id===me.id||e.sub===me.id)?`<div><a class="lk np" onclick="evAdd('${e.class_id}','${ds}',${e.n},'${e.teaching_id}')">+ wpis</a></div>`:'';
   return h.replace(/<\/div>$/,L+add+'</div>')});
 const _pl2=V.pl;
