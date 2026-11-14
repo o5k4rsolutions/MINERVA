@@ -44,7 +44,7 @@ tr{transition:background .2s}tr.hv:hover{background:#fffbeb}
   <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between gap-3">
     <div class="flex items-center gap-2 min-w-0"><img src="https://dziennik-minerva.pages.dev/themes/icon-dark.svg" class="h-8" alt="">
       <div class="leading-tight min-w-0"><div id="sch" class="font-bold truncate"></div><div id="who" class="text-xs text-white/60 truncate"></div></div></div>
-    <div class="flex items-center gap-2"><span id="live" class="text-xs text-white/60 hidden sm:inline"></span><button class="b2" onclick="refresh()" title="Odśwież wszystko"><span id="rfi" class="spin">⟳</span> Odśwież</button><button class="b2" onclick="logout()">Wyloguj</button></div>
+    <div class="flex items-center gap-2"><span id="live" class="text-xs text-white/60 hidden sm:inline"></span><span id="rfi" class="spin text-white/50 text-sm" title="Dane odświeżają się automatycznie">⟳</span><button class="b2" onclick="logout()">Wyloguj</button></div>
   </div>
   <nav id="nav" class="max-w-6xl mx-auto px-4 pb-2 flex gap-1 overflow-x-auto text-white"></nav>
 </header>
@@ -75,6 +75,7 @@ const warn=m=>toast(m,'bad',4500);
 const ask=(msg,okL='Tak')=>new Promise(r=>{const m=$('#modal');m.innerHTML=`<div class="box"><p class="font-semibold">${esc(msg)}</p><div class="flex gap-2 justify-end mt-4"><button class="b2" id="mn">Anuluj</button><button class="b" id="my">${okL}</button></div></div>`;m.classList.add('show');const c=x=>{m.classList.remove('show');r(x)};$('#mn').onclick=()=>c(false);$('#my').onclick=()=>c(true)});
 const act=async(p,ok,msg)=>{const r=await p;if(r.error){warn(r.error.message||String(r.error));return false}msg&&toast(msg);ok&&await ok();return true};
 document.addEventListener('click',e=>{const b=e.target.closest('button.b');if(b){b.classList.add('busy');setTimeout(()=>b.classList.remove('busy'),800)}});
+const typing=()=>document.activeElement.matches('input,textarea,select')||(tab==='msg'&&mtab==='new')||[...document.querySelectorAll('#main textarea')].some(t=>t.value);
 const beep=()=>{try{const c=new(window.AudioContext||window.webkitAudioContext)(),o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.frequency.value=880;g.gain.setValueAtTime(.08,c.currentTime);g.gain.exponentialRampToValueAtTime(.0001,c.currentTime+.25);o.start();o.stop(c.currentTime+.25)}catch{}};
 const gv=x=>{const m=String(x).match(/^([1-6])([+-])?$/);return m?+m[1]+(m[2]==='+'?.5:m[2]==='-'?-.25:0):null};
 const avg=g=>{let a=0,w=0;g.forEach(x=>{const n=gv(x.value);if(n!==null){a+=n*x.weight;w+=x.weight}});return w?(a/w).toFixed(2):'—'};
@@ -87,18 +88,25 @@ const LIVE={
  justifications:p=>{if(p.eventType==='INSERT'&&staff())toast('🗂 Nowe usprawiedliwienie do rozpatrzenia','info',6000);if(p.eventType==='UPDATE'&&me.role==='parent')toast('Usprawiedliwienie: '+({accepted:'przyjęte',rejected:'odrzucone'}[p.new.status]||''),'info',5000)},
  messages:()=>{},attendance:()=>{}};
 
+const fatal=(t,m)=>{$('#main').innerHTML=`<div class="card"><h2>${esc(t)}</h2><p class="text-sm">${esc(m)}</p><button class="b mt-3" onclick="logout()">Wyloguj i wróć do logowania</button></div>`};
 async function init(){
   const {data:{session}}=await sb.auth.getSession(); if(!session)return location.href='/login';
-  const {data:m}=await sb.from('profiles').select('*').eq('id',session.user.id).single();
-  if(!m||m.must_change_password)return location.href='/login';
-  me=m; await load();
+  sb.auth.onAuthStateChange(ev=>{if(ev==='SIGNED_OUT')location.href='/login'});
+  const {data:m,error}=await sb.from('profiles').select('*').eq('id',session.user.id).maybeSingle();
+  if(error)return fatal('Błąd odczytu konta',error.message+' — sprawdź, czy w Supabase wykonano schema.sql (polityki RLS).');
+  if(!m)return fatal('Brak profilu użytkownika','Konto logowania istnieje, ale nie ma dla niego wpisu w tabeli profiles. Poproś dyrekcję o ponowne założenie konta.');
+  if(m.must_change_password)return location.href='/login';
+  me=m;
+  try{await load()}catch(e){return fatal('Błąd wczytywania danych',e.message)}
   $('#sch').textContent=school; $('#who').textContent=`${nm(me.id)} · ${RL[me.role]}`;
   if(me.role==='student')sid=me.id; if(me.role==='parent')sid=KIDS[0]||null;
   await calcDots(); nav(); render();
   let to; const ch=sb.channel('live');
-  Object.keys(LIVE).forEach(t=>ch.on('postgres_changes',{event:'*',schema:'public',table:t},p=>{LIVE[t](p);clearTimeout(to);to=setTimeout(async()=>{await calcDots();nav();if(detail){if(t==='messages')openMsg(detail,true);return}if(!document.activeElement.matches('input,textarea,select'))render(true)},500)}));
+  Object.keys(LIVE).forEach(t=>ch.on('postgres_changes',{event:'*',schema:'public',table:t},p=>{LIVE[t](p);clearTimeout(to);to=setTimeout(async()=>{await calcDots();nav();if(detail){if(t==='messages')openMsg(detail,true);return}if(!typing())render(true)},500)}));
   ch.subscribe(st=>{const e=$('#live');e.classList.remove('hidden');e.innerHTML=st==='SUBSCRIBED'?'<span style="color:#4ade80">●</span> na żywo':'<span style="color:#f87171">●</span> offline'});
-  setInterval(()=>{if(!document.hidden&&!detail&&!document.activeElement.matches('input,textarea,select'))refresh(true)},90000);
+  setInterval(()=>{if(!document.hidden&&!detail&&!typing())refresh(true)},30000);
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden&&!detail&&!typing())refresh(true)});
+  window.addEventListener('online',()=>refresh(true));
 }
 async function load(){
   const [p,c,s,t,st,pc,sc]=await Promise.all([sb.from('profiles').select('*'),sb.from('classes').select('*').order('name'),sb.from('subjects').select('*').order('name'),sb.from('teaching').select('*'),sb.from('students').select('*'),sb.from('parent_children').select('*'),sb.from('schools').select('name').single()]);
@@ -129,9 +137,9 @@ async function render(silent){
   }catch(e){if(my===rid)$('#main').innerHTML=`<div class="card">Nie udało się wczytać danych.<button class="b ml-3" onclick="render()">Spróbuj ponownie</button><p class="text-xs text-slate-500 mt-2">${esc(e.message||e)}</p></div>`}
 }
 async function refresh(quiet){
-  const i=$('#rfi');i.classList.add('go');
+  const i=$('#rfi');i&&i.classList.add('go');
   try{await load();await calcDots();nav();if(detail)await openMsg(detail,true);else await render(true);if(quiet!==true)toast('Dane odświeżone','ok',1800)}catch(e){toast('Błąd odświeżania','bad')}
-  i.classList.remove('go');
+  i&&i.classList.remove('go');
 }
 async function logout(){await sb.auth.signOut();location.href='/login'}
 
