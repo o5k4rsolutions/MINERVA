@@ -1,7 +1,10 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#1E2A78">
+<meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Minerva"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png"><link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
 <title>Dziennik - Minerva</title>
 <link rel="icon" href="https://dziennik-minerva.pages.dev/themes/icon-dark.svg">
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -101,6 +104,32 @@ tbody tr:nth-child(even) td{background:#fafbfd}tbody tr:hover td{background:#fff
 .evp{cursor:pointer}.evp:hover{filter:brightness(.95)}
 .cmp{display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-top:.8rem}.cmp>div{border:1px solid var(--ln);border-radius:10px;padding:.7rem .8rem;background:#f7f9fc}.cmp>div.is{background:#f5ebfa;border-color:#d9b8e8}.cmp .lb{margin-bottom:.35rem}
 @media(max-width:480px){.cmp{grid-template-columns:1fr}}
+</style>
+<style>
+/* ===== wygląd aplikacji na telefonie ===== */
+.swr{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.85rem 0;border-bottom:1px solid var(--ln);font-weight:600}.swr:last-child{border:0}
+.swr input{appearance:none;-webkit-appearance:none;width:50px;height:30px;border-radius:999px;background:#cbd3e1;position:relative;flex-shrink:0;transition:background .2s;border:0}
+.swr input:after{content:"";position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;box-shadow:0 1px 4px #0003;transition:transform .2s}
+.swr input:checked{background:#22a55b}.swr input:checked:after{transform:translateX(20px)}
+.ist{display:flex;gap:.75rem;align-items:flex-start;margin:.7rem 0}.ist i{flex:0 0 28px;height:28px;border-radius:50%;background:var(--in);color:#fff;font-style:normal;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:.85rem}
+@media(max-width:767px){
+ html{-webkit-text-size-adjust:100%}body{background:#F2F4F9;-webkit-tap-highlight-color:transparent;overscroll-behavior-y:none}
+ .top{background:linear-gradient(135deg,#1E2A78,#2f3fa8)!important;border:0!important;height:calc(56px + env(safe-area-inset-top))!important;padding-top:env(safe-area-inset-top);box-shadow:0 4px 16px #1e2a7844}
+ #ptitle{color:#fff!important;font-size:1.2rem!important;letter-spacing:-.01em}.top .mu,#rfi{color:#fff!important}.qk{background:#ffffff26!important;border:0!important;color:#fff!important}
+ main{padding:1rem .9rem calc(6rem + env(safe-area-inset-bottom))!important}
+ .pn{border:0!important;border-radius:20px!important;box-shadow:0 2px 12px #1e2a7814}.ph{background:#fff!important;border-radius:20px 20px 0 0!important;border-bottom:1px solid #eef1f6}
+ .tile{border-radius:18px;border:0;box-shadow:0 2px 12px #1e2a7814}
+ #mnav{background:#ffffffee!important;backdrop-filter:saturate(1.6) blur(16px);-webkit-backdrop-filter:saturate(1.6) blur(16px);border-top:1px solid #e0e5ee;padding-bottom:env(safe-area-inset-bottom);box-shadow:0 -4px 20px #1e2a7814}
+ #mnav .nv{color:#8a94ab!important;min-width:74px;font-size:.66rem;font-weight:700;border-top:0!important}#mnav .nv:hover{background:none}
+ #mnav .nv .ic{width:1.55em;height:1.55em}#mnav .nv.on{color:var(--in)!important;background:none!important}#mnav .nv.on .ic{color:var(--in);transform:translateY(-1px)}
+ #mnav .nv.on:before{content:"";position:absolute;top:0;width:28px;height:3px;border-radius:0 0 3px 3px;background:var(--am)}
+ .btn,.gh{min-height:44px;border-radius:12px;padding-left:1.1rem;padding-right:1.1rem}.btn.sm,.gh.sm{min-height:36px}
+ input[type=text],input[type=password],textarea,.inp{font-size:16px!important;min-height:44px;border-radius:12px}
+ #modal{align-items:flex-end;padding:0}#modal .box,#modal .box.w{max-width:none;border-radius:24px 24px 0 0;padding:1.3rem 1.2rem calc(1.3rem + env(safe-area-inset-bottom));max-height:90vh;animation:sheet .25s ease both}
+ @keyframes sheet{from{transform:translateY(40px);opacity:0}}
+ #toasts{bottom:calc(86px + env(safe-area-inset-bottom));left:12px;right:12px;max-width:none}
+}
+@media all and (display-mode:standalone){html,body{-webkit-user-select:none;user-select:none}input,textarea,.sel{-webkit-user-select:text;user-select:text}}
 </style>
 </head>
 <body>
@@ -212,6 +241,54 @@ const LIVE={
 const relCh=k=>{if(k.kind==='moved_in')return false;if(dir())return !!k.created_by&&k.created_by!==me.id;if(me.role==='student')return ST[me.id]?.class_id===k.class_id;if(me.role==='parent')return KIDS.some(i=>ST[i]?.class_id===k.class_id);return T.find(t=>t.id===k.teaching_id)?.teacher_id===me.id||k.sub_teacher_id===me.id};
 const chMsg=k=>'Zmiana w planie: '+fdl(k.date)+', lekcja '+k.lesson_no+' - '+({substitution:'zastępstwo',cancelled:'lekcja odwołana',moved_out:'lekcja przeniesiona'}[k.kind]||'zmiana');
 const plCount=async()=>{const {data,error}=await sb.from('timetable_changes').select('*').gt('created_at',plSeen||sinceOf('pl'));return error?0:(data||[]).filter(relCh).length};
+/* ===== PWA: instalacja, powiadomienia push ===== */
+ICO.ps='<path d="M18 8a6 6 0 10-12 0c0 7-3 8-3 8h18s-3-1-3-8"/><path d="M13.7 20a2 2 0 01-3.4 0"/>';
+const VAPID_PUBLIC='WKLEJ_KLUCZ_PUBLICZNY_VAPID';
+const IOS=/iphone|ipad|ipod/i.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1),ANDR=/android/i.test(navigator.userAgent);
+const STANDALONE=matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
+const MOBILE=IOS||ANDR||(matchMedia('(pointer:coarse)').matches&&innerWidth<=900);
+const PUSH_OK='serviceWorker' in navigator&&'PushManager' in window&&'Notification' in window;
+let deferredInstall=null;
+addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredInstall=e});
+addEventListener('appinstalled',()=>{deferredInstall=null;closeModal();toast('Aplikacja zainstalowana')});
+if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
+const PREFK=[['grades','Nowe oceny'],['attendance','Nieobecności i spóźnienia'],['messages','Nowe wiadomości'],['announcements','Nowe ogłoszenia'],['notes','Uwagi i pochwały'],['plan','Zmiany w planie lekcji']];
+function pwaInit(){
+  const t=new URLSearchParams(location.search).get('tab');if(t&&t!==tab&&['gr','at','msg','ann','nt','pl','js'].includes(t))go(t);
+  if(MOBILE&&!STANDALONE)installSheet(false)}
+function installSheet(force){
+  if(!force){try{if(Date.now()<+localStorage.getItem('instHide'))return}catch{}}
+  const sh='<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:-4px"><path d="M12 3v12M8 7l4-4 4 4"/><path d="M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/></svg>';
+  const st=IOS?[`Otwórz dziennik w przeglądarce <b>Safari</b>.`,`Stuknij przycisk <b>Udostępnij</b> ${sh} na dolnym (lub górnym) pasku.`,`Przewiń listę i wybierz <b>„Dodaj do ekranu początkowego”</b>.`,`Stuknij <b>„Dodaj”</b>. Ikona Dziennika Minerva pojawi się na ekranie głównym.`,`Uruchom dziennik z ikony i w zakładce <b>Powiadomienia</b> włącz powiadomienia (na iPhonie działają tylko z ikony, iOS 16.4 lub nowszy).`]
+   :[`Stuknij menu przeglądarki <b>⋮</b> (prawy górny róg w Chrome).`,`Wybierz <b>„Zainstaluj aplikację”</b> albo <b>„Dodaj do ekranu głównego”</b>.`,`Potwierdź przyciskiem <b>„Zainstaluj”</b>. Ikona pojawi się na ekranie głównym.`,`Uruchom dziennik z ikony i w zakładce <b>Powiadomienia</b> włącz powiadomienia.`];
+  modal(`<div class="box"><div class="flex items-center gap-3 mb-1"><img src="icons/icon-192.png" width="52" height="52" style="border-radius:13px" alt=""><div><h3 class="mh" style="margin:0">Dodaj Dziennik Minerva do ekranu głównego</h3><div class="text-sm mu">Działa jak zwykła aplikacja, bez paska przeglądarki, z powiadomieniami.</div></div></div>
+   ${!IOS&&deferredInstall?`<button class="btn w-full justify-center mt-3" onclick="doInstall()">Zainstaluj aplikację</button><div class="text-xs mu mt-2">Albo ręcznie:</div>`:''}
+   ${st.map((x,i)=>`<div class="ist"><i>${i+1}</i><div class="text-sm">${x}</div></div>`).join('')}
+   <div class="flex flex-wrap gap-2 justify-end mt-3"><button class="gh" onclick="instHide(0)">Nie pokazuj więcej</button><button class="gh" onclick="instHide(7)">Przypomnij później</button><button class="btn" onclick="closeModal()">Rozumiem</button></div></div>`)}
+const instHide=d=>{try{localStorage.setItem('instHide',Date.now()+(d||3650)*864e5)}catch{}closeModal()};
+const doInstall=async()=>{if(!deferredInstall)return;deferredInstall.prompt();await deferredInstall.userChoice.catch(()=>{});deferredInstall=null;closeModal()};
+const u8=b=>{const p='='.repeat((4-b.length%4)%4),r=atob((b+p).replace(/-/g,'+').replace(/_/g,'/'));return Uint8Array.from(r,c=>c.charCodeAt(0))};
+async function pushState(){if(!PUSH_OK)return IOS&&!STANDALONE?'ios-install':'unsupported';if(IOS&&!STANDALONE)return 'ios-install';if(Notification.permission==='denied')return 'denied';
+  const r=await navigator.serviceWorker.ready,s=await r.pushManager.getSubscription();return s&&Notification.permission==='granted'?'on':'off'}
+async function pushOn(){
+  if(VAPID_PUBLIC.startsWith('WKLEJ'))return warn('Brak klucza VAPID w kodzie (VAPID_PUBLIC).');
+  try{const p=await Notification.requestPermission();if(p!=='granted')return warn('Powiadomienia są zablokowane. Zezwól na nie w ustawieniach telefonu lub przeglądarki.');
+    const r=await navigator.serviceWorker.ready;let s=await r.pushManager.getSubscription();if(!s)s=await r.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:u8(VAPID_PUBLIC)});
+    const j=s.toJSON(),x=await sb.rpc('register_push',{p_endpoint:j.endpoint,p_p256dh:j.keys.p256dh,p_auth:j.keys.auth,p_ua:navigator.userAgent.slice(0,200)});if(x.error)throw x.error;
+    toast('Powiadomienia włączone na tym urządzeniu');rr()}catch(e){warn('Nie udało się włączyć powiadomień: '+(e.message||e))}}
+async function pushOff(silent){
+  if(!PUSH_OK)return;const r=await navigator.serviceWorker.ready,s=await r.pushManager.getSubscription();if(!s)return;
+  await sb.from('push_subscriptions').delete().eq('endpoint',s.endpoint);await s.unsubscribe();if(!silent){toast('Powiadomienia wyłączone na tym urządzeniu');rr()}}
+const prefSet=async(k,on)=>{PREFS[k]=on;const row={user_id:me.id};PREFK.forEach(([x])=>row[x]=PREFS[x]!==false);const r=await sb.from('notification_prefs').upsert(row,{onConflict:'user_id'});r.error?warn(r.error.message):toast('Zapisano')};
+let PREFS={};
+const pushTest=async()=>{const r=await navigator.serviceWorker.ready;r.showNotification('Dziennik Minerva',{body:'Testowe powiadomienie\nTak będą wyglądać wiadomości z dziennika',icon:'icons/icon-192.png',badge:'icons/badge-96.png',lang:'pl'})};
+const viewPs=async()=>{
+  const st=await pushState(),{data}=await sb.from('notification_prefs').select('*').eq('user_id',me.id).maybeSingle();PREFS=data||{};
+  const msg={on:['Włączone na tym urządzeniu','Powiadomienia będą przychodzić także przy zamkniętej aplikacji.'],off:['Wyłączone na tym urządzeniu','Włącz je, aby dostawać informacje o ocenach, wiadomościach i nieobecnościach.'],denied:['Zablokowane','Zezwól na powiadomienia dla tej strony w ustawieniach telefonu lub przeglądarki, a potem wróć tutaj.'],'ios-install':['Najpierw dodaj dziennik do ekranu głównego','Na iPhonie i iPadzie powiadomienia działają tylko z ikony aplikacji (iOS 16.4 lub nowszy).'],unsupported:['Ta przeglądarka nie obsługuje powiadomień','Użyj Chrome (Android) lub Safari (iPhone) i dodaj dziennik do ekranu głównego.']}[st];
+  const btn=st==='on'?`<button class="btn" onclick="pushTest()">Pokaż testowe powiadomienie</button><button class="gh" onclick="pushOff()">Wyłącz na tym urządzeniu</button>`:st==='off'?`<button class="btn" onclick="pushOn()">Włącz powiadomienia</button>`:st==='ios-install'?`<button class="btn" onclick="installSheet(true)">Pokaż instrukcję</button>`:'';
+  return pn('Powiadomienia na telefonie',`<div class="mb-3"><b>${msg[0]}</b><div class="text-sm mu">${msg[1]}</div></div><div class="flex flex-wrap gap-2">${btn}${!STANDALONE&&st!=='ios-install'?`<button class="gh" onclick="installSheet(true)">Jak dodać do ekranu głównego</button>`:''}</div>`,'','ps')
+   +pn('Jakie powiadomienia chcę dostawać',PREFK.map(([k,l])=>`<label class="swr"><span>${l}</span><input type="checkbox" ${PREFS[k]===false?'':'checked'} onchange="prefSet('${k}',this.checked)"></label>`).join('')+`<p class="text-xs mu mt-3">Ustawienia dotyczą wszystkich Twoich urządzeń. Uczeń i rodzic dostają powiadomienia o danym uczniu.</p>`,'','')};
+
 const fatal=(t,m)=>{$('#main').innerHTML=`<div class="pn"><div class="pb"><h3 class="mh">${esc(t)}</h3><p>${esc(m)}</p><button class="btn mt-3" onclick="logout()">Wyloguj i wróć do logowania</button></div></div>`};
 async function init(){
   try{setFs(+localStorage.getItem('fs')||0)}catch{setFs(0)}
@@ -228,7 +305,7 @@ async function init(){
   $('#pnm').textContent=nm(me.id);$('#pcl').textContent=me.role==='student'?`Klasa ${cn(ST[me.id]?.class_id)} · ${school}`:me.role==='teacher'&&hcn.length?`Wychowawca klasy ${hcn.join(', ')} · ${school}`:school;
   $('#um').innerHTML=`<span class="av" style="width:26px;height:26px;font-size:.7rem">${esc(me.first_name[0])}</span> ${esc(me.first_name)} ${ic('chev')}`;
   if(me.role==='student')sid=me.id;if(me.role==='parent')sid=KIDS[0]||null;
-  await calcDots();nav();render();
+  await calcDots();nav();render();setTimeout(pwaInit,1200);
   let to;const ch=sb.channel('live');
   Object.keys(LIVE).forEach(t=>ch.on('postgres_changes',{event:'*',schema:'public',table:t},p=>{LIVE[t](p);clearTimeout(to);to=setTimeout(async()=>{if(['timetable','timetable_changes','days_off'].includes(t))await load().catch(()=>{});await calcDots();nav();if(detail){if(t==='messages')openMsg(detail,true);return}if(!dirty&&!$('#modal').classList.contains('show'))render(true)},500)}));
   ch.subscribe(st=>{const e=$('#live');e.classList.remove('hidden');e.innerHTML=st==='SUBSCRIBED'?'<i class="ld on"></i>na żywo':'<i class="ld"></i>offline'});
@@ -256,7 +333,7 @@ function nav(){
   const t=[['home','Start',''],['gr','Oceny','Dziennik'],['at','Frekwencja','Dziennik'],['pl','Plan lekcji','Dziennik'],['nt','Uwagi i pochwały','Dziennik']];
   if(me.role==='parent'||(staff()&&(dir()||isHome())))t.push(['js','Usprawiedliwienia','Dziennik']);
   if(staff()&&(dir()||isHome()))t.push(['cl','Moja klasa','Dziennik']);
-  t.push(['msg','Wiadomości','Komunikacja'],['ann','Ogłoszenia','Komunikacja']);if(dir())t.push(['ad','Administracja','Szkoła']);
+  t.push(['msg','Wiadomości','Komunikacja'],['ann','Ogłoszenia','Komunikacja']);if(dir())t.push(['ad','Administracja','Szkoła']);t.push(['ps','Powiadomienia','Konto']);
   const item=([k,l])=>`<button class="nv ${k===tab?'on':''}" onclick="go('${k}')">${ic(k)}<span>${l}</span>${dots[k]?`<em>${dots[k]>99?'99+':dots[k]}</em>`:''}</button>`;
   let pg='';const hd=t.map(x=>{const lb=x[2]!==pg&&x[2]?`<div class="ng">${x[2]}</div>`:'';pg=x[2];return lb+item(x)}).join('');
   $('#nav').innerHTML=hd;$('#mnav').innerHTML=t.map(item).join('');
@@ -276,7 +353,7 @@ async function render(silent){
 async function refresh(quiet){const i=$('#rfi');i&&i.firstElementChild?.classList.add('go');
   try{await load();await calcDots();nav();if(detail)await openMsg(detail,true);else await render(true);if(quiet!==true)toast('Dane odświeżone','ok',1800)}catch(e){toast('Błąd odświeżania','bad')}
   i&&i.firstElementChild?.classList.remove('go')}
-async function logout(){await sb.auth.signOut();location.href='/login'}
+async function logout(){try{await pushOff(true)}catch{}await sb.auth.signOut();location.href='/login'}
 const reload=async()=>{await load();dirty=false;await render(true)};
 
 const BELLS=[['07:45','08:30'],['08:35','09:20'],['09:25','10:10'],['10:20','11:05'],['11:20','12:05'],['12:20','13:05'],['13:10','13:55'],['14:00','14:45'],['14:50','15:35'],['15:40','16:25']];
@@ -327,7 +404,7 @@ function weekGrid(data,cell){
   for(const n of ns){h+=`<div class="tm">${(BELLS[n-1]||[]).join('<br>')}</div>`;days.forEach(d=>{const ds=isoL(d),es=data.filter(x=>x.d===ds&&x.n===n);h+=hol(d)?'<div class="hol"></div>':es.length?'<div>'+es.map(e=>cell(e,T.find(x=>x.id===e.teaching_id),ds)).join('')+'</div>':'<div></div>'})}
   return h+'</div></div>'}
 /* ---------- widoki ---------- */
-const V={};
+const V={};V.ps=()=>viewPs();
 V.home=async()=>{
   const pup=me.role==='student'||me.role==='parent',ids=me.role==='student'?[me.id]:KIDS,now=new Date(),wd=now.getDay(),cid=pup?ST[sid]?.class_id:null,E=Promise.resolve({data:[],count:0}),hd=hol(now),since=me.prev_seen||new Date(0).toISOString(),d3=isoL(addD(now,-3));
   const [a,g,m,tt,ab,j]=await Promise.all([
