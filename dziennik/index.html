@@ -832,58 +832,6 @@ let czT;const cardify=()=>{if(!isM())return;$$('#main table:not(.gt):not(.rt),#m
   const hs=[...t.querySelectorAll('thead th')].map(h=>h.textContent.replace(/[↑↓↕]/g,'').trim());t.classList.add('rt');
   t.querySelectorAll('tbody tr').forEach(tr=>[...tr.children].forEach((c,i)=>{c.dataset.l=hs[i]||''}))})};
 new MutationObserver(()=>{clearTimeout(czT);czT=setTimeout(cardify,0)}).observe(document.body,{childList:true,subtree:true});
-/* ===== Administracja: archiwum zmian w planie, tematy i frekwencja ===== */
-const byId=(a,id)=>a.find(z=>String(z.id)===String(id));
-let plgF='all',PLGR=[];
-const PLG_K={substitution:'Zastępstwo',cancelled:'Odwołana lekcja',moved_out:'Przeniesienie lekcji',moved_in:'Przeniesienie lekcji'},DN5=['','poniedziałek','wtorek','środa','czwartek','piątek'];
-AD.log=async back=>{
-  const r=await sb.from('plan_log').select('*').order('at',{ascending:false}).limit(600);
-  if(r.error)return pn('Archiwum zmian w planie','<p class="em">Brak tabeli plan_log. Uruchom plik admin-extras.sql w Supabase.</p>',back,'cal');
-  const G={};(r.data||[]).forEach(x=>{if(x.grp)(G[x.grp]=G[x.grp]||[]).push(x)});const seen=new Set();
-  let rows=(r.data||[]).filter(x=>{if(!x.grp)return true;if(seen.has(x.grp))return false;seen.add(x.grp);return true});
-  rows=rows.filter(x=>plgF==='all'||(plgF==='base'&&x.src==='timetable')||(plgF==='chg'&&x.src==='timetable_changes')||(plgF==='ev'&&x.src==='plan_events'));
-  PLGR=rows;
-  const what=x=>{const t=byId(T,x.teaching_id),cl=byId(C,x.class_id),s=t?sn(t.subject_id):'',c=cl?'kl. '+cl.name:'',te=t?nm(t.teacher_id):'';
-    if(x.src==='timetable')return [x.op==='DELETE'?'Usunięto lekcję z planu':'Dodano lekcję do planu',`${DN5[x.weekday]||''}, lekcja ${x.lesson_no}`,[s,te,c].filter(Boolean).join(' · ')];
-    if(x.src==='timetable_changes'){const g=x.grp&&G[x.grp]?G[x.grp]:[x],ds=g.map(y=>y.date).filter(Boolean).sort(),k=PLG_K[x.kind]||'Zmiana';
-      return [x.op==='DELETE'?'Usunięto zmianę: '+k.toLowerCase():x.op==='UPDATE'?'Zmieniono: '+k.toLowerCase():k,ds.length>1&&ds[0]!==ds[ds.length-1]?fdl(ds[0])+' - '+fdl(ds[ds.length-1]):(ds[0]?fdl(ds[0]):'')+(x.lesson_no!=null?', lekcja '+x.lesson_no:''),[s,c].filter(Boolean).join(' · ')]}
-    return [x.op==='DELETE'?'Usunięto wydarzenie':'Wydarzenie w planie',x.date?fdl(x.date):'',[x.note,c].filter(Boolean).join(' · ')]};
-  const flt=[['all','Wszystko'],['base','Plan stały'],['chg','Zastępstwa i odwołania'],['ev','Wydarzenia']];
-  return pn('Archiwum zmian w planie',`<div class="flex flex-wrap gap-2 mb-3">${flt.map(([k,l])=>`<button class="${plgF===k?'btn':'gh'} sm" onclick="plgF='${k}';rr()">${l}</button>`).join('')}</div>`
-   +(rows.length?rows.map((x,i)=>{const w=what(x);return `<button class="plg" onclick="plgGo(${i})"><b>${esc(w[0])}</b><span>${esc(w[1])}${w[2]?' · '+esc(w[2]):''}</span><small>${esc(x.user_id?nm(x.user_id):'system')} · ${fd(x.at)}</small></button>`}).join(''):'<p class="em">Brak zapisanych zmian.</p>'),back,'cal')};
-const plgGo=i=>{const x=PLGR[i];if(!x)return;if(x.class_id&&byId(C,x.class_id))plSel=byId(C,x.class_id).id;wk=mon(x.date?new Date(x.date+'T12:00'):new Date());go('pl')};
-
-let tpaD=null,tpaC='all',TPAD={};
-const pageAll=async mk=>{let all=[],from=0;for(;;){const r=await mk().range(from,from+999);if(r.error)throw r.error;all=all.concat(r.data);if(r.data.length<1000)break;from+=1000}return all};
-AD.tpa=async back=>{
-  if(!tpaD)tpaD=isoL(new Date());
-  const d=tpaD,date=new Date(d+'T12:00'),wd=date.getDay(),hl=hol(date);
-  const [tt,tp,at]=await Promise.all([wd>=1&&wd<=5&&!hl?sb.from('timetable').select('*').eq('weekday',wd).then(r=>r.data||[]):[],sb.from('lesson_topics').select('*').eq('date',d).then(r=>r.data||[]),
-    pageAll(()=>sb.from('attendance').select('*').eq('date',d).order('teaching_id').order('lesson_no').order('student_id'))]);
-  const L={};
-  entries(tt,mon(date),r=>r.d===d).forEach(e=>{L[e.teaching_id+'|'+e.n]=e});
-  at.forEach(a=>{const k=a.teaching_id+'|'+a.lesson_no;if(!L[k]){const t=byId(T,a.teaching_id);if(t)L[k]={teaching_id:a.teaching_id,n:a.lesson_no,class_id:t.class_id}}});
-  tp.forEach(a=>{const k=a.teaching_id+'|'+a.lesson_no;if(!L[k]){const t=byId(T,a.teaching_id);if(t)L[k]={teaching_id:a.teaching_id,n:a.lesson_no,class_id:t.class_id}}});
-  const A={},TPm={};at.forEach(a=>{(A[a.teaching_id+'|'+a.lesson_no]=A[a.teaching_id+'|'+a.lesson_no]||[]).push(a)});tp.forEach(a=>TPm[a.teaching_id+'|'+a.lesson_no]=a);
-  TPAD={A,TPm,L};
-  const all=Object.keys(L).filter(k=>tpaC==='all'||String(L[k].class_id)===String(tpaC)),act=all.filter(k=>L[k].st!=='cancel');
-  const sum=`<div class="flex flex-wrap gap-2 mb-3"><span class="bd b">Lekcji: ${act.length}</span><span class="bd ${act.every(k=>TPm[k])?'g':'y'}">Z tematem: ${act.filter(k=>TPm[k]).length}</span><span class="bd ${act.every(k=>A[k])?'g':'y'}">Z frekwencją: ${act.filter(k=>A[k]).length}</span></div>`;
-  const body=[...C].sort((a,b)=>a.name.localeCompare(b.name,'pl',{numeric:true})).map(c=>{
-    const ks=all.filter(k=>String(L[k].class_id)===String(c.id)).sort((a,b)=>L[a].n-L[b].n);if(!ks.length)return '';
-    return `<div class="tpc"><h4>Klasa ${esc(c.name)}</h4>${ks.map(k=>{const e=L[k],t=byId(T,e.teaching_id),a=A[k]||[],tpx=TPm[k],cnt=s=>a.filter(x=>x.status===s).length,dead=e.st==='cancel',who=(a[0]?.updated_by||tpx?.updated_by);
-      return `<button class="tpr" onclick="tpaDet('${k}')"><div class="n">${e.n}</div><div><div class="t"><b>${esc(sn(e.subj||t?.subject_id))}</b> · ${esc(nm(e.sub||t?.teacher_id))}${dead?' · <span class="x">odwołana</span>':''}</div>
-       <div class="m ${!dead&&!tpx?'x':''}">${tpx?esc(tpx.topic||'(pusty temat)'):dead?'':'Brak tematu'}</div>
-       <div>${a.length?`<span class="bd g">obecni ${cnt('present')}</span>${cnt('absent')?`<span class="bd r">nieobecni ${cnt('absent')}</span>`:''}${cnt('late')?`<span class="bd y">spóźnieni ${cnt('late')}</span>`:''}${cnt('excused')?`<span class="bd b">usprawiedliwieni ${cnt('excused')}</span>`:''}`:(dead?'':'<span class="bd y">brak frekwencji</span>')}</div>
-       ${who?`<div class="m">wpisał(a): ${esc(nm(who))}</div>`:''}</div></button>`}).join('')}</div>`}).join('');
-  const opts=[['all','Wszystkie klasy'],...[...C].sort((a,b)=>a.name.localeCompare(b.name,'pl',{numeric:true})).map(c=>['c'+c.id,'Klasa '+c.name])];
-  return pn('Tematy i frekwencja',`<div class="flex flex-wrap items-center gap-2 mb-3"><button class="gh sm" onclick="tpaGo(-1)">${ic('back')}</button><input type="date" value="${d}" onchange="tpaD=this.value||tpaD;rr()" class="inp" style="max-width:170px"><button class="gh sm" onclick="tpaGo(1)"><span style="display:inline-block;transform:scaleX(-1)">${ic('back')}</span></button><button class="gh sm" onclick="tpaD=isoL(new Date());rr()">Dziś</button><div style="min-width:170px;flex:1">${dd('tpac',opts,tpaC==='all'?'all':'c'+tpaC,{on:x=>{tpaC=x==='all'?'all':x.slice(1);rr()}})}</div></div>
-   ${hl?`<p class="text-sm mu mb-3">${esc(hl)}</p>`:''}${sum}${body||'<p class="em">Brak lekcji w tym dniu.</p>'}`,back,'book')};
-const tpaGo=n=>{tpaD=isoL(addD(new Date(tpaD+'T12:00'),n));rr()};
-const tpaDet=k=>{const {A,TPm,L}=TPAD,e=L[k],t=byId(T,e.teaching_id),a=A[k]||[],g=st=>a.filter(x=>x.status===st).map(x=>esc(ln(x.student_id))).join(', ')||'-';
-  modal(`<div class="box"><h3 class="mh">Klasa ${esc(cn(e.class_id))} · lekcja ${e.n}</h3><div class="text-sm mu mb-3">${esc(sn(e.subj||t?.subject_id))} · ${esc(nm(e.sub||t?.teacher_id))}</div>
-   <div class="lb">Temat</div><p class="mb-3">${esc(TPm[k]?.topic||'Brak tematu')}</p>
-   ${a.length?`<div class="lb">Nieobecni</div><p class="mb-2">${g('absent')}</p><div class="lb">Spóźnieni</div><p class="mb-2">${g('late')}</p><div class="lb">Usprawiedliwieni</div><p class="mb-2">${g('excused')}</p>`:'<p class="mu">Brak wpisu frekwencji.</p>'}
-   <div class="flex justify-end mt-3"><button class="btn" onclick="closeModal()">Zamknij</button></div></div>`)};
 /* ---------- Administracja ---------- */
 V.ad=async()=>{
   const back=`<button class="gh sm" onclick="adTab=null;rr()">${ic('back')} Administracja</button>`;
@@ -1079,6 +1027,58 @@ async function prnGo(){
     doc.save('plan-lekcji-'+fn+'-'+(color?'kolor':'cz-b')+'.pdf');toast('Wygenerowano PDF')
   }catch(e){warn(e.message||String(e))}finally{b.disabled=false;b.innerHTML=lab}}
 
+/* ===== Administracja: archiwum zmian w planie, tematy i frekwencja ===== */
+const byId=(a,id)=>a.find(z=>String(z.id)===String(id));
+let plgF='all',PLGR=[];
+const PLG_K={substitution:'Zastępstwo',cancelled:'Odwołana lekcja',moved_out:'Przeniesienie lekcji',moved_in:'Przeniesienie lekcji'},DN5=['','poniedziałek','wtorek','środa','czwartek','piątek'];
+AD.log=async back=>{
+  const r=await sb.from('plan_log').select('*').order('at',{ascending:false}).limit(600);
+  if(r.error)return pn('Archiwum zmian w planie','<p class="em">Brak tabeli plan_log. Uruchom plik admin-extras.sql w Supabase.</p>',back,'cal');
+  const G={};(r.data||[]).forEach(x=>{if(x.grp)(G[x.grp]=G[x.grp]||[]).push(x)});const seen=new Set();
+  let rows=(r.data||[]).filter(x=>{if(!x.grp)return true;if(seen.has(x.grp))return false;seen.add(x.grp);return true});
+  rows=rows.filter(x=>plgF==='all'||(plgF==='base'&&x.src==='timetable')||(plgF==='chg'&&x.src==='timetable_changes')||(plgF==='ev'&&x.src==='plan_events'));
+  PLGR=rows;
+  const what=x=>{const t=byId(T,x.teaching_id),cl=byId(C,x.class_id),s=t?sn(t.subject_id):'',c=cl?'kl. '+cl.name:'',te=t?nm(t.teacher_id):'';
+    if(x.src==='timetable')return [x.op==='DELETE'?'Usunięto lekcję z planu':'Dodano lekcję do planu',`${DN5[x.weekday]||''}, lekcja ${x.lesson_no}`,[s,te,c].filter(Boolean).join(' · ')];
+    if(x.src==='timetable_changes'){const g=x.grp&&G[x.grp]?G[x.grp]:[x],ds=g.map(y=>y.date).filter(Boolean).sort(),k=PLG_K[x.kind]||'Zmiana';
+      return [x.op==='DELETE'?'Usunięto zmianę: '+k.toLowerCase():x.op==='UPDATE'?'Zmieniono: '+k.toLowerCase():k,ds.length>1&&ds[0]!==ds[ds.length-1]?fdl(ds[0])+' - '+fdl(ds[ds.length-1]):(ds[0]?fdl(ds[0]):'')+(x.lesson_no!=null?', lekcja '+x.lesson_no:''),[s,c].filter(Boolean).join(' · ')]}
+    return [x.op==='DELETE'?'Usunięto wydarzenie':'Wydarzenie w planie',x.date?fdl(x.date):'',[x.note,c].filter(Boolean).join(' · ')]};
+  const flt=[['all','Wszystko'],['base','Plan stały'],['chg','Zastępstwa i odwołania'],['ev','Wydarzenia']];
+  return pn('Archiwum zmian w planie',`<div class="flex flex-wrap gap-2 mb-3">${flt.map(([k,l])=>`<button class="${plgF===k?'btn':'gh'} sm" onclick="plgF='${k}';rr()">${l}</button>`).join('')}</div>`
+   +(rows.length?rows.map((x,i)=>{const w=what(x);return `<button class="plg" onclick="plgGo(${i})"><b>${esc(w[0])}</b><span>${esc(w[1])}${w[2]?' · '+esc(w[2]):''}</span><small>${esc(x.user_id?nm(x.user_id):'system')} · ${fd(x.at)}</small></button>`}).join(''):'<p class="em">Brak zapisanych zmian.</p>'),back,'cal')};
+const plgGo=i=>{const x=PLGR[i];if(!x)return;if(x.class_id&&byId(C,x.class_id))plSel=byId(C,x.class_id).id;wk=mon(x.date?new Date(x.date+'T12:00'):new Date());go('pl')};
+
+let tpaD=null,tpaC='all',TPAD={};
+const pageAll=async mk=>{let all=[],from=0;for(;;){const r=await mk().range(from,from+999);if(r.error)throw r.error;all=all.concat(r.data);if(r.data.length<1000)break;from+=1000}return all};
+AD.tpa=async back=>{
+  if(!tpaD)tpaD=isoL(new Date());
+  const d=tpaD,date=new Date(d+'T12:00'),wd=date.getDay(),hl=hol(date);
+  const [tt,tp,at]=await Promise.all([wd>=1&&wd<=5&&!hl?sb.from('timetable').select('*').eq('weekday',wd).then(r=>r.data||[]):[],sb.from('lesson_topics').select('*').eq('date',d).then(r=>r.data||[]),
+    pageAll(()=>sb.from('attendance').select('*').eq('date',d).order('teaching_id').order('lesson_no').order('student_id'))]);
+  const L={};
+  entries(tt,mon(date),r=>r.d===d).forEach(e=>{L[e.teaching_id+'|'+e.n]=e});
+  at.forEach(a=>{const k=a.teaching_id+'|'+a.lesson_no;if(!L[k]){const t=byId(T,a.teaching_id);if(t)L[k]={teaching_id:a.teaching_id,n:a.lesson_no,class_id:t.class_id}}});
+  tp.forEach(a=>{const k=a.teaching_id+'|'+a.lesson_no;if(!L[k]){const t=byId(T,a.teaching_id);if(t)L[k]={teaching_id:a.teaching_id,n:a.lesson_no,class_id:t.class_id}}});
+  const A={},TPm={};at.forEach(a=>{(A[a.teaching_id+'|'+a.lesson_no]=A[a.teaching_id+'|'+a.lesson_no]||[]).push(a)});tp.forEach(a=>TPm[a.teaching_id+'|'+a.lesson_no]=a);
+  TPAD={A,TPm,L};
+  const all=Object.keys(L).filter(k=>tpaC==='all'||String(L[k].class_id)===String(tpaC)),act=all.filter(k=>L[k].st!=='cancel');
+  const sum=`<div class="flex flex-wrap gap-2 mb-3"><span class="bd b">Lekcji: ${act.length}</span><span class="bd ${act.every(k=>TPm[k])?'g':'y'}">Z tematem: ${act.filter(k=>TPm[k]).length}</span><span class="bd ${act.every(k=>A[k])?'g':'y'}">Z frekwencją: ${act.filter(k=>A[k]).length}</span></div>`;
+  const body=[...C].sort((a,b)=>a.name.localeCompare(b.name,'pl',{numeric:true})).map(c=>{
+    const ks=all.filter(k=>String(L[k].class_id)===String(c.id)).sort((a,b)=>L[a].n-L[b].n);if(!ks.length)return '';
+    return `<div class="tpc"><h4>Klasa ${esc(c.name)}</h4>${ks.map(k=>{const e=L[k],t=byId(T,e.teaching_id),a=A[k]||[],tpx=TPm[k],cnt=s=>a.filter(x=>x.status===s).length,dead=e.st==='cancel',who=(a[0]?.updated_by||tpx?.updated_by);
+      return `<button class="tpr" onclick="tpaDet('${k}')"><div class="n">${e.n}</div><div><div class="t"><b>${esc(sn(e.subj||t?.subject_id))}</b> · ${esc(nm(e.sub||t?.teacher_id))}${dead?' · <span class="x">odwołana</span>':''}</div>
+       <div class="m ${!dead&&!tpx?'x':''}">${tpx?esc(tpx.topic||'(pusty temat)'):dead?'':'Brak tematu'}</div>
+       <div>${a.length?`<span class="bd g">obecni ${cnt('present')}</span>${cnt('absent')?`<span class="bd r">nieobecni ${cnt('absent')}</span>`:''}${cnt('late')?`<span class="bd y">spóźnieni ${cnt('late')}</span>`:''}${cnt('excused')?`<span class="bd b">usprawiedliwieni ${cnt('excused')}</span>`:''}`:(dead?'':'<span class="bd y">brak frekwencji</span>')}</div>
+       ${who?`<div class="m">wpisał(a): ${esc(nm(who))}</div>`:''}</div></button>`}).join('')}</div>`}).join('');
+  const opts=[['all','Wszystkie klasy'],...[...C].sort((a,b)=>a.name.localeCompare(b.name,'pl',{numeric:true})).map(c=>['c'+c.id,'Klasa '+c.name])];
+  return pn('Tematy i frekwencja',`<div class="flex flex-wrap items-center gap-2 mb-3"><button class="gh sm" onclick="tpaGo(-1)">${ic('back')}</button><input type="date" value="${d}" onchange="tpaD=this.value||tpaD;rr()" class="inp" style="max-width:170px"><button class="gh sm" onclick="tpaGo(1)"><span style="display:inline-block;transform:scaleX(-1)">${ic('back')}</span></button><button class="gh sm" onclick="tpaD=isoL(new Date());rr()">Dziś</button><div style="min-width:170px;flex:1">${dd('tpac',opts,tpaC==='all'?'all':'c'+tpaC,{on:x=>{tpaC=x==='all'?'all':x.slice(1);rr()}})}</div></div>
+   ${hl?`<p class="text-sm mu mb-3">${esc(hl)}</p>`:''}${sum}${body||'<p class="em">Brak lekcji w tym dniu.</p>'}`,back,'book')};
+const tpaGo=n=>{tpaD=isoL(addD(new Date(tpaD+'T12:00'),n));rr()};
+const tpaDet=k=>{const {A,TPm,L}=TPAD,e=L[k],t=byId(T,e.teaching_id),a=A[k]||[],g=st=>a.filter(x=>x.status===st).map(x=>esc(ln(x.student_id))).join(', ')||'-';
+  modal(`<div class="box"><h3 class="mh">Klasa ${esc(cn(e.class_id))} · lekcja ${e.n}</h3><div class="text-sm mu mb-3">${esc(sn(e.subj||t?.subject_id))} · ${esc(nm(e.sub||t?.teacher_id))}</div>
+   <div class="lb">Temat</div><p class="mb-3">${esc(TPm[k]?.topic||'Brak tematu')}</p>
+   ${a.length?`<div class="lb">Nieobecni</div><p class="mb-2">${g('absent')}</p><div class="lb">Spóźnieni</div><p class="mb-2">${g('late')}</p><div class="lb">Usprawiedliwieni</div><p class="mb-2">${g('excused')}</p>`:'<p class="mu">Brak wpisu frekwencji.</p>'}
+   <div class="flex justify-end mt-3"><button class="btn" onclick="closeModal()">Zamknij</button></div></div>`)};
 AD.bells=back=>{const ns=LNS(),mx=ns[ns.length-1];
   return pn('Godziny lekcji',`<p class="text-sm mu mb-3">Godziny obowiązują wszystkich. Dostępna jest lekcja 0 i lekcje po dziesiątej (do ${MAXL}).</p>`
    +tbl(['Lekcja','Od','Do',''],ns.map(i=>{const b=BELLS[i-1]||['',''];return `<tr><td><span class="av">${i}</span></td><td><input type="text" id="bs${i}" class="inp" value="${b[0]}" maxlength="5" style="max-width:110px"></td><td><input type="text" id="be${i}" class="inp" value="${b[1]}" maxlength="5" style="max-width:110px"></td><td>${i===0||(i>10&&i===mx)?`<button class="gh sm red" title="Usuń lekcję" onclick="rmLesson(${i})">${ic('trash')}</button>`:''}</td></tr>`}))
