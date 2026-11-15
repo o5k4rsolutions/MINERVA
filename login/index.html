@@ -7,35 +7,89 @@
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.tailwindcss.com/3.4.17"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
-<style>body{font-family:'Open Sans',sans-serif}input{border:1px solid #cbd5e1;border-radius:.6rem;padding:.65rem .8rem;width:100%}input:focus{outline:2px solid #F5A524;border-color:transparent}
-.b{background:#F5A524;color:#1E2A78;font-weight:700;border-radius:.6rem;padding:.7rem;width:100%;transition:.2s}.b:hover{background:#1E2A78;color:#fff}</style>
+<style>
+:root{--in:#1E2A78;--am:#F5A524;--ink:#1b2238;--mu:#64708a;--ln:#d9dfeb}
+*{box-sizing:border-box}
+body{font-family:'Open Sans',sans-serif;margin:0;color:var(--ink);min-height:100vh;
+  background:radial-gradient(900px 500px at 15% -10%,#2f3fb5 0%,transparent 60%),radial-gradient(700px 500px at 100% 110%,#3a2a78 0%,transparent 55%),linear-gradient(135deg,#080B1A,#1E2A78)}
+.card{background:#fff;border-radius:22px;box-shadow:0 30px 80px #0008;width:100%;max-width:430px;padding:2.2rem 2rem 1.6rem;animation:up .35s both}
+@keyframes up{from{opacity:0;transform:translateY(12px)}}
+.fld{display:block;margin-bottom:1rem}
+.fld>span{display:block;font-size:.82rem;font-weight:700;color:#475569;margin-bottom:.3rem}
+.wrap{position:relative}
+.wrap svg.l{position:absolute;left:.9rem;top:50%;transform:translateY(-50%);width:18px;height:18px;color:#94a3b8;pointer-events:none}
+.wrap input{width:100%;border:1.5px solid var(--ln);border-radius:12px;padding:.8rem 2.8rem .8rem 2.7rem;font:inherit;font-size:1rem;background:#f8fafc;transition:.15s}
+.wrap input:focus{outline:none;border-color:var(--am);background:#fff;box-shadow:0 0 0 4px #F5A52433}
+.eye{position:absolute;right:.4rem;top:50%;transform:translateY(-50%);border:0;background:none;padding:.5rem;color:#94a3b8;cursor:pointer;border-radius:8px}
+.eye:hover{color:var(--in);background:#eef0fb}.eye svg{width:20px;height:20px;display:block}
+.btn{width:100%;border:0;border-radius:12px;padding:.9rem;font:inherit;font-weight:800;font-size:1rem;background:var(--am);color:var(--in);cursor:pointer;transition:.15s;display:flex;align-items:center;justify-content:center;gap:.5rem}
+.btn:hover{background:var(--in);color:#fff}.btn:disabled{opacity:.65;cursor:wait}
+.spin{width:18px;height:18px;border:2.5px solid currentColor;border-right-color:transparent;border-radius:50%;animation:sp .7s linear infinite;display:none}
+.btn:disabled .spin{display:inline-block}@keyframes sp{to{transform:rotate(360deg)}}
+#err{display:none;align-items:flex-start;gap:.5rem;background:#fef2f2;border:1px solid #fecaca;color:#b91c1c;border-radius:12px;padding:.65rem .8rem;font-size:.88rem;margin-bottom:1rem}
+#err.show{display:flex}#err svg{width:18px;height:18px;flex-shrink:0;margin-top:1px}
+.hint{font-size:.78rem;color:#b45309;margin:-.5rem 0 1rem;display:none}.hint.show{display:block}
+.rq{list-style:none;padding:0;margin:0 0 1.1rem;font-size:.82rem;color:var(--mu)}
+.rq li{display:flex;align-items:center;gap:.5rem;padding:.15rem 0}
+.rq i{width:16px;height:16px;border-radius:50%;border:1.5px solid #cbd3e1;display:inline-flex;align-items:center;justify-content:center;font-style:normal;font-size:.65rem;color:transparent;flex-shrink:0}
+.rq li.ok{color:#15803d}.rq li.ok i{background:#15803d;border-color:#15803d;color:#fff}
+.note{background:#fffbeb;border:1px solid #fde68a;color:#92400e;border-radius:12px;padding:.7rem .85rem;font-size:.87rem;margin-bottom:1.1rem}
+.hidden{display:none!important}
+</style>
 </head>
-<body class="min-h-screen bg-gradient-to-br from-[#080B1A] to-[#1E2A78] flex items-center justify-center p-4">
-<main class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8">
-  <img src="https://dziennik-minerva.pages.dev/themes/icon-dark.svg" alt="" class="h-12 mx-auto mb-2">
-  <h1 class="text-2xl font-extrabold text-center text-[#1E2A78]">Dziennik Minerva</h1>
-  <p id="sub" class="text-center text-slate-500 text-sm mb-6">Zaloguj się loginem otrzymanym w szkole</p>
-  <p id="err" class="hidden bg-red-50 text-red-700 text-sm rounded-lg p-2 mb-3"></p>
+<body class="flex items-center justify-center p-4">
+<main class="card">
+  <div class="text-center mb-6">
+    <img src="https://dziennik-minerva.pages.dev/themes/logo-horizontal-light.svg" alt="Minerva" class="mx-auto" style="height:56px;max-width:100%;width:auto"
+      onerror="this.style.display='none';document.getElementById('lt').classList.remove('hidden')">
+    <div id="lt" class="hidden text-3xl font-extrabold" style="color:var(--in)">Minerva</div>
+    <h1 class="text-lg font-extrabold mt-5" style="color:var(--ink)">Dziennik elektroniczny</h1>
+    <p id="sub" class="text-sm mt-1" style="color:var(--mu)">Zaloguj się loginem otrzymanym w szkole</p>
+  </div>
 
-  <form id="f1" class="space-y-3">
-    <label class="block text-sm font-semibold">Login<input id="login" autocomplete="username" required></label>
-    <label class="block text-sm font-semibold">Hasło<input id="pw" type="password" autocomplete="current-password" required></label>
-    <button class="b">Zaloguj</button>
+  <p id="err" role="alert"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16v.5"/></svg><span id="errt"></span></p>
+
+  <form id="f1" novalidate>
+    <label class="fld"><span>Login</span><div class="wrap">
+      <svg class="l" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+      <input id="login" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="np. jan.kowalski" required autofocus></div></label>
+    <label class="fld"><span>Hasło</span><div class="wrap">
+      <svg class="l" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/></svg>
+      <input id="pw" type="password" autocomplete="current-password" placeholder="Twoje hasło" required>
+      <button type="button" class="eye" data-t="pw" aria-label="Pokaż hasło"></button></div></label>
+    <p id="caps" class="hint">Włączony jest Caps Lock.</p>
+    <button class="btn" id="b1"><span class="spin"></span><span>Zaloguj się</span></button>
   </form>
 
-  <form id="f2" class="space-y-3 hidden">
-    <p class="text-sm bg-amber-50 border border-amber-200 rounded-lg p-2">To Twoje pierwsze logowanie. Ustaw własne hasło (min. 8 znaków), hasło jednorazowe przestanie działać.</p>
-    <label class="block text-sm font-semibold">Nowe hasło<input id="n1" type="password" autocomplete="new-password" minlength="8" required></label>
-    <label class="block text-sm font-semibold">Powtórz hasło<input id="n2" type="password" autocomplete="new-password" minlength="8" required></label>
-    <button class="b">Zapisz i wejdź</button>
+  <form id="f2" class="hidden" novalidate>
+    <p class="note">To Twoje pierwsze logowanie. Ustaw własne hasło, hasło jednorazowe przestanie działać.</p>
+    <label class="fld"><span>Nowe hasło</span><div class="wrap">
+      <svg class="l" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/></svg>
+      <input id="n1" type="password" autocomplete="new-password" minlength="8" required>
+      <button type="button" class="eye" data-t="n1" aria-label="Pokaż hasło"></button></div></label>
+    <label class="fld"><span>Powtórz hasło</span><div class="wrap">
+      <svg class="l" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/></svg>
+      <input id="n2" type="password" autocomplete="new-password" minlength="8" required>
+      <button type="button" class="eye" data-t="n2" aria-label="Pokaż hasło"></button></div></label>
+    <ul class="rq"><li id="r1"><i>✓</i>Co najmniej 8 znaków</li><li id="r2"><i>✓</i>Różne od hasła jednorazowego</li><li id="r3"><i>✓</i>Oba hasła są takie same</li></ul>
+    <button class="btn" id="b2"><span class="spin"></span><span>Zapisz i wejdź</span></button>
   </form>
-  <p class="text-center text-xs text-slate-400 mt-6">Konta zakłada wyłącznie dyrekcja szkoły. Nie masz danych? Zgłoś się do sekretariatu.</p>
+
+  <p class="text-center text-xs mt-6" style="color:#94a3b8">Konta zakłada wyłącznie dyrekcja szkoły.<br>Nie masz danych? Zgłoś się do sekretariatu.</p>
 </main>
 <script>
 const sb=supabase.createClient('https://tsoxtjxfskvgiruraoau.supabase.co','sb_publishable_oU23IIberCIeZksCjK5dFA_iMd0cNZB');
 const $=s=>document.querySelector(s), DOMAIN='@minerva.local';
-const err=m=>{const e=$('#err');e.textContent=m;e.classList.toggle('hidden',!m)};
-const showChange=()=>{$('#f1').classList.add('hidden');$('#f2').classList.remove('hidden');$('#sub').textContent='Ustaw własne hasło'};
+const err=m=>{$('#errt').textContent=m;$('#err').classList.toggle('show',!!m)};
+const busy=(b,on)=>{$(b).disabled=on};
+const showChange=()=>{$('#f1').classList.add('hidden');$('#f2').classList.remove('hidden');$('#sub').textContent='Ustaw własne hasło';$('#n1').focus()};
+const EYE='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>',
+ EYE0='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3l18 18M10.6 5.1A10 10 0 0112 5c6.4 0 10 7 10 7a17 17 0 01-3.2 4M6.5 6.6C3.7 8.3 2 12 2 12s3.6 7 10 7a9.7 9.7 0 004.4-1M9.9 9.9a3 3 0 004.2 4.2"/></svg>';
+document.querySelectorAll('.eye').forEach(b=>{b.innerHTML=EYE;b.onclick=()=>{const i=$('#'+b.dataset.t),h=i.type==='password';i.type=h?'text':'password';b.innerHTML=h?EYE0:EYE;b.setAttribute('aria-label',h?'Ukryj hasło':'Pokaż hasło')}});
+$('#pw').addEventListener('keyup',e=>$('#caps').classList.toggle('show',!!e.getModifierState&&e.getModifierState('CapsLock')));
+$('#login').addEventListener('input',()=>err(''));$('#pw').addEventListener('input',()=>err(''));
+const rq=()=>{const a=$('#n1').value,b=$('#n2').value,set=(id,ok)=>$('#'+id).classList.toggle('ok',ok);set('r1',a.length>=8);set('r2',a.length>0&&a!==$('#pw').value);set('r3',a.length>0&&a===b)};
+$('#n1').addEventListener('input',rq);$('#n2').addEventListener('input',rq);
 
 (async()=>{ // już zalogowany?
   const {data:{session}}=await sb.auth.getSession(); if(!session)return;
@@ -46,20 +100,26 @@ const showChange=()=>{$('#f1').classList.add('hidden');$('#f2').classList.remove
 
 $('#f1').onsubmit=async e=>{
   e.preventDefault();err('');
+  if(!$('#login').value.trim()||!$('#pw').value)return err('Podaj login i hasło.');
+  busy('#b1',true);
   const {data,error}=await sb.auth.signInWithPassword({email:$('#login').value.trim().toLowerCase()+DOMAIN,password:$('#pw').value});
-  if(error)return err('Nieprawidłowy login lub hasło.');
+  if(error){busy('#b1',false);return err('Nieprawidłowy login lub hasło.')}
   await sb.rpc('touch_login');
   const {data:p,error:pe}=await sb.from('profiles').select('must_change_password').eq('id',data.user.id).maybeSingle();
-  if(pe||!p){await sb.auth.signOut();return err('Zalogowano, ale nie można odczytać profilu ('+(pe?.message||'brak wpisu w profiles')+').')}
-  p.must_change_password?showChange():location.href='/dziennik';
+  if(pe||!p){await sb.auth.signOut();busy('#b1',false);return err('Zalogowano, ale nie można odczytać profilu ('+(pe?.message||'brak wpisu w profiles')+').')}
+  if(p.must_change_password){busy('#b1',false);showChange()}else location.href='/dziennik';
 };
 $('#f2').onsubmit=async e=>{
   e.preventDefault();err('');
+  if($('#n1').value.length<8)return err('Hasło musi mieć co najmniej 8 znaków.');
   if($('#n1').value!==$('#n2').value)return err('Hasła nie są takie same.');
   if($('#n1').value===$('#pw').value)return err('Nowe hasło musi różnić się od jednorazowego.');
+  busy('#b2',true);
   const {error}=await sb.auth.updateUser({password:$('#n1').value});
-  if(error)return err(error.message);
-  const {error:e2}=await sb.rpc('finish_password_change'); if(e2)return err('Nie udało się zapisać zmiany hasła: '+e2.message); location.href='/dziennik';
+  if(error){busy('#b2',false);return err(error.message)}
+  const {error:e2}=await sb.rpc('finish_password_change');
+  if(e2){busy('#b2',false);return err('Nie udało się zapisać zmiany hasła: '+e2.message)}
+  location.href='/dziennik';
 };
 </script>
 </body>
