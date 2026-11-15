@@ -153,6 +153,19 @@ document.addEventListener('click',e=>{const b=e.target.closest('button.btn');if(
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){closePop();closeModal()}});
 document.addEventListener('input',e=>{if(e.target.closest('#main,#modal'))dirty=true});
 
+/* ---------- formatowanie tekstu (bezpieczne: najpierw escape, potem znaczniki) ---------- */
+const fmt=t=>{let o='',ul=false;const inl=x=>esc(x).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/__(.+?)__/g,'<u>$1</u>').replace(/\*(.+?)\*/g,'<i>$1</i>').replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g,'<a href="$2" target="_blank" rel="noopener" class="lk">$1</a>');
+  String(t??'').split('\n').forEach(l=>{const m=l.match(/^\s*[-•]\s+(.*)$/);if(m){if(!ul){o+='<ul style="list-style:disc;margin:.3rem 0 .3rem 1.3rem">';ul=true}o+='<li>'+inl(m[1])+'</li>'}else{if(ul){o+='</ul>';ul=false}o+=inl(l)+'<br>'}});return ul?o+'</ul>':o};
+const plain=t=>String(t??'').replace(/\[([^\]]+)\]\([^)]*\)/g,'$1').replace(/\*\*|__|\*/g,'').replace(/^\s*[-•]\s+/gm,'');
+const tbar=id=>`<div class="flex gap-1 mb-1 np"><button type="button" class="gh sm" title="Pogrubienie" onclick="fw('${id}','**')"><b>B</b></button><button type="button" class="gh sm" title="Kursywa" onclick="fw('${id}','*')"><i>I</i></button><button type="button" class="gh sm" title="Podkreślenie" onclick="fw('${id}','__')"><u>U</u></button><button type="button" class="gh sm" title="Lista punktowana" onclick="fl('${id}')">• Lista</button><button type="button" class="gh sm" title="Wstaw link" onclick="flk('${id}')">Link</button></div>`;
+function fw(id,m){const e=$('#'+id),s=e.selectionStart,t=e.selectionEnd,x=e.value,sel=x.slice(s,t)||'tekst';e.value=x.slice(0,s)+m+sel+m+x.slice(t);e.focus();e.setSelectionRange(s+m.length,s+m.length+sel.length);dirty=true}
+function fl(id){const e=$('#'+id),x=e.value,a=x.lastIndexOf('\n',e.selectionStart-1)+1;let b=x.indexOf('\n',e.selectionEnd);if(b<0)b=x.length;e.value=x.slice(0,a)+x.slice(a,b).split('\n').map(l=>/^\s*[-•]\s/.test(l)?l:'- '+l).join('\n')+x.slice(b);e.focus();dirty=true}
+function flk(id){const u=prompt('Adres strony (https://…)');if(!u)return;if(!/^https?:\/\//.test(u))return warn('Adres musi zaczynać się od http:// lub https://');const e=$('#'+id),s=e.selectionStart,t=e.selectionEnd,x=e.value;e.value=x.slice(0,s)+'['+(x.slice(s,t)||u)+']('+u+')'+x.slice(t);e.focus();dirty=true}
+/* zapamiętywanie odczytanych kropek (per użytkownik, w tej przeglądarce) */
+const seenAt=k=>{try{return localStorage.getItem('seen_'+me.id+'_'+k)||''}catch{return ''}};
+const markSeen=k=>{try{localStorage.setItem('seen_'+me.id+'_'+k,new Date().toISOString())}catch{}};
+const sinceOf=k=>{const a=me.prev_seen||new Date(0).toISOString(),b=seenAt(k);return b>a?b:a};
+
 /* ---------- własne kontrolki ---------- */
 const FV={},DD={};
 const lab=(o,k)=>(o.find(x=>String(x[0])===String(k))||[,''])[1];
@@ -198,7 +211,7 @@ const LIVE={
  messages:()=>{},attendance:()=>{}};
 const relCh=k=>{if(k.kind==='moved_in')return false;if(dir())return !!k.created_by&&k.created_by!==me.id;if(me.role==='student')return ST[me.id]?.class_id===k.class_id;if(me.role==='parent')return KIDS.some(i=>ST[i]?.class_id===k.class_id);return T.find(t=>t.id===k.teaching_id)?.teacher_id===me.id||k.sub_teacher_id===me.id};
 const chMsg=k=>'Zmiana w planie: '+fdl(k.date)+', lekcja '+k.lesson_no+' - '+({substitution:'zastępstwo',cancelled:'lekcja odwołana',moved_out:'lekcja przeniesiona'}[k.kind]||'zmiana');
-const plCount=async()=>{const {data,error}=await sb.from('timetable_changes').select('*').gt('created_at',plSeen||me.prev_seen||new Date(0).toISOString());return error?0:(data||[]).filter(relCh).length};
+const plCount=async()=>{const {data,error}=await sb.from('timetable_changes').select('*').gt('created_at',plSeen||sinceOf('pl'));return error?0:(data||[]).filter(relCh).length};
 const fatal=(t,m)=>{$('#main').innerHTML=`<div class="pn"><div class="pb"><h3 class="mh">${esc(t)}</h3><p>${esc(m)}</p><button class="btn mt-3" onclick="logout()">Wyloguj i wróć do logowania</button></div></div>`};
 async function init(){
   try{setFs(+localStorage.getItem('fs')||0)}catch{setFs(0)}
@@ -234,7 +247,7 @@ const inHome=s=>C.some(c=>c.homeroom_teacher_id===me.id&&c.id===ST[s]?.class_id)
 const jCount=async()=>{if(!(dir()||isHome()))return 0;const {data}=await sb.from('justifications').select('student_id').eq('status','pending');return(data||[]).filter(x=>dir()||inHome(x.student_id)).length};
 async function calcDots(){
   const since=me.prev_seen||new Date(0).toISOString(),h=t=>sb.from(t).select('*',{count:'exact',head:true});
-  const [m,a,g,n,j,pc]=await Promise.all([h('message_recipients').eq('recipient_id',me.id).is('read_at',null),h('announcements').gt('created_at',since).neq('author_id',me.id),h('grades').gt('created_at',since).neq('author_id',me.id),h('notes').gt('created_at',since).neq('author_id',me.id),jCount(),plCount()]);
+  const [m,a,g,n,j,pc]=await Promise.all([h('message_recipients').eq('recipient_id',me.id).is('read_at',null),h('announcements').gt('created_at',sinceOf('ann')).neq('author_id',me.id),h('grades').gt('created_at',sinceOf('gr')).neq('author_id',me.id),h('notes').gt('created_at',sinceOf('nt')).neq('author_id',me.id),jCount(),plCount()]);
   const keep=k=>dots[k]===0?0:undefined;
   dots={msg:m.count,ann:keep('ann')??a.count,gr:staff()?0:keep('gr')??g.count,nt:staff()?0:keep('nt')??n.count,js:j,pl:tab==='pl'?0:pc};if(tab==='pl')plSeen=new Date().toISOString();
 }
@@ -250,7 +263,7 @@ function nav(){
   $('#quick').innerHTML=[['msg','Wiadomości'],['ann','Ogłoszenia']].map(([k,l])=>`<button class="qk" title="${l}" onclick="go('${k}')">${ic(k)}${dots[k]?`<em>${dots[k]>99?'99+':dots[k]}</em>`:''}</button>`).join('');
   $('#ptitle').textContent=(t.find(x=>x[0]===tab)||[])[1]||'';
 }
-function go(k){if(attDirty&&tab==='at'){ask('Masz niezapisane zmiany frekwencji. Odrzucić je?','Odrzuć').then(ok=>{if(ok){attDirty=false;go(k)}});return}tab=k;detail=null;dirty=false;if(k==='ad')adTab=null;if(k==='gr'){gmode=gN||'list';gN=null}if(['ann','gr','nt'].includes(k))dots[k]=0;if(k==='pl')plSeen=new Date().toISOString();nav();render();scrollTo(0,0)}
+function go(k){if(attDirty&&tab==='at'){ask('Masz niezapisane zmiany frekwencji. Odrzucić je?','Odrzuć').then(ok=>{if(ok){attDirty=false;go(k)}});return}tab=k;detail=null;dirty=false;if(k==='ad')adTab=null;if(k==='gr'){gmode=gN||'list';gN=null}if(['ann','gr','nt'].includes(k)){dots[k]=0;markSeen(k)}if(k==='pl'){plSeen=new Date().toISOString();markSeen('pl')}nav();render();scrollTo(0,0)}
 async function render(silent){
   const my=++rid;detail=null;if(silent!==true){dirty=false;$('#main').innerHTML=[1,2,3].map(()=>'<div class="pn pb"><div class="skel" style="width:40%"></div><div class="skel"></div><div class="skel" style="width:80%"></div></div>').join('')}
   try{
@@ -332,7 +345,7 @@ V.home=async()=>{
   const c3=pup?help+pn('Ważne dzisiaj',imp)+pn('Frekwencja - ostatnie 3 dni',(ab.data||[]).map(x=>row(`${fdl(x.date)} · lekcja ${x.lesson_no} <span class="tag ${x.status==='late'?'y':x.status==='excused'?'b':'r'}">${AS[x.status]}</span>`)).join('')||n('Brak nieobecności i spóźnień.'),lk('at','Cała frekwencja'),'at')
    :((dir()||isHome())?pn('Do rozpatrzenia',`<div class="text-center"><b class="text-4xl" style="color:var(--in)">${j.count||0}</b><p class="text-sm mu">usprawiedliwień czeka na decyzję</p><button class="gh mt-2" onclick="go('js')">Przejdź</button></div>`,'','js'):'')+pn('Ważne dzisiaj',imp)+pn('Moje przedmioty',T.filter(t=>t.teacher_id===me.id).slice(0,8).map(t=>`<button class="gh sm m-1" onclick="openT('${t.id}','one')">${esc(tl(t))}</button>`).join('')||n('Brak przydziałów - dyrekcja ustawia je w Administracji.'),'','gr');
   const c2=(pup?pn('Oceny od ostatniego logowania',newG.map(x=>row(`<div class="flex items-center gap-3"><button class="gc ${gcls(x.value)}" onclick="gDet('${x.id}')">${esc(x.value)}</button><div class="text-sm"><b>${esc(sn(T.find(t=>t.id===x.teaching_id)?.subject_id))}</b><div class="text-xs mu">${me.role==='parent'?esc(nm(x.student_id))+' · ':''}${fd(x.created_at)}</div></div></div>`)).join('')||n('Brak nowych ocen.'),lk('gr','Wszystkie oceny'),'gr'):'')
-   +pn('Ogłoszenia',(a.data||[]).map(x=>row(`<b>${esc(x.title)}</b><div class="text-xs mu">${esc(nm(x.author_id))} · ${fd(x.created_at)}</div><p class="text-sm">${esc(x.body.slice(0,140))}${x.body.length>140?'…':''}</p>`)).join('')||n('Brak ogłoszeń.'),lk('ann','Wszystkie'),'ann')
+   +pn('Ogłoszenia',(a.data||[]).map(x=>row(`<b>${esc(x.title)}</b><div class="text-xs mu">${esc(nm(x.author_id))} · ${fd(x.created_at)}</div><p class="text-sm">${esc(plain(x.body).slice(0,140))}${plain(x.body).length>140?'…':''}</p>`)).join('')||n('Brak ogłoszeń.'),lk('ann','Wszystkie'),'ann')
    +pn('Nieprzeczytane wiadomości',msgs.map(x=>`<div class="py-2 cursor-pointer" onclick="mtab='in';go('msg');openMsg('${x.id}')"><b>${esc(x.subject)}</b><div class="text-xs mu">${esc(nm(x.sender_id))} · ${fd(x.created_at)}</div></div>`).join('')||n('Brak nowych wiadomości.'),lk('msg','Skrzynka'),'msg');
   return `<div class="mb-4"><div class="text-xl font-bold">Dzień dobry, ${esc(me.first_name)}!</div><div class="text-sm mu">${now.toLocaleDateString('pl-PL',{weekday:'long',day:'numeric',month:'long'})} · poprzednie logowanie: ${fd(me.prev_seen)}</div></div>
   <div class="grid lg:grid-cols-3 gap-4 items-start"><div>${pn('Dzisiejszy plan zajęć',plan,lk('pl','Cały plan'),'pl')}</div><div>${c2}</div><div>${c3}</div></div>`;
@@ -375,7 +388,7 @@ function compose(){
   people.forEach(p=>o.push(['p:'+p.id,nm(p.id),RL[p.role]]));
   return pn('Nowa wiadomość',`<label class="lb">Do kogo (grupy lub pojedyncze osoby)</label>${dd('to',o,p0.to?['p:'+p0.to]:[],{multi:1,ph:'Wybierz odbiorców…'})}
    <div class="mt-2"><span class="lb">Wyślij kopię do:</span>${ck('cc_dir',false,'Dyrekcji')}${ck('cc_home',false,'Wychowawcy')}</div>
-   <label class="lb mt-3">Temat</label><input type="text" id="sub" value="${esc(p0.subject||'')}"><label class="lb mt-3">Treść</label><textarea id="body" rows="9">${esc(p0.body||'')}</textarea><button class="btn mt-3" onclick="sendMsg()">Wyślij wiadomość</button>`,'','edit');
+   <label class="lb mt-3">Temat</label><input type="text" id="sub" value="${esc(p0.subject||'')}"><label class="lb mt-3">Treść</label>${tbar('body')}<textarea id="body" rows="9">${esc(p0.body||'')}</textarea><button class="btn mt-3" onclick="sendMsg()">Wyślij wiadomość</button>`,'','edit');
 }
 const reply=async id=>{const {data:m}=await sb.from('messages').select('*').eq('id',id).single();if(!m)return warn('Nie można otworzyć wiadomości');
   pre={to:m.sender_id,subject:'Re: '+m.subject.replace(/^Re: /,''),body:'\n\n\n--- '+nm(m.sender_id)+', '+fd(m.created_at)+' ---\n'+m.body};mtab='new';rr()};
@@ -401,7 +414,7 @@ async function openMsg(id,silent){
   let rec='';if(m.sender_id===me.id){const {data}=await sb.from('message_recipients').select('recipient_id,read_at').eq('message_id',id);rec=`<div class="mt-2"><div class="text-sm mu mb-1">Odbiorcy i godzina odczytu:</div>`+tbl(['Odbiorca','Przeczytano'],(data||[]).slice().sort((a,b)=>ln(a.recipient_id).localeCompare(ln(b.recipient_id),'pl')).map(r=>`<tr><td>${esc(nm(r.recipient_id))}</td><td>${r.read_at?ic('check','text-green-600')+' '+fd(r.read_at):'<span class="mu">nieprzeczytano</span>'}</td></tr>`))+'</div>'}
   const d=m.recalled_at?new Date(m.recalled_at):null;detail=id;rid++;
   $('#main').innerHTML=pn(esc(m.subject),`<p class="text-sm mu">Od: ${esc(nm(m.sender_id))} · ${fd(m.created_at)}</p>${rec}
-   ${d?`<p class="mt-3 italic mu">Ta wiadomość została usunięta przez nadawcę ${d.toLocaleDateString('pl-PL')} o ${d.toLocaleTimeString('pl-PL',{hour:'2-digit',minute:'2-digit'})}.</p>`:`<p class="mt-3 whitespace-pre-wrap" style="max-width:70ch">${esc(m.body)}</p>`}
+   ${d?`<p class="mt-3 italic mu">Ta wiadomość została usunięta przez nadawcę ${d.toLocaleDateString('pl-PL')} o ${d.toLocaleTimeString('pl-PL',{hour:'2-digit',minute:'2-digit'})}.</p>`:`<div class="mt-3" style="max-width:70ch">${fmt(m.body)}</div>`}
    <div class="flex gap-2 mt-4">${!d&&m.sender_id!==me.id?`<button class="btn" onclick="reply('${m.id}')">Odpowiedz</button>`:''}${m.sender_id!==me.id?`<button class="gh red" onclick="delOne('${id}')">${ic('trash')} Usuń</button>`:''}${!d&&m.sender_id===me.id&&staff()?`<button class="gh red" onclick="recall('${id}')">Wycofaj wiadomość</button>`:''}</div>`,`<button class="gh sm" onclick="detail=null;render()">${ic('back')} Wróć</button>`);
   calcDots().then(nav);
 }
@@ -410,11 +423,11 @@ const recall=async id=>await ask('Wycofać wiadomość u wszystkich odbiorców? 
 // Ogłoszenia
 V.ann=async()=>{
   const {data,error}=await sb.from('announcements').select('*').order('created_at',{ascending:false});if(error)throw error;
-  const form=staff()?(annNew?pn('Nowe ogłoszenie',`<label class="lb">Tytuł</label><input type="text" id="at"><label class="lb mt-3">Treść</label><textarea id="ab" rows="4"></textarea>
+  const form=staff()?(annNew?pn('Nowe ogłoszenie',`<label class="lb">Tytuł</label><input type="text" id="at"><label class="lb mt-3">Treść</label>${tbar('ab')}<textarea id="ab" rows="4"></textarea>
    <label class="lb mt-3">Dla kogo</label><div>${[['parent','Rodzice'],['student','Uczniowie'],['teacher','Nauczyciele']].map(([r,l])=>ck('ar_'+r,r!=='teacher',l)).join('')}</div>
    <label class="lb mt-2">Klasy (puste = cała szkoła)</label>${dd('ac',C.map(c=>[c.id,'Klasa '+c.name]),[],{multi:1,ph:'Cała szkoła'})}
    <div class="flex gap-2 mt-3"><button class="btn" onclick="postAnn()">Opublikuj</button><button class="gh" onclick="annNew=false;rr()">Anuluj</button></div>`,'','ann'):`<div class="mb-4"><button class="btn" onclick="annNew=true;rr()">${ic('plus')} Nowe ogłoszenie</button></div>`):'';
-  return form+(data.map(a=>pn(esc(a.title),`<p class="text-xs mu">${esc(nm(a.author_id))} · ${fd(a.created_at)} · ${a.class_ids?.length?a.class_ids.map(cn).join(', '):'cała szkoła'}</p><p class="whitespace-pre-wrap mt-2" style="max-width:75ch">${esc(a.body)}</p>`,a.author_id===me.id||dir()?`<button class="gh sm red" onclick="delAnn('${a.id}')">${ic('trash')} Usuń</button>`:'')).join('')||pn('Ogłoszenia','<p class="em">Brak ogłoszeń.</p>'));
+  return form+(data.map(a=>pn(esc(a.title),`<p class="text-xs mu">${esc(nm(a.author_id))} · ${fd(a.created_at)} · ${a.class_ids?.length?a.class_ids.map(cn).join(', '):'cała szkoła'}</p><div class="mt-2" style="max-width:75ch">${fmt(a.body)}</div>`,a.author_id===me.id||dir()?`<button class="gh sm red" onclick="delAnn('${a.id}')">${ic('trash')} Usuń</button>`:'')).join('')||pn('Ogłoszenia','<p class="em">Brak ogłoszeń.</p>'));
 };
 const postAnn=()=>{const roles=['parent','student','teacher'].filter(r=>FV['ar_'+r]);if(!v('at').trim()||!roles.length)return warn('Podaj tytuł i wybierz odbiorców.');
   act(sb.from('announcements').insert({school_id:me.school_id,author_id:me.id,title:v('at').trim(),body:v('ab'),roles,class_ids:FV.ac}),()=>{annNew=false;rr()},'Ogłoszenie opublikowane')};
@@ -454,15 +467,33 @@ const atFor=id=>{curT=id;curD=isoL(new Date());atManual=true;go('at')};
 const gPick=n=>{FV.gnum=n;$$('.gp').forEach((b,i)=>b.classList.toggle('sel',i+1===n))};
 
 // Uwagi i pochwały
+let ntC='',ntM='list';
+const noteTag=n=>n.kind==='praise'?'<span class="tag g">'+ic('thumb')+' Pochwała</span>':'<span class="tag r">'+ic('warn')+' Uwaga</span>';
 V.nt=async()=>{
-  const q=sb.from('notes').select('*').order('created_at',{ascending:false}).limit(150);if(!staff())q.eq('student_id',sid);
-  const {data,error}=await q;if(error)throw error;
-  FV.ns='';const nco=(dir()?C:C.filter(c=>c.homeroom_teacher_id===me.id||T.some(t=>t.teacher_id===me.id&&t.class_id===c.id))).map(c=>[c.id,'Klasa '+c.name]);
-  const form=staff()?pn('Dodaj uwagę lub pochwałę',`<label class="lb">1. Klasa</label><div style="max-width:300px">${dd('nc',nco,'',{ph:'Wybierz klasę…',on:x=>{$('#nsw').innerHTML=dd('ns',classStudents(x).map((p,i)=>[p.id,(i+1)+'. '+ln(p.id)]),'',{ph:'Wybierz ucznia…'})}})}</div><label class="lb mt-3">2. Uczeń (lista numerowana)</label><div id="nsw" style="max-width:300px"><span class="mu text-sm">Najpierw wybierz klasę.</span></div><label class="lb mt-3">3. Rodzaj wpisu</label>${seg('nk',[['remark','Uwaga'],['praise','Pochwała']],'',()=>{})}<label class="lb mt-3">4. Treść</label><textarea id="nb" rows="3"></textarea><button class="btn mt-3" onclick="addNote()">Dodaj wpis</button>`,'','nt'):'';
-  const rows=data.filter(n=>ntF==='all'||n.kind===ntF);
-  return form+pn('Wpisy',`<div class="mb-3">${seg('nf',[['all','Wszystkie'],['remark','Uwagi'],['praise','Pochwały']],ntF,k=>{ntF=k;rr()})}</div>`+(rows.length?tbl(['Data','Uczeń','Rodzaj','Treść','Autor',''],rows.map(n=>`<tr><td style="white-space:nowrap">${fd(n.created_at)}</td><td>${esc(nm(n.student_id))}</td><td>${n.kind==='praise'?'<span class="tag g">'+ic('thumb')+' Pochwała</span>':'<span class="tag r">'+ic('warn')+' Uwaga</span>'}</td><td>${esc(n.body)}</td><td>${esc(nm(n.author_id))}</td><td>${staff()&&(dir()||n.author_id===me.id)?`<button class="gh sm red" onclick="delNote('${n.id}')">${ic('trash')}</button>`:''}</td></tr>`)):'<p class="em">Brak wpisów.</p>'));
-};
-const addNote=()=>{if(!FV.nc)return warn('Wybierz klasę.');if(!FV.ns)return warn('Wybierz ucznia.');if(!FV.nk)return warn('Wybierz: uwaga czy pochwała.');if(!v('nb').trim())return warn('Wpisz treść.');act(sb.from('notes').insert({student_id:FV.ns,kind:FV.nk,body:v('nb').trim(),author_id:me.id}),rr,'Dodano wpis')};
+  if(!staff()){
+    if(!sid)return pn('Uwagi i pochwały','<p class="em">Do konta nie przypisano ucznia.</p>');
+    const {data,error}=await sb.from('notes').select('*').eq('student_id',sid).order('created_at',{ascending:false});if(error)throw error;
+    const rows=data.filter(n=>ntF==='all'||n.kind===ntF);
+    return pn('Uwagi i pochwały',`<div class="mb-3">${seg('nf',[['all','Wszystkie'],['remark','Uwagi'],['praise','Pochwały']],ntF,k=>{ntF=k;rr()})}</div>`+(rows.length?tbl(['Data','Rodzaj','Treść','Autor'],rows.map(n=>`<tr><td style="white-space:nowrap">${fd(n.created_at)}</td><td>${noteTag(n)}</td><td>${esc(n.body)}</td><td>${esc(nm(n.author_id))}</td></tr>`)):'<p class="em">Brak wpisów.</p>'),'','nt')}
+  const cs=dir()?C:C.filter(c=>c.homeroom_teacher_id===me.id||T.some(t=>t.teacher_id===me.id&&t.class_id===c.id));
+  if(!cs.length)return pn('Uwagi i pochwały','<p class="em">Nie masz przypisanych klas.</p>');
+  if(!ntC||!cs.some(c=>c.id===ntC))return pn('Wybierz klasę',`<div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">${cs.map(c=>`<button class="tile" onclick="ntC='${c.id}';ntM='list';rr()"><b>Klasa ${esc(c.name)}</b><span>${classStudents(c.id).length} uczniów</span></button>`).join('')}</div>`,'','nt');
+  const c=C.find(x=>x.id===ntC),sts=classStudents(ntC),ids=sts.map(p=>p.id);
+  const {data,error}=ids.length?await sb.from('notes').select('*').in('student_id',ids).order('created_at',{ascending:false}):{data:[]};if(error)throw error;
+  const head=`<div class="flex flex-wrap items-center gap-3 mb-3 np"><button class="gh" onclick="ntC='';rr()">${ic('back')} Klasy</button><b>Klasa ${esc(c.name)}</b>${seg('ntm',[['list','Uczniowie i wpisy'],['bulk','Dodaj seryjnie']],ntM,k=>{ntM=k;rr()})}</div>`;
+  if(!sts.length)return pn('Uwagi i pochwały',head+'<p class="em">W tej klasie nie ma uczniów.</p>','','nt');
+  if(ntM==='bulk'){
+    const all=ck('nb_all',false,'Zaznacz wszystkich');DD.nb_all={on:x=>{ids.forEach(i=>FV['nb_'+i]=x);$$('.nbk .ck').forEach(b=>b.classList.toggle('on',x))}};
+    return pn('Dodaj seryjnie',head+`<label class="lb">1. Uczniowie</label><div class="mb-2">${all}</div><div class="nbk">${sts.map((p,i)=>ck('nb_'+p.id,false,(i+1)+'. '+esc(ln(p.id)))).join('')}</div>
+     <label class="lb mt-3">2. Rodzaj wpisu</label>${seg('nk',[['remark','Uwaga'],['praise','Pochwała']],'remark',()=>{})}<label class="lb mt-3">3. Treść</label><textarea id="nb" rows="3"></textarea><button class="btn mt-3" onclick="ntBulk()">Dodaj wpis zaznaczonym</button>`,'','nt')}
+  const blk=n=>`<div class="py-1 text-sm flex gap-2 items-start"><span>${n.kind==='praise'?ic('thumb','text-green-600'):ic('warn','text-red-600')}</span><span class="flex-1">${esc(n.body)} <span class="mu text-xs">· ${esc(nm(n.author_id))}, ${fd(n.created_at)}</span></span>${dir()||n.author_id===me.id?`<button class="gh sm red" title="Usuń" onclick="delNote('${n.id}')">${ic('trash')}</button>`:''}</div>`;
+  return pn('Klasa '+esc(c.name),head+tbl(['Nr','Uczeń','Wpisy',''],sts.map((p,i)=>{const a=data.filter(n=>n.student_id===p.id),r=a.filter(x=>x.kind==='remark').length;
+    return `<tr><td class="mu">${i+1}</td><td style="white-space:nowrap"><b>${esc(ln(p.id))}</b><div class="text-xs mu">uwagi: ${r} · pochwały: ${a.length-r}</div></td><td>${a.map(blk).join('')||'<span class="mu text-sm">Brak wpisów</span>'}</td><td><button class="btn sm" title="Dodaj wpis" onclick="ntAdd('${p.id}')">${ic('plus')}</button></td></tr>`})),'','nt')};
+function ntAdd(id){modal(`<div class="box"><h3 class="mh">Nowy wpis - ${esc(nm(id))}</h3><label class="lb">Rodzaj</label>${seg('nk',[['remark','Uwaga'],['praise','Pochwała']],'remark',()=>{})}<label class="lb mt-3">Treść</label><textarea id="nb" rows="4"></textarea><div class="flex gap-2 justify-end mt-4"><button class="gh" onclick="closeModal()">Anuluj</button><button class="btn" onclick="ntSave('${id}')">Dodaj</button></div></div>`)}
+const ntSave=id=>{if(!v('nb').trim())return warn('Wpisz treść.');act(sb.from('notes').insert({student_id:id,kind:FV.nk,body:v('nb').trim(),author_id:me.id}),()=>{closeModal();rr()},'Dodano wpis')};
+async function ntBulk(){const ids=classStudents(ntC).map(p=>p.id).filter(i=>FV['nb_'+i]);if(!ids.length)return warn('Zaznacz uczniów.');if(!v('nb').trim())return warn('Wpisz treść.');
+  const body=v('nb').trim(),kind=FV.nk;if(!await ask(`Dodać ${kind==='praise'?'pochwałę':'uwagę'} dla ${ids.length} uczniów?`,'Dodaj'))return;
+  act(sb.from('notes').insert(ids.map(i=>({student_id:i,kind,body,author_id:me.id}))),()=>{ntM='list';rr()},'Dodano wpisów: '+ids.length)}
 const delNote=async id=>await ask('Usunąć wpis?','Usuń')&&act(sb.from('notes').delete().eq('id',id),rr,'Usunięto');
 
 // Frekwencja
@@ -592,7 +623,7 @@ function stuDet(id){const {g,n,a}=CLD,by={};g.filter(x=>x.student_id===id).forEa
 V.pl=async()=>{
   const pup=me.role==='student'||me.role==='parent';let cid,mineT=false,ptid=null;
   if(pup)cid=ST[sid]?.class_id;else{if(!plSel)plSel=T.some(t=>t.teacher_id===me.id)?'my':(C[0]?.id||'');ptid=plSel==='my'?me.id:plSel.startsWith('t:')?plSel.slice(2):null;mineT=!!ptid;cid=mineT?null:plSel}
-  const sel=staff()?`<div class="pn pb np" style="max-width:420px"><label class="lb">Plan</label>${dd('pls',[['my','Mój plan (moje lekcje)'],...C.map(c=>[c.id,'Klasa '+c.name]),...(dir()?Object.values(P).filter(p=>['teacher','director'].includes(p.role)&&p.id!==me.id).sort((a,b)=>ln(a.id).localeCompare(ln(b.id),'pl')).map(p=>['t:'+p.id,'Nauczyciel: '+ln(p.id)]):[])],plSel,{on:x=>{plSel=x;rr()}})}</div>`:'';
+  const sel=staff()?`<div class="pn pb np" style="max-width:420px"><label class="lb">Plan</label>${dd('pls',[['my','Mój plan (moje lekcje)'],...C.map(c=>[c.id,'Klasa '+c.name]),...(staff()?Object.values(P).filter(p=>['teacher','director'].includes(p.role)&&p.id!==me.id).sort((a,b)=>ln(a.id).localeCompare(ln(b.id),'pl')).map(p=>['t:'+p.id,'Nauczyciel: '+ln(p.id)]):[])],plSel,{on:x=>{plSel=x;rr()}})}</div>`:'';
   if(!cid&&!mineT)return sel+pn('Plan zajęć','<p class="em">Brak przypisanej klasy.</p>');
   const q=sb.from('timetable').select('*');const {data,error}=await(mineT?q.in('teaching_id',T.filter(t=>t.teacher_id===ptid).map(t=>t.id)):q.eq('class_id',cid));if(error)throw error;
   const ids=T.filter(t=>t.teacher_id===ptid).map(t=>t.id),es=entries(data,wk,mineT?(r=>ids.includes(r.teaching_id)||r.sub===ptid):(r=>r.class_id===cid));
