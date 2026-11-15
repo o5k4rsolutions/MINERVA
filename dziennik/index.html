@@ -638,7 +638,7 @@ V.ad=async()=>{
   const back=`<button class="gh sm" onclick="adTab=null;rr()">${ic('back')} Administracja</button>`;
   if(!adTab){const n=(k)=>Object.values(P).filter(p=>p.role===k).length;
     const tl2=(k,i,t,d)=>`<button class="tile" onclick="adTab='${k}';rr()">${ic(i)}<b>${t}</b><span>${d}</span></button>`;
-    return `<p class="mu mb-4">Wybierz, czym chcesz zarządzać.</p><div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">${tl2('ppl','user','Osoby i konta',`${n('teacher')+n('director')} pracowników · ${n('student')} uczniów · ${n('parent')} rodziców`)}${tl2('cls','cl','Klasy i wychowawcy',`${C.length} klas`)}${tl2('sub','book','Przedmioty',`${SUB.length} przedmiotów`)}${tl2('plan','pl','Plan lekcji','Ustaw lekcje klasy dzień po dniu')}${tl2('chg','pl','Zmiany w planie','Zastępstwa, odwołania i przeniesienia lekcji')}${tl2('off','cal','Dni wolne i święta','Dodatkowe dni wolne od szkoły')}${tl2('bells','at','Godziny lekcji','Lekcja 0, dodatkowe lekcje i ich godziny')}${tl2('logins','key','Logowania','Kto i kiedy się logował')}${tl2('new','plus','Nowe konto','Uczeń z rodzicami, nauczyciel, dyrektor')}${tl2('imp','up','Import uczniów','Masowe wgrywanie uczniów do klas (lista lub plik CSV)')}</div>`}
+    return `<p class="mu mb-4">Wybierz, czym chcesz zarządzać.</p><div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">${tl2('ppl','user','Osoby i konta',`${n('teacher')+n('director')} pracowników · ${n('student')} uczniów · ${n('parent')} rodziców`)}${tl2('cls','cl','Klasy i wychowawcy',`${C.length} klas`)}${tl2('sub','book','Przedmioty',`${SUB.length} przedmiotów`)}${tl2('plan','pl','Plan lekcji','Ustaw lekcje klasy dzień po dniu')}${tl2('prn','print','Drukowanie planu lekcji','Standardowy plan klas lub nauczycieli w PDF (A4), kolor lub czarno-biały')}${tl2('chg','pl','Zmiany w planie','Zastępstwa, odwołania i przeniesienia lekcji')}${tl2('off','cal','Dni wolne i święta','Dodatkowe dni wolne od szkoły')}${tl2('bells','at','Godziny lekcji','Lekcja 0, dodatkowe lekcje i ich godziny')}${tl2('logins','key','Logowania','Kto i kiedy się logował')}${tl2('new','plus','Nowe konto','Uczeń z rodzicami, nauczyciel, dyrektor')}${tl2('imp','up','Import uczniów','Masowe wgrywanie uczniów do klas (lista lub plik CSV)')}</div>`}
   return AD[adTab](back);
 };
 const AD={};
@@ -744,6 +744,83 @@ function addOff(){const a=FV.od,b=FV.od2||a,nmv=v('odn').trim();if(!a||!nmv)retu
   const rows=[];for(let d=new Date(a+'T12:00');isoL(d)<=b&&rows.length<200;d=addD(d,1))if(d.getDay()%6)rows.push({school_id:me.school_id,date:isoL(d),name:nmv});
   if(!rows.length)return warn('W tym zakresie nie ma dni roboczych.');act(sb.from('days_off').upsert(rows,{onConflict:'school_id,date'}),reload,'Dodano dni wolne: '+rows.length)}
 const delOff=async id=>await ask('Usunąć ten dzień wolny?','Usuń')&&act(sb.from('days_off').delete().eq('id',id),reload,'Usunięto');
+/* ---------- Drukowanie planu lekcji (plan standardowy, PDF A4) ---------- */
+let prnT='c',prnCol='c',PRN_C=null;
+const PRN_B='https://dziennik-minerva.pages.dev/dziennik/',PRN_F={Hr:'Helvetica.ttf',Hb:'Helvetica-Bold.ttf',Hl:'helvetica-light-587ebe5a59211.ttf',Pr:'Poppins-Regular.ttf',Pb:'Poppins-Bold.ttf'};
+const PRN_PAL=['#DCE4FF','#FFE9C7','#D6F2E3','#FAD9E4','#E3DAFB','#D3EEF7','#FBF0C2','#E6EDD0','#F7DCCB','#DADFE8'];
+const ldScript=src=>new Promise((ok,no)=>{const e=document.createElement('script');e.src=src;e.onload=ok;e.onerror=()=>no(new Error('Nie udało się wczytać biblioteki PDF.'));document.head.appendChild(e)});
+const buf64=b=>{const a=new Uint8Array(b);let t='';for(let i=0;i<a.length;i+=0x8000)t+=String.fromCharCode.apply(null,a.subarray(i,i+0x8000));return btoa(t)};
+async function prnFonts(){
+  if(PRN_C)return PRN_C;
+  if(!window.jspdf)await ldScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js');
+  const o={};
+  await Promise.all(Object.entries(PRN_F).map(async([k,f])=>{try{const r=await fetch(PRN_B+f);if(!r.ok)throw 0;o[k]=buf64(await r.arrayBuffer())}catch(e){}}));
+  const fb={Hr:'Pr',Hb:'Pb',Hl:'Pr',Pr:'Hr',Pb:'Hb'},any=Object.values(o)[0];
+  if(!any)throw new Error('Nie udało się pobrać czcionek do PDF.');
+  Object.keys(PRN_F).forEach(k=>{if(!o[k])o[k]=o[fb[k]]||any});
+  return PRN_C=o}
+async function prnLoad(){let all=[],from=0;for(;;){const r=await sb.from('timetable').select('*').order('id').range(from,from+999);if(r.error)throw r.error;all=all.concat(r.data);if(r.data.length<1000)break;from+=1000}return all}
+function prnPage(doc,o){
+  const W=297,H=210,mg=10,col=o.color,navy=[30,42,120],amber=[245,165,36],ink=col?[27,34,56]:[0,0,0],soft=col?[100,112,138]:[80,80,80],line=col?[200,208,224]:[0,0,0];
+  const hx=h=>[1,3,5].map(i=>parseInt(h.slice(i,i+2),16));
+  // nagłówek
+  if(col){doc.setFillColor(...navy);doc.rect(0,0,W,26,'F');doc.setFillColor(...amber);doc.rect(0,26,W,1.6,'F')}
+  else{doc.setDrawColor(0,0,0);doc.setLineWidth(.6);doc.line(mg,25,W-mg,25)}
+  doc.setTextColor(...(col?[255,255,255]:[0,0,0]));
+  doc.setFont('Pb','normal');doc.setFontSize(22);doc.text(o.title,mg,14.5);
+  doc.setFont('Hl','normal');doc.setFontSize(10);doc.text(o.sub+(school?' · '+school:''),mg,21);
+  doc.setFont('Pb','normal');doc.setFontSize(12);doc.text('Minerva',W-mg,14.5,{align:'right'});
+  doc.setFont('Hl','normal');doc.setFontSize(8.5);doc.text('dziennik elektroniczny',W-mg,19.5,{align:'right'});
+  // tabela
+  const top=33,bot=H-12,hh=9,lw=32,cw=(W-2*mg-lw)/5,rh=Math.min(24,(bot-top-hh)/o.rows.length);
+  doc.setLineWidth(.25);
+  doc.setFillColor(...(col?navy:[255,255,255]));doc.setDrawColor(...(col?navy:[0,0,0]));doc.rect(mg,top,lw,hh,'FD');
+  DAYS.slice(1).forEach((d,i)=>{const x=mg+lw+i*cw;doc.setFillColor(...(col?navy:[255,255,255]));doc.setDrawColor(...(col?navy:[0,0,0]));doc.rect(x,top,cw,hh,'FD')
+    doc.setTextColor(...(col?[255,255,255]:[0,0,0]));doc.setFont('Pb','normal');doc.setFontSize(10);doc.text(d,x+cw/2,top+hh/2+1.3,{align:'center'})});
+  doc.setTextColor(...(col?[255,255,255]:[0,0,0]));doc.setFont('Pb','normal');doc.setFontSize(8.5);doc.text('Lekcja',mg+lw/2,top+hh/2+1.2,{align:'center'});
+  o.rows.forEach((n,r)=>{const y=top+hh+r*rh;
+    doc.setFillColor(...(col?[238,241,246]:[255,255,255]));doc.setDrawColor(...line);doc.rect(mg,y,lw,rh,'FD');
+    doc.setTextColor(...ink);doc.setFont('Pb','normal');doc.setFontSize(Math.min(14,rh*.9));doc.text(String(n),mg+5,y+rh/2+1.6,{align:'center'});
+    const hrs=BELLS[n-1];if(hrs){doc.setFont('Hr','normal');doc.setFontSize(7.5);doc.setTextColor(...soft);doc.text(hrs[0],mg+lw-3,y+rh/2-.8,{align:'right'});doc.text(hrs[1],mg+lw-3,y+rh/2+3,{align:'right'})}
+    for(let d=1;d<=5;d++){const x=mg+lw+(d-1)*cw,it=o.cell(d,n);
+      doc.setFillColor(...(col&&it?hx(it.fill):[255,255,255]));doc.setDrawColor(...line);doc.rect(x,y,cw,rh,'FD');
+      if(!it)continue;
+      doc.setTextColor(...ink);doc.setFont('Hb','normal');let fs=11,ls;
+      for(;fs>=6;fs-=.5){doc.setFontSize(fs);ls=doc.splitTextToSize(it.a,cw-4);if(ls.length<=(it.b?2:3))break}
+      const bs=Math.min(8.5,fs-1.5),lh=fs*.36,bl=it.b?doc.setFont('Hl','normal')&&doc.setFontSize(bs)&&doc.splitTextToSize(it.b,cw-4).slice(0,2):[];
+      const hA=ls.length*lh,hB=bl.length*bs*.36+(bl.length?1:0),y0=y+(rh-hA-hB)/2+lh*.8;
+      doc.setFont('Hb','normal');doc.setFontSize(fs);doc.setTextColor(...ink);doc.text(ls,x+cw/2,y0,{align:'center',lineHeightFactor:1.05});
+      if(bl.length){doc.setFont('Hl','normal');doc.setFontSize(bs);doc.setTextColor(...soft);doc.text(bl,x+cw/2,y0+(ls.length-1)*lh+bs*.36+1.6,{align:'center',lineHeightFactor:1.05})}}});
+  // stopka
+  doc.setFont('Hl','normal');doc.setFontSize(7.5);doc.setTextColor(...soft);
+  doc.text('Plan standardowy - bez zastępstw i zmian w poszczególnych tygodniach',mg,H-6);
+  doc.text('Wygenerowano: '+new Date().toLocaleDateString('pl-PL'),W-mg,H-6,{align:'right'})}
+AD.prn=back=>{const isC=prnT==='c',opts=isC?C.map(c=>[c.id,'Klasa '+c.name]):Object.values(P).filter(p=>['teacher','director'].includes(p.role)).sort((a,b)=>ln(a.id).localeCompare(ln(b.id),'pl')).map(p=>[p.id,ln(p.id)]);
+  return pn('Drukowanie planu lekcji',`<p class="mu mb-4">Drukowany jest standardowy plan lekcji (bez zastępstw i zmian z konkretnego tygodnia). Każda klasa lub nauczyciel dostaje osobną stronę A4 w poziomie.</p>
+   <div class="grid md:grid-cols-3 gap-3 mb-4"><div><label class="lb">Plan dla</label>${dd('prnt',[['c','Klas'],['t','Nauczycieli']],prnT,{on:x=>{prnT=x;rr()}})}</div><div><label class="lb">${isC?'Klasy':'Nauczyciele'}</label>${dd('prni',opts,[],{multi:1,ph:isC?'Wybierz klasy…':'Wybierz nauczycieli…'})}</div><div><label class="lb">Wygląd</label>${dd('prnc',[['c','Kolorowy'],['b','Czarno-biały']],prnCol,{on:x=>{prnCol=x}})}</div></div>
+   <div class="flex flex-wrap gap-2"><button class="gh" onclick="prnAll()">Zaznacz wszystkie</button><button class="btn" id="prnb" onclick="prnGo()">${ic('print')} Generuj PDF (A4)</button></div>`,back,'pl')};
+const prnAll=()=>{FV.prni=DD.prni.o.map(e=>e[0]);$('#dd_prni').innerHTML=ddb('prni')};
+async function prnGo(){
+  const ids=FV.prni||[];if(!ids.length)return warn('Wybierz co najmniej jedną pozycję.');
+  const isC=prnT==='c',color=prnCol==='c',b=$('#prnb'),lab=b.innerHTML;b.disabled=true;b.textContent='Generuję PDF…';
+  try{
+    const [F,tt]=await Promise.all([prnFonts(),prnLoad()]),{jsPDF}=window.jspdf;
+    const doc=new jsPDF({orientation:'landscape',unit:'mm',format:'a4',compress:true});
+    Object.keys(F).forEach(k=>{doc.addFileToVFS(k+'.ttf',F[k]);doc.addFont(k+'.ttf',k,'normal')});
+    const sorted=[...SUB].sort((a,b)=>a.name.localeCompare(b.name,'pl')),fillOf=sid=>PRN_PAL[Math.max(0,sorted.findIndex(x=>x.id===sid))%PRN_PAL.length];
+    ids.forEach((id,i)=>{
+      const tids=isC?null:T.filter(t=>t.teacher_id===id).map(t=>t.id),es=tt.filter(r=>isC?r.class_id===id:tids.includes(r.teaching_id));
+      const mx=es.reduce((m,r)=>Math.max(m,r.lesson_no),0),rows=LNS().filter(n=>n===0?es.some(r=>r.lesson_no===0):n<=Math.max(mx,6));
+      const cell=(d,n)=>{const c=es.filter(r=>r.weekday===d&&r.lesson_no===n);if(!c.length)return null;
+        const ts=c.map(r=>T.find(x=>x.id===r.teaching_id)).filter(Boolean);if(!ts.length)return null;
+        const a=[...new Set(ts.map(t=>sn(t.subject_id)))].join(' / '),bb=isC?[...new Set(ts.map(t=>nm(t.teacher_id)))].join(', '):[...new Set(c.map(r=>'kl. '+cn(r.class_id)))].join(', ');
+        return {a,b:bb,fill:fillOf(ts[0].subject_id)}};
+      if(i)doc.addPage();
+      prnPage(doc,{title:isC?'Klasa '+cn(id):nm(id),sub:isC?'Plan lekcji klasy':'Plan lekcji nauczyciela',rows,cell,color})});
+    const fn=(ids.length===1?(isC?'klasa-'+cn(ids[0]):ln(ids[0])):(isC?'klasy':'nauczyciele')).normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/ł/g,'l').replace(/Ł/g,'L').replace(/[^\w-]+/g,'-');
+    doc.save('plan-lekcji-'+fn+'-'+(color?'kolor':'cz-b')+'.pdf');toast('Wygenerowano PDF')
+  }catch(e){warn(e.message||String(e))}finally{b.disabled=false;b.innerHTML=lab}}
+
 AD.bells=back=>{const ns=LNS(),mx=ns[ns.length-1];
   return pn('Godziny lekcji',`<p class="text-sm mu mb-3">Początek i koniec każdej lekcji (format GG:MM). Zmiana obowiązuje wszystkich. Możesz dodać lekcję 0 oraz kolejne lekcje po dziesiątej (do ${MAXL}).</p>`
    +tbl(['Lekcja','Od','Do',''],ns.map(i=>{const b=BELLS[i-1]||['',''];return `<tr><td><span class="av">${i}</span></td><td><input type="text" id="bs${i}" class="inp" value="${b[0]}" maxlength="5" style="max-width:110px"></td><td><input type="text" id="be${i}" class="inp" value="${b[1]}" maxlength="5" style="max-width:110px"></td><td>${i===0||(i>10&&i===mx)?`<button class="gh sm red" title="Usuń lekcję" onclick="rmLesson(${i})">${ic('trash')}</button>`:''}</td></tr>`}))
