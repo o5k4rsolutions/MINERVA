@@ -131,6 +131,27 @@ tbody tr:nth-child(even) td{background:#fafbfd}tbody tr:hover td{background:#fff
 }
 @media all and (display-mode:standalone){html,body{-webkit-user-select:none;user-select:none}input,textarea,.sel{-webkit-user-select:text;user-select:text}}
 </style>
+<style>
+/* ===== jasny motyw aplikacji ===== */
+.mgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:.6rem}.mtl{position:relative;display:flex;flex-direction:column;align-items:center;gap:.35rem;padding:.9rem .4rem;border-radius:16px;background:#F2F4F9;border:0;color:var(--in);font-weight:700;font-size:.74rem;text-align:center}.mtl .ic{width:1.6em;height:1.6em}.mtl em{position:absolute;top:6px;right:8px;font-style:normal;background:#ef4444;color:#fff;border-radius:999px;font-size:.65rem;min-width:18px;height:18px;line-height:18px}
+.hm-head{display:flex;align-items:center;justify-content:space-between;padding:calc(env(safe-area-inset-top) + .6rem) 0 .9rem}.hm-head h2{font-size:1.7rem;font-weight:800;color:var(--tx);letter-spacing:-.02em;margin:0}
+.hm-av{width:48px;height:48px;border-radius:50%;background:#E4E9FB;color:var(--in);font-weight:800;font-size:1.1rem;border:0;display:flex;align-items:center;justify-content:center;position:relative}.hm-av em{position:absolute;top:-2px;right:-2px;font-style:normal;background:#ef4444;color:#fff;border-radius:999px;font-size:.62rem;min-width:18px;height:18px;line-height:18px}
+.hm-c{background:#fff;border-radius:22px;padding:1rem 1.1rem;margin-bottom:.9rem;box-shadow:0 2px 14px #1e2a7812}
+.hm-date{display:flex;align-items:center;gap:.8rem}.hm-date img{width:46px;height:46px;border-radius:12px}.hm-date div{flex:1}.hm-date small{display:block;color:var(--mu);text-transform:capitalize;font-size:.8rem}.hm-date b{font-size:1.05rem}.hm-date button{width:42px;height:42px;border-radius:50%;background:#F2F4F9;border:0;color:var(--in);display:flex;align-items:center;justify-content:center}
+.hm-h{font-size:1.15rem;font-weight:800;color:var(--tx);margin-bottom:.4rem}.hm-sub{color:var(--mu);font-size:.85rem;margin:.2rem 0 .3rem}
+.hm-ls{display:grid;grid-template-columns:92px 1fr auto;gap:.6rem;align-items:center;padding:.65rem 0;border-top:1px solid #eef1f6;font-size:.85rem}.hm-ls:first-of-type{border-top:0}.hm-t{color:var(--mu);font-size:.78rem}.hm-r{color:var(--mu);font-size:.76rem;text-align:right;max-width:110px}
+.hm-ls.past{opacity:.45}.hm-ls.cur{background:#EEF2FF;margin:0 -.6rem;padding:.65rem .6rem;border-radius:12px}.hm-ls.dead b{text-decoration:line-through}
+.hm-sec{display:flex;align-items:baseline;justify-content:space-between;margin:1.2rem .2rem .5rem}.hm-sec b{font-size:1.2rem;font-weight:800;color:var(--tx)}.hm-sec a{color:var(--in);font-weight:700;font-size:.85rem}
+.hm-row{display:flex;gap:.7rem;overflow-x:auto;scroll-snap-type:x mandatory;margin:0 -.9rem;padding:0 .9rem .3rem;scrollbar-width:none}.hm-row::-webkit-scrollbar{display:none}
+.hm-gw{flex:0 0 150px;scroll-snap-align:start}.hm-g{width:100%;height:118px;border-radius:20px;background:#fff;box-shadow:0 2px 14px #1e2a7812;border:0;padding:.85rem;display:flex;flex-direction:column;justify-content:space-between;text-align:left;color:var(--tx)}.hm-g .v{font-weight:600;font-size:.95rem;line-height:1.35;overflow:hidden;max-height:3.9em}.hm-g .a{font-size:.8rem;color:var(--mu)}.hm-g .a b{color:var(--in);font-size:1.1rem}.hm-gl{font-weight:800;font-size:.9rem;margin:.45rem .2rem 0;color:var(--in);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hm-li{display:block;width:100%;text-align:left;background:none;border:0;padding:.7rem 0;border-top:1px solid #eef1f6}.hm-li:first-child{border-top:0}.hm-li b{display:block}.hm-li span{color:var(--mu);font-size:.78rem}
+@media(max-width:767px){
+ body{background:#F2F4F9!important}body.ish .top{display:none!important}
+ .top{background:#fff!important;box-shadow:0 1px 0 #e6eaf3!important}#ptitle{color:var(--in)!important}.top .mu,#rfi{color:var(--mu)!important}.qk{background:#fff!important;border:1px solid var(--ln)!important;color:var(--in)!important}
+ body.ish main{padding-top:0!important}
+ #mnav{justify-content:space-around;overflow:visible!important}#mnav .nv{flex:1;min-width:0!important}
+}
+</style>
 </head>
 <body>
 <div class="md:flex min-h-screen">
@@ -243,7 +264,7 @@ const chMsg=k=>'Zmiana w planie: '+fdl(k.date)+', lekcja '+k.lesson_no+' - '+({s
 const plCount=async()=>{const {data,error}=await sb.from('timetable_changes').select('*').gt('created_at',plSeen||sinceOf('pl'));return error?0:(data||[]).filter(relCh).length};
 /* ===== PWA: instalacja, powiadomienia push ===== */
 ICO.ps='<path d="M18 8a6 6 0 10-12 0c0 7-3 8-3 8h18s-3-1-3-8"/><path d="M13.7 20a2 2 0 01-3.4 0"/>';
-const VAPID_PUBLIC='WKLEJ_KLUCZ_PUBLICZNY_VAPID';
+const VAPID_PUBLIC='BFzB73CnY6gOL-w3OD6Zvl-GmLjzeWPTMUC_ArcFolIjOomzdAsLLClNUV-cXAchbdYq35tvt22sohUtd7eumt8';
 const IOS=/iphone|ipad|ipod/i.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1),ANDR=/android/i.test(navigator.userAgent);
 const STANDALONE=matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
 const MOBILE=IOS||ANDR||(matchMedia('(pointer:coarse)').matches&&innerWidth<=900);
@@ -328,7 +349,7 @@ async function calcDots(){
   const keep=k=>dots[k]===0?0:undefined;
   dots={msg:m.count,ann:keep('ann')??a.count,gr:staff()?0:keep('gr')??g.count,nt:staff()?0:keep('nt')??n.count,js:j,pl:tab==='pl'?0:pc};if(tab==='pl')plSeen=new Date().toISOString();
 }
-function nav(){
+function nav(){document.body.classList.toggle('ish',tab==='home');
   const tot=Object.values(dots).reduce((a,b)=>a+(b||0),0);document.title=(tot?`(${tot}) `:'')+'Dziennik - Minerva';
   const t=[['home','Start',''],['gr','Oceny','Dziennik'],['at','Frekwencja','Dziennik'],['pl','Plan lekcji','Dziennik'],['nt','Uwagi i pochwały','Dziennik']];
   if(me.role==='parent'||(staff()&&(dir()||isHome())))t.push(['js','Usprawiedliwienia','Dziennik']);
@@ -336,7 +357,7 @@ function nav(){
   t.push(['msg','Wiadomości','Komunikacja'],['ann','Ogłoszenia','Komunikacja']);if(dir())t.push(['ad','Administracja','Szkoła']);t.push(['ps','Powiadomienia','Konto']);
   const item=([k,l])=>`<button class="nv ${k===tab?'on':''}" onclick="go('${k}')">${ic(k)}<span>${l}</span>${dots[k]?`<em>${dots[k]>99?'99+':dots[k]}</em>`:''}</button>`;
   let pg='';const hd=t.map(x=>{const lb=x[2]!==pg&&x[2]?`<div class="ng">${x[2]}</div>`:'';pg=x[2];return lb+item(x)}).join('');
-  $('#nav').innerHTML=hd;$('#mnav').innerHTML=t.map(item).join('');
+  $('#nav').innerHTML=hd;$('#mnav').innerHTML=mnavApp(t,item);
   $('#quick').innerHTML=[['msg','Wiadomości'],['ann','Ogłoszenia']].map(([k,l])=>`<button class="qk" title="${l}" onclick="go('${k}')">${ic(k)}${dots[k]?`<em>${dots[k]>99?'99+':dots[k]}</em>`:''}</button>`).join('');
   $('#ptitle').textContent=(t.find(x=>x[0]===tab)||[])[1]||'';
 }
@@ -710,6 +731,55 @@ V.pl=async()=>{
   return sel+pn(mineT?(ptid===me.id?'Mój plan zajęć':'Plan nauczyciela - '+esc(nm(ptid))):'Plan zajęć - klasa '+esc(cn(cid)),weekGrid(es,(e,t)=>`<div class="lsn${e.st==='cancel'||e.st==='moved'?' x':''}"><div class="lt">${(BELLS[e.n-1]||[]).join(' - ')}</div><b>${esc(sn(e.subj||t?.subject_id))}</b><div class="text-xs">${mineT?(e.st==='sub'?esc(nm(e.sub))+' · ':'')+'klasa '+esc(cn(e.class_id)):esc(nm(e.sub||t?.teacher_id))}</div>${chTag(e)}</div>`),wkNav()+`<button class="btn sm np" onclick="window.print()">${ic('print')} Drukuj</button>`,'pl');
 };
 
+/* ===== ekran Start jak w aplikacji mobilnej ===== */
+ICO.more='<circle cx="5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="19" cy="12" r="1.7"/>';
+let NAVT=[];
+const isM=()=>matchMedia('(max-width:767px)').matches;
+const fmtAvg=a=>a==null?'-':a.toFixed(2).replace('.',',');
+const tmin2=q=>{const a=String(q).split(':');return +a[0]*60+ +a[1]};
+const mainKeys=()=>staff()?['home','at','pl','msg']:['home','gr','pl','msg'];
+function mnavApp(t,item){
+  NAVT=t;if(!isM())return t.map(item).join('');
+  const sh={pl:'Plan',gr:'Oceny',at:'Frekwencja',msg:'Wiadomości',home:'Start'},mk=mainKeys(),rest=t.filter(x=>!mk.includes(x[0])).reduce((a,x)=>a+(dots[x[0]]||0),0);
+  return mk.map(k=>t.find(x=>x[0]===k)).filter(Boolean).map(x=>item([x[0],sh[x[0]]||x[1]])).join('')+`<button class="nv ${mk.includes(tab)?'':'on'}" onclick="moreSheet()">${ic('more')}<span>Więcej</span>${rest?`<em>${rest>99?'99+':rest}</em>`:''}</button>`}
+function moreSheet(){
+  const rest=NAVT.filter(x=>!mainKeys().includes(x[0])&&x[0]!=='ps').concat([['ps','Powiadomienia']]);
+  modal(`<div class="box"><div class="flex items-center gap-3 mb-3"><span class="av" style="width:46px;height:46px;font-size:1.1rem">${esc(me.first_name[0])}</span><div><b>${esc(nm(me.id))}</b><div class="text-xs mu">${RL[me.role]}${school?' · '+esc(school):''}</div></div></div>
+   <div class="mgrid">${rest.map(([k,l])=>`<button class="mtl" onclick="closeModal();go('${k}')">${ic(k)}<span>${l}</span>${dots[k]?`<em>${dots[k]>99?'99+':dots[k]}</em>`:''}</button>`).join('')}</div>
+   <div class="sec flex items-center justify-between"><span class="text-sm font-semibold">Rozmiar tekstu</span><span class="flex gap-2"><button class="gh sm" onclick="setFs(0)">A</button><button class="gh sm" style="font-size:1rem" onclick="setFs(1)">A</button><button class="gh sm" style="font-size:1.2rem" onclick="setFs(2)">A</button></span></div>
+   <div class="flex flex-wrap gap-2 mt-3">${STANDALONE?'':`<button class="gh" onclick="installSheet(true)">Dodaj do ekranu głównego</button>`}<button class="gh red" onclick="logout()">Wyloguj</button></div></div>`)}
+const hmRows=(es,pup,now,live)=>es.map(e=>{const t=T.find(x=>x.id===e.teaching_id),b=BELLS[e.n-1]||[],dead=e.st==='cancel'||e.st==='moved',nm_=now.getHours()*60+now.getMinutes(),past=live&&b[1]&&nm_>tmin2(b[1]),cur=live&&b[0]&&nm_>=tmin2(b[0])&&nm_<=tmin2(b[1]);
+  return `<div class="hm-ls${past?' past':''}${cur?' cur':''}${dead?' dead':''}"><div class="hm-t">${b.join(' - ')}</div><div><b>${esc(sn(e.subj||t?.subject_id))}</b>${chTag(e)}</div><div class="hm-r">${pup?esc(nm(e.sub||t?.teacher_id)):'kl. '+esc(cn(e.class_id))}</div></div>`}).join('');
+const homeDesk=V.home;
+V.home=()=>isM()?homeM():homeDesk();
+async function homeM(){
+  const pup=me.role==='student'||me.role==='parent',stu=me.role==='student'?me.id:sid,cid=pup?ST[stu]?.class_id:null,now=new Date(),wd=now.getDay(),E=Promise.resolve({data:[]}),mt=T.filter(t=>t.teacher_id===me.id).map(t=>t.id),hd=hol(now);
+  const scope=r=>pup?r.class_id===cid:mt.includes(r.teaching_id)||r.sub===me.id;
+  let nd=addD(now,1),g=0;while(g++<10&&(nd.getDay()<1||nd.getDay()>5||hol(nd)))nd=addD(nd,1);
+  const [a,m,tt,tn,gr,ab,j]=await Promise.all([
+    sb.from('announcements').select('*').order('created_at',{ascending:false}).limit(3),
+    sb.from('message_recipients').select('read_at,messages(*)').eq('recipient_id',me.id).is('read_at',null).limit(20),
+    wd>=1&&wd<=5&&!hd?sb.from('timetable').select('*').eq('weekday',wd):E,
+    sb.from('timetable').select('*').eq('weekday',nd.getDay()),
+    pup&&stu?sb.from('grades').select('*').eq('student_id',stu).order('created_at'):E,
+    pup&&stu?sb.from('attendance').select('*').eq('student_id',stu).neq('status','present').gte('date',isoL(addD(now,-3))).order('date',{ascending:false}):E,
+    staff()&&(dir()||isHome())?jCount().then(c=>({count:c})):E]);
+  const les=hd?[]:entries(tt.data||[],mon(now),r=>r.d===isoL(now)&&scope(r)).sort((x,y)=>x.n-y.n),nes=entries(tn.data||[],mon(nd),r=>r.d===isoL(nd)&&scope(r)).sort((x,y)=>x.n-y.n),
+    days=Math.round((new Date(isoL(nd)+'T12:00')-new Date(isoL(now)+'T12:00'))/864e5),when=days===1?'jutro':({1:'w poniedziałek',2:'we wtorek',3:'w środę',4:'w czwartek',5:'w piątek'}[nd.getDay()]);
+  const plan=les.length?`<div class="hm-h">Dzisiaj</div>`+hmRows(les,pup,now,true):`<div class="hm-h">Brak zajęć</div>${hd?`<div class="text-sm mu">${esc(hd)}</div>`:''}<div class="hm-sub">Następna lekcja, ${when}</div>`+(nes.length?hmRows(nes.slice(0,4),pup,now,false):'<div class="text-sm mu">Brak lekcji w planie.</div>');
+  const by={};(gr.data||[]).filter(x=>!x.replaced_by).forEach(x=>{const s=T.find(t=>t.id===x.teaching_id)?.subject_id;if(s)(by[s]=by[s]||[]).push(x)});
+  const gc=Object.keys(by).sort((x,y)=>sn(x).localeCompare(sn(y),'pl')).map(s=>`<div class="hm-gw"><button class="hm-g" onclick="go('gr')"><div class="v">${by[s].slice(-8).map(x=>esc(x.value)).join(', ')}</div><div class="a">średnia <b>${fmtAvg(wavg(by[s]))}</b></div></button><div class="hm-gl">${esc(sn(s))}</div></div>`).join('');
+  const unread=(m.data||[]).filter(r=>r.messages&&!r.messages.recalled_at).map(r=>r.messages).sort((x,y)=>y.created_at.localeCompare(x.created_at)).slice(0,3);
+  const sec=(t,k,l)=>`<div class="hm-sec"><b>${t}</b>${k?`<a onclick="go('${k}')">${l||'Zobacz wszystkie'}</a>`:''}</div>`;
+  const tot=Object.values(dots).reduce((x,y)=>x+(y||0),0);
+  return `<div class="hm-head"><h2>Cześć ${esc(me.first_name)}!</h2><button class="hm-av" onclick="moreSheet()">${esc(me.first_name[0])}</button></div>
+   <div class="hm-c"><div class="hm-date"><img src="icons/icon-192.png" alt=""><div><small>${now.toLocaleDateString('pl-PL',{weekday:'long'})}</small><b>${now.toLocaleDateString('pl-PL',{day:'numeric',month:'long',year:'numeric'})}</b></div><button onclick="go('ps')" title="Powiadomienia">${ic('ps')}</button></div></div>
+   <div class="hm-c">${plan}</div>
+   ${j.count?`<div class="hm-c"><div class="flex items-center justify-between"><div><b class="text-lg">${j.count}</b> usprawiedliwień do rozpatrzenia</div><button class="btn sm" onclick="go('js')">Przejdź</button></div></div>`:''}
+   ${pup?sec('Oceny'+(me.role==='parent'?' - '+esc(nm(stu)):''),'gr')+(gc?`<div class="hm-row">${gc}</div>`:'<div class="hm-c mu text-sm">Brak ocen.</div>'):''}
+   ${pup&&(ab.data||[]).length?sec('Frekwencja - ostatnie dni','at','Cała')+`<div class="hm-c">${ab.data.map(x=>`<div class="hm-li"><b>${fdl(x.date)} · lekcja ${x.lesson_no}</b><span>${AS[x.status]}</span></div>`).join('')}</div>`:''}
+   ${unread.length?sec('Nowe wiadomości','msg','Skrzynka')+`<div class="hm-c">${unread.map(x=>`<button class="hm-li" onclick="mtab='in';go('msg');openMsg('${x.id}')"><b>${esc(x.subject)}</b><span>${esc(nm(x.sender_id))} · ${fd(x.created_at)}</span></button>`).join('')}</div>`:''}
+   ${sec('Ogłoszenia','ann')}<div class="hm-c">${(a.data||[]).map(x=>`<button class="hm-li" onclick="go('ann')"><b>${esc(x.title)}</b><span>${esc(nm(x.author_id))} · ${fd(x.created_at)}</span></button>`).join('')||'<span class="mu text-sm">Brak ogłoszeń.</span>'}</div>`}
 /* ---------- Administracja ---------- */
 V.ad=async()=>{
   const back=`<button class="gh sm" onclick="adTab=null;rr()">${ic('back')} Administracja</button>`;
