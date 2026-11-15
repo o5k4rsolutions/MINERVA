@@ -291,7 +291,8 @@ function entries(base,m,scope){
 const ENT={};
 const chTag=r=>{if(!r.st)return'';const key=r.d+'|'+r.n+'|'+r.class_id+'|'+r.teaching_id+'|'+r.st;ENT[key]=r;
   const tg={cancel:'<span class="tag r">odwołane</span>',moved:'<span class="tag y">przeniesione</span>',in:'<span class="tag b">przeniesione tu</span>',sub:'<span class="tag p">zastępstwo</span>'}[r.st]||'';
-  return `<div class="mt-1">${tg}</div>`+(r.note?`<div class="text-xs mu">${esc(r.note)}</div>`:'')+`<a class="lk np" onclick="event.stopPropagation();chDet('${key}')">szczegóły</a>`};
+  const tg2=tg.replace('<span class="tag','<span style="cursor:pointer" title="Kliknij, aby zobaczyć szczegóły" onclick="event.stopPropagation();chDet(\''+key+'\')" class="tag');
+  return `<div class="mt-1">${tg2}</div>`+(r.note?`<div class="text-xs mu">${esc(r.note)}</div>`:'')};
 function chDet(key){const r=ENT[key];if(!r)return;
   const t=T.find(x=>x.id===r.teaching_id),hrs=(BELLS[r.n-1]||[]).join(' - '),pl=`<b>${esc(sn(t?.subject_id))}</b><div>${esc(nm(t?.teacher_id))}</div>`;
   let ttl='',was=pl,is='',tag='';
@@ -676,7 +677,7 @@ AD.chg=async back=>{
     return `<div class="lsn${pk?' pk':''}${e.st==='cancel'||e.st==='moved'?' x':''}"${pk?` title="Kliknij, aby zmienić tę lekcję" onclick="chPick('${e.class_id}','${e.d}',${e.n},'${e.teaching_id}')"`:''}><div class="lt">${(BELLS[e.n-1]||[]).join(' - ')}</div><b>${esc(sn(e.subj||t?.subject_id))}</b><div class="text-xs">${isT?(e.st==='sub'?esc(nm(e.sub))+' · ':'')+'klasa '+esc(cn(e.class_id)):esc(nm(e.sub||t?.teacher_id))}</div>${chTag(e)}</div>`});
   const list=CH.filter(k=>k.kind!=='moved_in'&&k.date>=isoL(addD(new Date(),-7))).sort((a,b)=>a.date.localeCompare(b.date)||a.lesson_no-b.lesson_no);
   return pn('Nowa zmiana w planie',`<div style="max-width:360px" class="mb-3"><label class="lb">Klasa lub nauczyciel</label>${dd('chs0',opts,chSel,{on:x=>{chSel=x;rr()}})}</div><p class="text-sm mu mb-3">Przełączaj tygodnie strzałkami, a potem kliknij lekcję, którą chcesz odwołać, zastąpić lub przenieść.</p>${grid}`,wkNav(),'pl')
-  +pn('Zaplanowane zmiany (od tygodnia wstecz)',list.length?tbl(['Data','Lekcja','Klasa','Przedmiot','Zmiana',''],list.map(k=>{const t=T.find(x=>x.id===k.teaching_id),to=k.kind==='moved_out'?CH.find(x=>x.grp===k.grp&&x.kind==='moved_in'):null,kd=KL[k.kind]||['-','']; return `<tr><td>${fdl(k.date)}</td><td>${k.lesson_no}</td><td>${esc(cn(k.class_id))}</td><td>${esc(sn(t?.subject_id))}</td><td><span class="tag ${kd[1]}">${kd[0]}</span> ${k.kind==='substitution'?esc(nm(k.sub_teacher_id))+(k.sub_subject_id?' (przedmiot: '+esc(sn(k.sub_subject_id))+')':''):''}${to?'na '+fdl(to.date)+', lekcja '+to.lesson_no:''}${k.note?`<div class="text-xs mu">${esc(k.note)}</div>`:''}</td><td><button class="gh sm red" onclick="delChg('${k.id}','${k.grp||''}')">${ic('trash')}</button></td></tr>`})):'<p class="em">Brak zaplanowanych zmian.</p>','','pl')};
+  +pn('Zaplanowane zmiany (kliknij wiersz, aby edytować lub usunąć)',list.length?tbl(['Data','Lekcja','Klasa','Przedmiot','Zmiana',''],list.map(k=>{const t=T.find(x=>x.id===k.teaching_id),to=k.kind==='moved_out'?CH.find(x=>x.grp===k.grp&&x.kind==='moved_in'):null,kd=KL[k.kind]||['-','']; return `<tr class="hv" title="Kliknij, aby edytować lub usunąć" onclick="chEdit('${k.id}')"><td>${fdl(k.date)}</td><td>${k.lesson_no}</td><td>${esc(cn(k.class_id))}</td><td>${esc(sn(t?.subject_id))}</td><td><span class="tag ${kd[1]}">${kd[0]}</span> ${k.kind==='substitution'?esc(nm(k.sub_teacher_id))+(k.sub_subject_id?' (przedmiot: '+esc(sn(k.sub_subject_id))+')':''):''}${to?'na '+fdl(to.date)+', lekcja '+to.lesson_no:''}${k.note?`<div class="text-xs mu">${esc(k.note)}</div>`:''}</td><td><button class="gh sm red" onclick="event.stopPropagation();delChg('${k.id}','${k.grp||''}')">${ic('trash')}</button></td></tr>`})):'<p class="em">Brak zaplanowanych zmian.</p>','','pl')};
 const delChg=async(id,g)=>await ask('Usunąć tę zmianę w planie?','Usuń')&&act(g?sb.from('timetable_changes').delete().eq('grp',g):sb.from('timetable_changes').delete().eq('id',id),reload,'Usunięto zmianę');
 function chPick(cid,d,n,tid){
   const t=T.find(x=>x.id===tid),L=[1,2,3,4,5,6,7,8,9,10].map(i=>[i,'Lekcja '+i]),
@@ -893,38 +894,72 @@ function saveTrip(){const f=FV.trf,d=FV.trd||f;if(!FV.trc||!f||!v('trt').trim())
   act(sb.rpc('create_trip',{p_class:FV.trc,p_title:v('trt').trim(),p_from:f,p_to:d,p_l1:+FV.trl1,p_l2:+FV.trl2,p_note:v('trn').trim()||null}),reload,'Dodano wycieczkę, lekcje odwołane')}
 const delTrip=async id=>await ask('Usunąć wycieczkę? Odwołane z jej powodu lekcje zostaną przywrócone w planie.','Usuń')&&act(sb.rpc('delete_trip',{p_id:id}),reload,'Wycieczka usunięta');
 
-/* ================= WPISY W PLANIE LEKCJI (sprawdzian, kartkówka, ...) ================= */
-const EVN={test:['Sprawdzian','r'],quiz:['Kartkówka','y'],homework:['Praca domowa','b'],task:['Zadanie','g'],project:['Projekt','']};
+/* ================= EDYCJA ZMIANY W PLANIE ================= */
+function chEdit(id){const k=CH.find(x=>x.id===id);if(!k)return;
+ const t=T.find(x=>x.id===k.teaching_id),hrs=(BELLS[k.lesson_no-1]||[]).join(' - '),mv=k.kind==='moved_out',to=mv?CH.find(x=>x.grp===k.grp&&x.kind==='moved_in'):null,
+  tch=Object.values(P).filter(p=>['teacher','director'].includes(p.role)).sort((a,b)=>ln(a.id).localeCompare(ln(b.id),'pl')).map(p=>[p.id,ln(p.id)]),kd=KL[k.kind]||['-',''],isSub=k.kind==='substitution';
+ modal(`<div class="box"><h3 class="mh">${ic('pl')} Zmiana w planie <span class="tag ${kd[1]}">${kd[0]}</span></h3>
+  <dl class="dl mb-3"><dt>Klasa</dt><dd>${esc(cn(k.class_id))}</dd><dt>Data</dt><dd>${fdl(k.date)}</dd><dt>Lekcja</dt><dd>${k.lesson_no}${hrs?' ('+hrs+')':''}</dd><dt>Przedmiot</dt><dd>${esc(sn(t?.subject_id))}</dd><dt>Nauczyciel</dt><dd>${esc(nm(t?.teacher_id))}</dd>${to?`<dt>Przeniesiona na</dt><dd>${fdl(to.date)}, lekcja ${to.lesson_no}</dd>`:''}</dl>
+  ${mv?'<p class="text-xs mu mb-2">Przeniesienia można tylko usunąć (lub zmienić notatkę).</p>':`<label class="lb">Rodzaj zmiany</label>${seg('cek',[['cancelled','Odwołanie'],['substitution','Zastępstwo']],k.kind,x=>{$('#ces').style.display=x==='substitution'?'':'none'})}
+  <div id="ces" class="mt-3" style="display:${isSub?'':'none'}"><label class="lb">Nauczyciel zastępujący</label>${dd('cet',tch,k.sub_teacher_id||'',{ph:'Wybierz nauczyciela…'})}<label class="lb mt-3">Przedmiot na zastępstwie</label>${dd('ces2',[['','Ten sam przedmiot'],...SUB.map(x=>[x.id,x.name])],k.sub_subject_id||'')}</div>`}
+  <label class="lb mt-3">Notatka</label><input type="text" id="cen" value="${esc(k.note||'')}">
+  <div class="flex gap-2 justify-end mt-4 flex-wrap"><button class="gh red" onclick="closeModal();delChg('${k.id}','${k.grp||''}')">${ic('trash')} Usuń</button><button class="gh" onclick="closeModal()">Anuluj</button><button class="btn" onclick="chSave('${k.id}')">Zapisz</button></div></div>`);
+ if(!mv)tchAt(k.date,k.lesson_no).then(({busy,abs})=>{if(!DD.cet)return;const r=i=>abs.has(i)?2:busy.has(i)&&i!==k.sub_teacher_id?1:0;
+  DD.cet.o=DD.cet.o.map(([i,l])=>[i,l,i===k.sub_teacher_id?'obecny':abs.has(i)?'nieobecny':busy.has(i)?'ma lekcję':'wolny']).sort((a,b)=>r(a[0])-r(b[0]));$('#dd_cet').innerHTML=ddb('cet')})}
+function chSave(id){const k=CH.find(x=>x.id===id);if(!k)return;const note=v('cen').trim()||null;
+ if(k.kind==='moved_out')return act(sb.from('timetable_changes').update({note}).eq('grp',k.grp),async()=>{closeModal();await reload()},'Zapisano zmianę');
+ const kind=FV.cek||k.kind;if(kind==='substitution'&&!FV.cet)return warn('Wybierz nauczyciela zastępującego.');
+ act(sb.from('timetable_changes').update({kind,note,sub_teacher_id:kind==='substitution'?FV.cet:null,sub_subject_id:kind==='substitution'?(FV.ces2||null):null}).eq('id',id),async()=>{closeModal();await reload()},'Zapisano zmianę')}
+
+/* ================= WYDARZENIA W PLANIE (lekcja / cały dzień / kilka dni) ================= */
+const EVN={test:['Sprawdzian','r'],quiz:['Kartkówka','y'],homework:['Praca domowa','b'],task:['Zadanie','g'],project:['Projekt',''],other:['Wydarzenie','b']};
 let EVC=[],EVADD=false;const EVM={};
+const evLabel=x=>x.kind==='other'&&x.title?x.title:(EVN[x.kind]||['Inne',''])[0];
+const evCovers=(x,ds)=>x.date<=ds&&(x.date_to||x.date)>=ds;
+const evTag=x=>{EVM[x.id]=x;const k=EVN[x.kind]||['Inne',''];return `<span class="tag ${k[1]} evp" title="Kliknij, aby zobaczyć szczegóły" onclick="event.stopPropagation();evShow('${x.id}')">${esc(evLabel(x))}</span>`};
 const _wg=weekGrid;
-weekGrid=(data,cell)=>_wg(data,(e,t,ds)=>{
-  const h=cell(e,t,ds),
-  L=EVC.filter(x=>x.class_id===e.class_id&&x.date===ds&&x.lesson_no===e.n).map(x=>{EVM[x.id]=x;const k=EVN[x.kind]||['Inne',''];
-    return `<div class="text-xs mt-1"><span class="tag ${k[1]} evp" title="Kliknij, aby zobaczyć szczegóły" onclick="event.stopPropagation();evShow('${x.id}')">${k[0]}</span></div>`}).join(''),
-  add=EVADD&&e.st!=='cancel'&&e.st!=='moved'&&(dir()||T.find(y=>y.id===e.teaching_id)?.teacher_id===me.id||e.sub===me.id)?`<div><a class="lk np" onclick="evAdd('${e.class_id}','${ds}',${e.n},'${e.teaching_id}')">+ wpis</a></div>`:'';
-  return h.replace(/<\/div>$/,L+add+'</div>')});
-/* okienko szczegółów wpisu: Nauczyciel / Lekcja / Co to / Opis */
-function evShow(id){const x=EVM[id];if(!x)return;const k=EVN[x.kind]||['Inne',''],hrs=(BELLS[x.lesson_no-1]||[]).join(' - '),
-  who=staff()&&x.student_ids?.length?`<dt>Dla kogo</dt><dd>${x.student_ids.map(i=>esc(ln(i))).join(', ')}</dd>`:`<dt>Dla kogo</dt><dd>cała klasa</dd>`,
-  can=staff()&&(dir()||x.created_by===me.id);
-  modal(`<div class="box"><h3 class="mh"><span class="tag ${k[1]}">${k[0]}</span> ${esc(sn(x.subject_id))}</h3>
-   <dl class="dl"><dt>Nauczyciel</dt><dd>${esc(nm(x.created_by))}</dd><dt>Lekcja</dt><dd>${esc(sn(x.subject_id))}, lekcja ${x.lesson_no}${hrs?' ('+hrs+')':''}<div class="mu">${fdl(x.date)} · klasa ${esc(cn(x.class_id))}</div></dd><dt>Co to</dt><dd>${k[0]}</dd><dt>Opis</dt><dd class="whitespace-pre-wrap">${esc(x.title||'-')}</dd>${who}</dl>
+weekGrid=(data,cell)=>{
+  const h0=_wg(data,(e,t,ds)=>{
+    const h=cell(e,t,ds),L=EVC.filter(x=>x.lesson_no&&x.class_id===e.class_id&&x.lesson_no===e.n&&evCovers(x,ds)).map(x=>`<div class="text-xs mt-1">${evTag(x)}</div>`).join(''),
+    add=EVADD&&e.st!=='cancel'&&e.st!=='moved'&&(dir()||T.find(y=>y.id===e.teaching_id)?.teacher_id===me.id||e.sub===me.id)?`<div><a class="lk np" onclick="evAdd('${e.class_id}','${ds}',${e.n},'${e.teaching_id}')">+ wpis</a></div>`:'';
+    return h.replace(/<\/div>$/,L+add+'</div>')});
+  const days=[0,1,2,3,4].map(i=>isoL(addD(wk,i))),cls=new Set(data.map(e=>e.class_id)),al=days.map(ds=>EVC.filter(x=>!x.lesson_no&&cls.has(x.class_id)&&evCovers(x,ds)));
+  if(!al.some(a=>a.length)||!h0.includes('<div class="tm">'))return h0;
+  const row='<div class="tm">cały dzień</div>'+days.map((ds,i)=>hol(new Date(ds+'T12:00'))?'<div class="hol"></div>':'<div>'+al[i].map(x=>`<div class="mt-1">${evTag(x)}${cls.size>1?`<div class="text-xs mu">${esc(cn(x.class_id))}</div>`:''}</div>`).join('')+'</div>').join('');
+  return h0.replace('<div class="tm">',row+'<div class="tm">')};
+function evShow(id){const x=EVM[id];if(!x)return;const k=EVN[x.kind]||['Inne',''],hrs=x.lesson_no?(BELLS[x.lesson_no-1]||[]).join(' - '):'',
+  when=x.lesson_no?`${fdl(x.date)} · lekcja ${x.lesson_no}${hrs?' ('+hrs+')':''}`:((x.date_to&&x.date_to!==x.date?fdl(x.date)+' - '+fdl(x.date_to):fdl(x.date))+' · cały dzień'),
+  who=staff()&&x.student_ids?.length?x.student_ids.map(i=>esc(ln(i))).join(', '):'cała klasa',can=staff()&&(dir()||x.created_by===me.id);
+  modal(`<div class="box"><h3 class="mh"><span class="tag ${k[1]}">${k[0]}</span> ${esc(x.title||'')}</h3>
+   <dl class="dl"><dt>Kiedy</dt><dd>${when}</dd><dt>Klasa</dt><dd>${esc(cn(x.class_id))}</dd>${x.subject_id?`<dt>Przedmiot</dt><dd>${esc(sn(x.subject_id))}</dd>`:''}<dt>Dodał(a)</dt><dd>${esc(nm(x.created_by))}</dd><dt>Dla kogo</dt><dd>${who}</dd></dl>
    <div class="flex gap-2 justify-end mt-4">${can?`<button class="gh red" onclick="delEv('${id}')">${ic('trash')} Usuń wpis</button>`:''}<button class="btn" onclick="closeModal()">Zamknij</button></div></div>`)}
 const _pl2=V.pl;
 V.pl=async()=>{
-  const pup=!staff(),cid=pup?ST[sid]?.class_id:null,r=await sb.from('events').select('*').gte('date',isoL(wk)).lte('date',isoL(addD(wk,4)));
+  const pup=!staff(),cid=pup?ST[sid]?.class_id:null,r=await sb.from('plan_events').select('*').lte('date',isoL(addD(wk,4))).gte('date_to',isoL(wk));
+  if(r.error)warn('Wydarzenia: '+r.error.message+' (uruchom plan_events.sql w Supabase)');
   EVC=(r.data||[]).filter(e=>!pup||(e.class_id===cid&&(!e.student_ids?.length||e.student_ids.includes(sid))));EVADD=staff();
-  try{return await _pl2()}finally{EVADD=false;EVC=[]}};
-function evAdd(cid,d,n,tid){const t=T.find(x=>x.id===tid);
-  modal(`<div class="box"><h3 class="mh">Wpis do planu · klasa ${esc(cn(cid))}, lekcja ${n}</h3><p class="text-sm mu mb-3">${fdl(d)} · ${esc(sn(t?.subject_id))}</p>
-   <label class="lb">Rodzaj</label>${seg('evk',Object.entries(EVN).map(([k,x])=>[k,x[0]]),'test',()=>{})}
-   <label class="lb mt-3">Opis</label><textarea id="evt" rows="3"></textarea>
-   <label class="lb mt-3">Dla kogo</label>${seg('evw',[['all','Cała klasa'],['pick','Wybrani uczniowie']],'all',k=>{$('#evpw').style.display=k==='pick'?'':'none'})}
-   <div id="evpw" class="mt-2" style="display:none">${dd('evs',classStudents(cid).map((p,i)=>[p.id,(i+1)+'. '+ln(p.id)]),[],{multi:1,ph:'Wybierz uczniów…'})}</div>
-   <div class="flex gap-2 justify-end mt-4"><button class="gh" onclick="closeModal()">Anuluj</button><button class="btn" onclick="saveEv2('${cid}','${d}',${n},'${tid}')">Zapisz</button></div></div>`)}
-function saveEv2(cid,d,n,tid){const pick=FV.evw==='pick';if(pick&&!(FV.evs||[]).length)return warn('Wybierz uczniów albo ustaw „Cała klasa”.');
-  act(sb.from('events').insert({school_id:me.school_id,class_id:cid,kind:FV.evk,title:v('evt').trim()||EVN[FV.evk][0],date:d,lesson_no:n,subject_id:T.find(x=>x.id===tid)?.subject_id||null,student_ids:pick?FV.evs:null,created_by:me.id}),()=>{closeModal();rr()},'Dodano wpis')}
-const delEv=async id=>await ask('Usunąć wpis?','Usuń')&&act(sb.from('events').delete().eq('id',id),rr,'Usunięto');
+  try{const h=await _pl2();return (staff()?`<div class="mb-3 np"><button class="btn" onclick="evAddDay()">${ic('plus')} Dodaj wydarzenie (lekcja / cały dzień / kilka dni)</button></div>`:'')+h}finally{EVADD=false;EVC=[]}};
+const evAdd=(cid,d,n,tid)=>evForm(cid,d,n,tid);
+const evAddDay=()=>evForm(plSel&&plSel!=='my'&&!String(plSel).startsWith('t:')?plSel:'',null,null,null);
+function evForm(cid,d,n,tid){const les=n!=null,mine=dir()?C:C.filter(c=>c.homeroom_teacher_id===me.id||T.some(t=>t.teacher_id===me.id&&t.class_id===c.id)),
+  L=[1,2,3,4,5,6,7,8,9,10].map(i=>[i,'Lekcja '+i]),t=T.find(x=>x.id===tid);
+  modal(`<div class="box w"><h3 class="mh">${les?'Wpis do planu · klasa '+esc(cn(cid))+', lekcja '+n:'Nowe wydarzenie'}</h3>${les?`<p class="text-sm mu mb-3">${fdl(d)} · ${esc(sn(t?.subject_id))}</p>`:''}
+   <label class="lb">Rodzaj</label>${seg('evk',Object.entries(EVN).map(([k,x])=>[k,x[0]]),les?'test':'other',()=>{})}
+   <label class="lb mt-3">Nazwa / opis (dla rodzaju „Wydarzenie” to się wyświetla w planie)</label><textarea id="evt" rows="2" placeholder="np. Wycieczka do muzeum"></textarea>
+   ${les?'':`<label class="lb mt-3">Klasy</label>${dd('evc',mine.map(c=>[c.id,'Klasa '+c.name]),cid?[cid]:[],{multi:1,ph:'Wybierz klasy…'})}
+   <label class="lb mt-3">Kiedy</label>${seg('evm',[['day','Cały dzień / kilka dni'],['les','Jedna lekcja']],'day',k=>{$('#evd2w').style.display=k==='day'?'':'none';$('#evlw').style.display=k==='les'?'':'none'})}
+   <div class="grid grid-cols-2 gap-3 mt-2"><div><label class="lb">Od dnia</label>${dp('evd1',isoL(new Date()))}</div><div id="evd2w"><label class="lb">Do dnia (puste = jeden dzień)</label>${dp('evd2','')}</div><div id="evlw" style="display:none"><label class="lb">Lekcja</label>${dd('evl',L,1)}</div></div>`}
+   <label class="lb mt-3">Dla kogo</label>${seg('evw',[['all','Cała klasa'],['pick','Wybrani uczniowie']],'all',k=>{const w=$('#evpw'),cs=les?[cid]:(FV.evc||[]);
+     if(k==='pick'&&cs.length!==1){warn('Wybrani uczniowie: zaznacz dokładnie jedną klasę.');sgP('evw','all');return}
+     w.style.display=k==='pick'?'':'none';if(k==='pick')w.innerHTML=dd('evs',classStudents(cs[0]).map((p,i)=>[p.id,(i+1)+'. '+ln(p.id)]),[],{multi:1,ph:'Wybierz uczniów…'})})}
+   <div id="evpw" class="mt-2" style="display:none"></div>
+   <div class="flex gap-2 justify-end mt-4"><button class="gh" onclick="closeModal()">Anuluj</button><button class="btn" onclick="evSave('${cid||''}','${d||''}',${les?n:'null'},'${tid||''}')">Zapisz</button></div></div>`)}
+function evSave(cid0,d0,n0,tid){const les=n0!=null,cids=les?[cid0]:(FV.evc||[]);if(!cids.length)return warn('Wybierz klasę.');
+  const pick=FV.evw==='pick';if(pick&&(cids.length!==1||!(FV.evs||[]).length))return warn('Wybierz uczniów (dla jednej klasy) albo ustaw „Cała klasa”.');
+  let d1,d2,ln_;if(les){d1=d2=d0;ln_=n0}else{d1=FV.evd1;if(!d1)return warn('Wybierz datę.');if(FV.evm==='les'){d2=d1;ln_=+FV.evl}else{d2=FV.evd2||d1;ln_=null;if(d2<d1)return warn('Data końcowa jest przed początkową.')}}
+  const title=v('evt').trim()||EVN[FV.evk][0],subj=les?(T.find(x=>x.id===tid)?.subject_id||null):null;
+  act(sb.from('plan_events').insert(cids.map(c=>({school_id:me.school_id,class_id:c,kind:FV.evk,title,date:d1,date_to:d2,lesson_no:ln_,subject_id:subj,student_ids:pick?FV.evs:null,created_by:me.id}))),()=>{closeModal();wk=mon(new Date(d1+'T12:00'));rr()},'Dodano wydarzenie')}
+const delEv=async id=>{closeModal();if(await ask('Usunąć wpis?','Usuń'))act(sb.from('plan_events').delete().eq('id',id),rr,'Usunięto')};
 
 /* ===== Dodatek do Dziennika Minerva ===== */
 const _st=document.createElement('style');_st.textContent='.ac.released{background:#ede9fe;color:#5b21b6}';document.head.appendChild(_st);
