@@ -755,10 +755,17 @@ async function prnFonts(){
   if(!window.jspdf)await ldScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js');
   const o={};
   await Promise.all(Object.entries(PRN_F).map(async([k,f])=>{try{const r=await fetch(PRN_B+f);if(!r.ok)throw 0;o[k]=buf64(await r.arrayBuffer())}catch(e){}}));
-  const fb={Hr:'Pr',Hb:'Pb',Hl:'Pr',Pr:'Hr',Pb:'Hb'},any=Object.values(o)[0];
+  const fb={Hr:'Pr',Hb:'Pb',Hl:'Pr',Pr:'Hr',Pb:'Hb'},any=Object.values(o)[0];['Hr','Hb','Hl'].forEach(k=>{if(o[fb[k]])o[k]=o[fb[k]]});
   if(!any)throw new Error('Nie udało się pobrać czcionek do PDF.');
   Object.keys(PRN_F).forEach(k=>{if(!o[k])o[k]=o[fb[k]]||any});
   return PRN_C=o}
+const PRN_LOGO={};
+function prnLogo(color){const k=color?'w':'k';if(PRN_LOGO[k]!==undefined)return Promise.resolve(PRN_LOGO[k]);
+  return new Promise(ok=>{const im=new Image();im.crossOrigin='anonymous';
+    im.onload=()=>{try{const c=document.createElement('canvas');c.width=im.naturalWidth;c.height=im.naturalHeight;const g=c.getContext('2d');g.drawImage(im,0,0);
+      if(!color){g.globalCompositeOperation='source-in';g.fillStyle='#000';g.fillRect(0,0,c.width,c.height)}
+      ok(PRN_LOGO[k]={url:c.toDataURL('image/png'),w:c.width,h:c.height})}catch(e){ok(PRN_LOGO[k]=null)}};
+    im.onerror=()=>ok(PRN_LOGO[k]=null);im.src='https://dziennik-minerva.pages.dev/themes/logo-horizontal-white.png'})}
 async function prnLoad(){let all=[],from=0;for(;;){const r=await sb.from('timetable').select('*').order('id').range(from,from+999);if(r.error)throw r.error;all=all.concat(r.data);if(r.data.length<1000)break;from+=1000}return all}
 function prnPage(doc,o){
   const W=297,H=210,mg=10,col=o.color,navy=[30,42,120],amber=[245,165,36],ink=col?[27,34,56]:[0,0,0],soft=col?[100,112,138]:[80,80,80],line=col?[200,208,224]:[0,0,0];
@@ -769,8 +776,8 @@ function prnPage(doc,o){
   doc.setTextColor(...(col?[255,255,255]:[0,0,0]));
   doc.setFont('Pb','normal');doc.setFontSize(22);doc.text(o.title,mg,14.5);
   doc.setFont('Hl','normal');doc.setFontSize(10);doc.text(o.sub+(school?' · '+school:''),mg,21);
-  doc.setFont('Pb','normal');doc.setFontSize(12);doc.text('Minerva',W-mg,14.5,{align:'right'});
-  doc.setFont('Hl','normal');doc.setFontSize(8.5);doc.text('dziennik elektroniczny',W-mg,19.5,{align:'right'});
+  if(o.logo){const lh=12,lw2=lh*o.logo.w/o.logo.h;doc.addImage(o.logo.url,'PNG',W-mg-lw2,(26-lh)/2,lw2,lh)}
+  else{doc.setFont('Pb','normal');doc.setFontSize(14);doc.text('Minerva',W-mg,14.5,{align:'right'})}
   // tabela
   const top=33,bot=H-12,hh=9,lw=32,cw=(W-2*mg-lw)/5,rh=Math.min(24,(bot-top-hh)/o.rows.length);
   doc.setLineWidth(.25);
@@ -793,7 +800,7 @@ function prnPage(doc,o){
       if(bl.length){doc.setFont('Hl','normal');doc.setFontSize(bs);doc.setTextColor(...soft);doc.text(bl,x+cw/2,y0+(ls.length-1)*lh+bs*.36+1.6,{align:'center',lineHeightFactor:1.05})}}});
   // stopka
   doc.setFont('Hl','normal');doc.setFontSize(7.5);doc.setTextColor(...soft);
-  doc.text('Plan standardowy - bez zastępstw i zmian w poszczególnych tygodniach',mg,H-6);
+  doc.text('© 2026 Dziennik elektroniczny Minerva. Wszelkie prawa zastrzeżone.',mg,H-6);
   doc.text('Wygenerowano: '+new Date().toLocaleDateString('pl-PL'),W-mg,H-6,{align:'right'})}
 AD.prn=back=>{const isC=prnT==='c',opts=isC?C.map(c=>[c.id,'Klasa '+c.name]):Object.values(P).filter(p=>['teacher','director'].includes(p.role)).sort((a,b)=>ln(a.id).localeCompare(ln(b.id),'pl')).map(p=>[p.id,ln(p.id)]);
   return pn('Drukowanie planu lekcji',`<p class="mu mb-4">Drukowany jest standardowy plan lekcji (bez zastępstw i zmian z konkretnego tygodnia). Każda klasa lub nauczyciel dostaje osobną stronę A4 w poziomie.</p>
@@ -804,7 +811,7 @@ async function prnGo(){
   const ids=FV.prni||[];if(!ids.length)return warn('Wybierz co najmniej jedną pozycję.');
   const isC=prnT==='c',color=prnCol==='c',b=$('#prnb'),lab=b.innerHTML;b.disabled=true;b.textContent='Generuję PDF…';
   try{
-    const [F,tt]=await Promise.all([prnFonts(),prnLoad()]),{jsPDF}=window.jspdf;
+    const [F,tt,logo]=await Promise.all([prnFonts(),prnLoad(),prnLogo(color)]),{jsPDF}=window.jspdf;
     const doc=new jsPDF({orientation:'landscape',unit:'mm',format:'a4',compress:true});
     Object.keys(F).forEach(k=>{doc.addFileToVFS(k+'.ttf',F[k]);doc.addFont(k+'.ttf',k,'normal')});
     const sorted=[...SUB].sort((a,b)=>a.name.localeCompare(b.name,'pl')),fillOf=sid=>PRN_PAL[Math.max(0,sorted.findIndex(x=>x.id===sid))%PRN_PAL.length];
@@ -816,7 +823,7 @@ async function prnGo(){
         const a=[...new Set(ts.map(t=>sn(t.subject_id)))].join(' / '),bb=isC?[...new Set(ts.map(t=>nm(t.teacher_id)))].join(', '):[...new Set(c.map(r=>'kl. '+cn(r.class_id)))].join(', ');
         return {a,b:bb,fill:fillOf(ts[0].subject_id)}};
       if(i)doc.addPage();
-      prnPage(doc,{title:isC?'Klasa '+cn(id):nm(id),sub:isC?'Plan lekcji klasy':'Plan lekcji nauczyciela',rows,cell,color})});
+      prnPage(doc,{title:isC?'Klasa '+cn(id):nm(id),sub:isC?'Plan lekcji klasy':'Plan lekcji nauczyciela',rows,cell,color,logo})});
     const fn=(ids.length===1?(isC?'klasa-'+cn(ids[0]):ln(ids[0])):(isC?'klasy':'nauczyciele')).normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/ł/g,'l').replace(/Ł/g,'L').replace(/[^\w-]+/g,'-');
     doc.save('plan-lekcji-'+fn+'-'+(color?'kolor':'cz-b')+'.pdf');toast('Wygenerowano PDF')
   }catch(e){warn(e.message||String(e))}finally{b.disabled=false;b.innerHTML=lab}}
