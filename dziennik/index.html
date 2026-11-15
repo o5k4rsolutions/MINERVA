@@ -172,6 +172,9 @@ tbody tr:nth-child(even) td{background:#fafbfd}tbody tr:hover td{background:#fff
  table.mt.rt td:before{display:none!important}table.mt.rt td:nth-child(2){font-size:.76rem;color:var(--mu)}table.mt.rt td:nth-child(3){font-size:.95rem}table.mt.rt td:nth-child(4),table.mt.rt td:nth-child(5){font-size:.72rem;color:var(--mu)}
 }
 </style>
+<style>
+@media(max-width:767px){#mnav .nv{position:relative}#mnav .nv em{position:absolute!important;top:3px!important;left:calc(50% + 4px)!important;right:auto!important;margin:0!important;z-index:3;display:block!important;font-style:normal;background:#ef4444;color:#fff;border-radius:999px;font-size:.65rem;font-weight:700;min-width:18px;height:18px;line-height:18px;text-align:center;padding:0 5px;box-shadow:0 0 0 2px #fff}}
+</style>
 </head>
 <body>
 <div class="md:flex min-h-screen">
@@ -293,7 +296,7 @@ let deferredInstall=null;
 addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredInstall=e});
 addEventListener('appinstalled',()=>{deferredInstall=null;closeModal();toast('Aplikacja zainstalowana')});
 if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
-const PREFK=[['grades','Nowe oceny'],['attendance','Nieobecności i spóźnienia'],['messages','Nowe wiadomości'],['announcements','Nowe ogłoszenia'],['notes','Uwagi i pochwały'],['plan','Zmiany w planie lekcji']];
+const PREFK=[['grades','Nowe oceny'],['attendance','Nieobecności i spóźnienia'],['messages','Nowe wiadomości'],['announcements','Nowe ogłoszenia'],['notes','Uwagi i pochwały'],['plan','Zmiany w planie lekcji'],['justifications','Usprawiedliwienia']];
 function pwaInit(){
   const t=new URLSearchParams(location.search).get('tab');if(t&&t!==tab&&['gr','at','msg','ann','nt','pl','js'].includes(t))go(t);
   if(MOBILE&&!STANDALONE)installSheet(false)}
@@ -370,7 +373,7 @@ async function calcDots(){
   dots={msg:m.count,ann:keep('ann')??a.count,gr:staff()?0:keep('gr')??g.count,nt:staff()?0:keep('nt')??n.count,js:j,pl:tab==='pl'?0:pc};if(tab==='pl')plSeen=new Date().toISOString();
 }
 function nav(){document.body.classList.toggle('ish',tab==='home');
-  const tot=Object.values(dots).reduce((a,b)=>a+(b||0),0);document.title=(tot?`(${tot}) `:'')+'Dziennik - Minerva';
+  const tot=Object.values(dots).reduce((a,b)=>a+(b||0),0);document.title=(tot?`(${tot}) `:'')+'Dziennik - Minerva';try{if(navigator.setAppBadge){tot?navigator.setAppBadge(tot):navigator.clearAppBadge()}}catch{}
   const t=[['home','Start',''],['gr','Oceny','Dziennik'],['at','Frekwencja','Dziennik'],['pl','Plan lekcji','Dziennik'],['nt','Uwagi i pochwały','Dziennik']];
   if(me.role==='parent'||(staff()&&(dir()||isHome())))t.push(['js','Usprawiedliwienia','Dziennik']);
   if(staff()&&(dir()||isHome()))t.push(['cl','Moja klasa','Dziennik']);
@@ -793,7 +796,7 @@ async function homeM(){
   const unread=(m.data||[]).filter(r=>r.messages&&!r.messages.recalled_at).map(r=>r.messages).sort((x,y)=>y.created_at.localeCompare(x.created_at)).slice(0,3);
   const sec=(t,k,l)=>`<div class="hm-sec"><b>${t}</b>${k?`<a onclick="go('${k}')">${l||'Zobacz wszystkie'}</a>`:''}</div>`;
   const tot=Object.values(dots).reduce((x,y)=>x+(y||0),0);
-  return `<div class="hm-head"><h2>Cześć ${esc(me.first_name)}!</h2><button class="hm-av" onclick="moreSheet()">${esc(me.first_name[0])}</button></div>
+  return `<div class="hm-head"><h2>Cześć ${esc(me.first_name)}!</h2><button class="hm-av" onclick="moreSheet()">${esc(me.first_name[0])}${(()=>{const n=NAVT.filter(x=>!mainKeys().includes(x[0])).reduce((a,x)=>a+(dots[x[0]]||0),0);return n?`<em>${n>99?'99+':n}</em>`:''})()}</button></div>
    <div class="hm-c"><div class="hm-date"><img src="icons/icon-192.png" alt=""><div><small>${now.toLocaleDateString('pl-PL',{weekday:'long'})}</small><b>${now.toLocaleDateString('pl-PL',{day:'numeric',month:'long',year:'numeric'})}</b></div><button onclick="go('ps')" title="Powiadomienia">${ic('ps')}</button></div></div>
    <div class="hm-c">${plan}</div>
    ${j.count?`<div class="hm-c"><div class="flex items-center justify-between"><div><b class="text-lg">${j.count}</b> usprawiedliwień do rozpatrzenia</div><button class="btn sm" onclick="go('js')">Przejdź</button></div></div>`:''}
