@@ -256,8 +256,20 @@ tbody tr:nth-child(even) td{background:#fafbfd}tbody tr:hover td{background:#fff
  .pb .seg{margin-bottom:0}
 }
 </style>
+<style>
+#splash{position:fixed;inset:0;z-index:99999;background:#fff;display:none;align-items:center;justify-content:center;transition:opacity .35s}
+#splash.on{display:flex}#splash.out{opacity:0;pointer-events:none}
+#splash img{width:min(64vw,320px);height:auto;animation:spl 1.1s ease-in-out infinite alternate}
+@keyframes spl{from{opacity:.7;transform:scale(.98)}to{opacity:1;transform:scale(1)}}
+.nlc{position:relative}.nlc.past .lsn{opacity:.5}.nlc.cur .lsn{box-shadow:0 0 0 2px var(--in)}
+.nl{position:absolute;left:-4px;right:-4px;height:0;border-top:2px solid #e11d48;z-index:5;pointer-events:none}
+.nl:before{content:'';position:absolute;left:-1px;top:-6px;width:9px;height:9px;border-radius:50%;background:#e11d48}
+.nl b{position:absolute;right:2px;top:-10px;background:#e11d48;color:#fff;font-size:.65rem;font-weight:700;padding:0 .4rem;border-radius:999px;line-height:1.1rem}
+</style>
 </head>
 <body>
+<div id="splash"><img src="themes/logo-horizontal-light.svg" alt="Minerva" onerror="if(!this.dataset.f){this.dataset.f=1;this.src='https://dziennik-minerva.pages.dev/themes/logo-horizontal-light.svg'}"></div>
+<script>if(matchMedia('(max-width:767px)').matches||matchMedia('(display-mode: standalone)').matches||navigator.standalone)document.getElementById('splash').classList.add('on')</script>
 <div class="md:flex min-h-screen">
 <aside class="side md:w-60 md:h-screen md:sticky md:top-0 md:flex md:flex-col shrink-0">
   <div class="p-4"><img src="https://dziennik-minerva.pages.dev/themes/logo-horizontal-white.svg" class="h-10 w-auto max-w-full" alt="Minerva"></div>
@@ -386,7 +398,7 @@ function installSheet(force){
   const sh='<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:-4px"><path d="M12 3v12M8 7l4-4 4 4"/><path d="M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/></svg>';
   const st=IOS?[`Otwórz dziennik w przeglądarce <b>Safari</b>.`,`Stuknij przycisk <b>Udostępnij</b> ${sh} na dolnym (lub górnym) pasku.`,`Przewiń listę i wybierz <b>„Dodaj do ekranu początkowego”</b>.`,`Stuknij <b>„Dodaj”</b>. Ikona Dziennika Minerva pojawi się na ekranie głównym.`,`Uruchom dziennik z ikony i w zakładce <b>Powiadomienia</b> włącz powiadomienia (na iPhonie działają tylko z ikony, iOS 16.4 lub nowszy).`]
    :[`Stuknij menu przeglądarki <b>⋮</b> (prawy górny róg w Chrome).`,`Wybierz <b>„Zainstaluj aplikację”</b> albo <b>„Dodaj do ekranu głównego”</b>.`,`Potwierdź przyciskiem <b>„Zainstaluj”</b>. Ikona pojawi się na ekranie głównym.`,`Uruchom dziennik z ikony i w zakładce <b>Powiadomienia</b> włącz powiadomienia.`];
-  modal(`<div class="box"><div class="flex items-center gap-3 mb-1"><img src="icons/icon-192.png" width="52" height="52" style="border-radius:13px" alt=""><div><h3 class="mh" style="margin:0">Dodaj Dziennik Minerva do ekranu głównego</h3><div class="text-sm mu">Działa jak zwykła aplikacja, bez paska przeglądarki, z powiadomieniami.</div></div></div>
+  modal(`<div class="box"><div class="flex items-center gap-3 mb-1"><img src="icons/icon-192.png" width="52" height="52" style="border-radius:13px" alt=""><div><h3 class="mh" style="margin:0">Dodaj Dziennik Minerva do ekranu głównego</h3></div></div>
    ${!IOS&&deferredInstall?`<button class="btn w-full justify-center mt-3" onclick="doInstall()">Zainstaluj aplikację</button><div class="text-xs mu mt-2">Albo ręcznie:</div>`:''}
    ${st.map((x,i)=>`<div class="ist"><i>${i+1}</i><div class="text-sm">${x}</div></div>`).join('')}
    <div class="flex flex-wrap gap-2 justify-end mt-3"><button class="gh" onclick="instHide(0)">Nie pokazuj więcej</button><button class="gh" onclick="instHide(7)">Przypomnij później</button><button class="btn" onclick="closeModal()">Rozumiem</button></div></div>`)}
@@ -409,18 +421,18 @@ let PREFS={};
 const pushTest=async()=>{const r=await navigator.serviceWorker.ready;r.showNotification('Dziennik Minerva',{body:'Testowe powiadomienie\nTak będą wyglądać wiadomości z dziennika',icon:'icons/icon-192.png',badge:'icons/badge-96.png',lang:'pl'})};
 const viewPs=async()=>{
   const st=await pushState(),{data}=await sb.from('notification_prefs').select('*').eq('user_id',me.id).maybeSingle();PREFS=data||{};
-  const msg={on:['Włączone na tym urządzeniu','Powiadomienia będą przychodzić także przy zamkniętej aplikacji.'],off:['Wyłączone na tym urządzeniu','Włącz je, aby dostawać informacje o ocenach, wiadomościach i nieobecnościach.'],denied:['Zablokowane','Zezwól na powiadomienia dla tej strony w ustawieniach telefonu lub przeglądarki, a potem wróć tutaj.'],'ios-install':['Najpierw dodaj dziennik do ekranu głównego','Na iPhonie i iPadzie powiadomienia działają tylko z ikony aplikacji (iOS 16.4 lub nowszy).'],unsupported:['Ta przeglądarka nie obsługuje powiadomień','Użyj Chrome (Android) lub Safari (iPhone) i dodaj dziennik do ekranu głównego.']}[st];
+  const msg={on:['Włączone na tym urządzeniu',''],off:['Wyłączone na tym urządzeniu','Włącz je, aby dostawać informacje o ocenach, wiadomościach i nieobecnościach.'],denied:['Zablokowane','Zezwól na powiadomienia dla tej strony w ustawieniach telefonu lub przeglądarki, a potem wróć tutaj.'],'ios-install':['Najpierw dodaj dziennik do ekranu głównego','Na iPhonie i iPadzie powiadomienia działają tylko z ikony aplikacji (iOS 16.4 lub nowszy).'],unsupported:['Ta przeglądarka nie obsługuje powiadomień','Użyj Chrome (Android) lub Safari (iPhone) i dodaj dziennik do ekranu głównego.']}[st];
   const btn=st==='on'?`<button class="btn" onclick="pushTest()">Pokaż testowe powiadomienie</button><button class="gh" onclick="pushOff()">Wyłącz na tym urządzeniu</button>`:st==='off'?`<button class="btn" onclick="pushOn()">Włącz powiadomienia</button>`:st==='ios-install'?`<button class="btn" onclick="installSheet(true)">Pokaż instrukcję</button>`:'';
-  return pn('Powiadomienia na telefonie',`<div class="mb-3"><b>${msg[0]}</b><div class="text-sm mu">${msg[1]}</div></div><div class="flex flex-wrap gap-2">${btn}${!STANDALONE&&st!=='ios-install'?`<button class="gh" onclick="installSheet(true)">Jak dodać do ekranu głównego</button>`:''}</div>`,'','ps')
+  return pn('Powiadomienia na telefonie',`<div class="mb-3"><b>${msg[0]}</b>${msg[1]?`<div class="text-sm mu">${msg[1]}</div>`:''}</div><div class="flex flex-wrap gap-2">${btn}${!STANDALONE&&st!=='ios-install'?`<button class="gh" onclick="installSheet(true)">Jak dodać do ekranu głównego</button>`:''}</div>`,'','ps')
    +pn('Jakie powiadomienia chcę dostawać',PREFK.map(([k,l])=>`<label class="swr"><span>${l}</span><input type="checkbox" ${PREFS[k]===false?'':'checked'} onchange="prefSet('${k}',this.checked)"></label>`).join('')+``,'','')};
 
-const fatal=(t,m)=>{$('#main').innerHTML=`<div class="pn"><div class="pb"><h3 class="mh">${esc(t)}</h3><p>${esc(m)}</p><button class="btn mt-3" onclick="logout()">Wyloguj i wróć do logowania</button></div></div>`};
+const fatal=(t,m)=>{hideSplash();$('#main').innerHTML=`<div class="pn"><div class="pb"><h3 class="mh">${esc(t)}</h3><p>${esc(m)}</p><button class="btn mt-3" onclick="logout()">Wyloguj i wróć do logowania</button></div></div>`};
 async function init(){
   try{setFs(+localStorage.getItem('fs')||0)}catch{setFs(0)}
   const {data:{session}}=await sb.auth.getSession();if(!session)return location.href='/login';
   sb.auth.onAuthStateChange(ev=>{if(ev==='SIGNED_OUT')location.href='/login'});
   const {data:m,error}=await sb.from('profiles').select('*').eq('id',session.user.id).maybeSingle();
-  if(error)return fatal('Błąd odczytu konta',error.message+' - sprawdź, czy w Supabase wykonano schema.sql (polityki RLS).');
+  if(error)return fatal('Błąd odczytu konta',error.message+'.');
   if(!m)return fatal('Brak profilu użytkownika','Konto logowania istnieje, ale nie ma wpisu w tabeli profiles. Poproś dyrekcję o ponowne założenie konta.');
   if(m.must_change_password)return location.href='/login';
   me=m;try{await load()}catch(e){return fatal('Błąd wczytywania danych',e.message)}
@@ -430,7 +442,7 @@ async function init(){
   $('#pnm').textContent=nm(me.id);$('#pcl').textContent=me.role==='student'?`Klasa ${cn(ST[me.id]?.class_id)} · ${school}`:me.role==='teacher'&&hcn.length?`Wychowawca klasy ${hcn.join(', ')} · ${school}`:school;
   $('#um').innerHTML=`<span class="av" style="width:26px;height:26px;font-size:.7rem">${esc(me.first_name[0])}</span> ${esc(me.first_name)} ${ic('chev')}`;
   if(me.role==='student')sid=me.id;if(me.role==='parent')sid=KIDS[0]||null;
-  await calcDots();nav();render();setTimeout(pwaInit,1200);
+  await calcDots();nav();await render();hideSplash();setTimeout(pwaInit,1200);try{evLive()}catch{}
   let to;const ch=sb.channel('live');
   Object.keys(LIVE).forEach(t=>ch.on('postgres_changes',{event:'*',schema:'public',table:t},p=>{LIVE[t](p);clearTimeout(to);to=setTimeout(async()=>{if(['timetable','timetable_changes','days_off'].includes(t))await load().catch(()=>{});await calcDots();nav();if(detail){if(t==='messages')openMsg(detail,true);return}if(!dirty&&!$('#modal').classList.contains('show'))render(true)},500)}));
   ch.subscribe(st=>{const e=$('#live');e.classList.remove('hidden');e.innerHTML=st==='SUBSCRIBED'?'<i class="ld on"></i>na żywo':'<i class="ld"></i>offline'});
@@ -527,25 +539,30 @@ function weekGrid(data,cell){
   if(!ns.length)return '<p class="em">Brak lekcji w planie.</p>';
   if(isM())return weekM(days,ns,data,cell,td);
   let h='<div class="overflow-x-auto"><div class="pw"><div></div>'+days.map((d,i)=>{const ho=hol(d);return `<div class="dh${ho?' hol':''}${isoL(d)===td?' tdy':''}"><b>${pad(d.getDate())}</b><div>${DAYS[i+1].toLowerCase()}</div>${ho?`<small>${ho}</small>`:''}</div>`}).join('');
-  for(const n of ns){h+=`<div class="tm">${(BELLS[n-1]||[]).join('<br>')}</div>`;days.forEach(d=>{const ds=isoL(d),es=data.filter(x=>x.d===ds&&x.n===n);h+=hol(d)?'<div class="hol"></div>':es.length?'<div>'+es.map(e=>cell(e,T.find(x=>x.id===e.teaching_id),ds)).join('')+'</div>':'<div></div>'})}
+  for(const n of ns){h+=`<div class="tm">${(BELLS[n-1]||[]).join('<br>')}</div>`;days.forEach(d=>{const ds=isoL(d),es=data.filter(x=>x.d===ds&&x.n===n),mk=ds===td?nowMark(n,ns):null,inner=es.map(e=>cell(e,T.find(x=>x.id===e.teaching_id),ds)).join('')+(mk&&mk.pos!=null?nowLine(mk.pos):'');h+=hol(d)?'<div class="hol"></div>':mk?`<div class="nlc ${mk.st}">${inner}</div>`:es.length?'<div>'+inner+'</div>':'<div></div>'})}
   return h+'</div></div>'}
 /* ---------- widoki ---------- */
 const V={};V.ps=()=>viewPs();
 V.home=async()=>{
   const pup=me.role==='student'||me.role==='parent',ids=me.role==='student'?[me.id]:KIDS,now=new Date(),wd=now.getDay(),cid=pup?ST[sid]?.class_id:null,E=Promise.resolve({data:[],count:0}),hd=hol(now),since=me.prev_seen||new Date(0).toISOString(),d3=isoL(addD(now,-3));
-  const [a,g,m,tt,ab,j]=await Promise.all([
+  let nd=addD(now,1),g0=0;while(g0++<10&&(nd.getDay()<1||nd.getDay()>5||hol(nd)))nd=addD(nd,1);
+  const [a,g,m,tt,ab,j,tn,evs]=await Promise.all([
     sb.from('announcements').select('*').order('created_at',{ascending:false}).limit(4),
     pup&&ids.length?sb.from('grades').select('*').in('student_id',ids).order('created_at',{ascending:false}).limit(30):E,
     sb.from('message_recipients').select('read_at,messages(*)').eq('recipient_id',me.id).is('read_at',null).limit(20),
     wd>=1&&wd<=5?sb.from('timetable').select('*').eq('weekday',wd).order('lesson_no'):E,
     pup&&ids.length?sb.from('attendance').select('*').in('student_id',ids).neq('status','present').gte('date',d3).order('date',{ascending:false}):E,
-    staff()?jCount().then(c=>({count:c})):E]);
+    staff()?jCount().then(c=>({count:c})):E,sb.from('timetable').select('*').eq('weekday',nd.getDay()),evUp(pup,cid,sid)]);
   const mt=T.filter(t=>t.teacher_id===me.id).map(t=>t.id),n=x=>`<p class="mu text-sm">${x}</p>`,row=h=>`<div class="py-2 border-b last:border-0" style="border-color:var(--ln)">${h}</div>`,lk=(k,l)=>`<a class="lk" onclick="go('${k}')">${l}</a>`;
-  const les=hd?[]:entries(tt.data||[],mon(now),r=>r.d===isoL(now)&&(pup?r.class_id===cid:mt.includes(r.teaching_id)||r.sub===me.id)).sort((a,b)=>a.n-b.n);
-  const plan=(hd?`<p class="tag r mb-2">${hd}</p>`:'')+(les.length?les.map(e=>{const t=T.find(x=>x.id===e.teaching_id),dead=e.st==='cancel'||e.st==='moved',nogo=pup||dead||(e.st==='sub'&&e.sub!==me.id&&!dir());return `<div class="flex items-center gap-3 py-2 border-b last:border-0" style="border-color:var(--ln)${nogo?'':';cursor:pointer'}${dead?';opacity:.55':''}" ${nogo?'':`title="Sprawdź obecność" onclick="curT='${e.teaching_id}';curL=${e.n};curD=isoL(new Date());atManual=false;go('at')"`}><span class="av">${e.n}</span><div class="flex-1"><div class="font-semibold"${dead?' style="text-decoration:line-through"':''}>${esc(sn(e.subj||t?.subject_id))}</div><div class="text-xs mu">${pup||e.st==='sub'?esc(nm(e.sub||t?.teacher_id)):'klasa '+esc(cn(e.class_id))}${!pup&&e.st==='sub'?' · klasa '+esc(cn(e.class_id)):''}</div>${chTag(e)}</div><div class="text-xs mu">${(BELLS[e.n-1]||[]).join('-')}</div></div>`}).join(''):n(wd>=1&&wd<=5&&!hd?'Brak lekcji w planie na dziś.':'Dziś brak lekcji.'));
+  const sc0=r=>pup?r.class_id===cid:mt.includes(r.teaching_id)||r.sub===me.id,nowM=now.getHours()*60+now.getMinutes(),endB=e=>{const b=BELLS[e.n-1];return b&&b[1]?tmin2(b[1]):0},pastE=e=>endB(e)<nowM;
+  let les=hd?[]:entries(tt.data||[],mon(now),r=>r.d===isoL(now)&&sc0(r)).sort((a,b)=>a.n-b.n),nextDay=false;
+  const nes=entries(tn.data||[],mon(nd),r=>r.d===isoL(nd)&&sc0(r)).sort((a,b)=>a.n-b.n),dn=Math.round((new Date(isoL(nd)+'T12:00')-new Date(isoL(now)+'T12:00'))/864e5),when=dn===1?'jutro':({1:'w poniedziałek',2:'we wtorek',3:'w środę',4:'w czwartek',5:'w piątek'}[nd.getDay()]);
+  if(les.filter(e=>e.st!=='cancel'&&e.st!=='moved').every(pastE)){les=nes;nextDay=true}
+  const plan=(hd?`<p class="tag r mb-2">${hd}</p>`:'')+(les.length?les.map(e=>{const t=T.find(x=>x.id===e.teaching_id),dead=e.st==='cancel'||e.st==='moved',nogo=pup||nextDay||dead||(e.st==='sub'&&e.sub!==me.id&&!dir());return `<div class="flex items-center gap-3 py-2 border-b last:border-0" style="border-color:var(--ln)${nogo?'':';cursor:pointer'}${dead||(!nextDay&&pastE(e))?';opacity:.55':''}" ${nogo?'':`title="Sprawdź obecność" onclick="curT='${e.teaching_id}';curL=${e.n};curD=isoL(new Date());atManual=false;go('at')"`}><span class="av">${e.n}</span><div class="flex-1"><div class="font-semibold"${dead?' style="text-decoration:line-through"':''}>${esc(sn(e.subj||t?.subject_id))}</div><div class="text-xs mu">${pup||e.st==='sub'?esc(nm(e.sub||t?.teacher_id)):'klasa '+esc(cn(e.class_id))}${!pup&&e.st==='sub'?' · klasa '+esc(cn(e.class_id)):''}</div>${chTag(e)}</div><div class="text-xs mu">${(BELLS[e.n-1]||[]).join('-')}</div></div>`}).join(''):n('Brak lekcji w planie.'));
   const msgs=(m.data||[]).filter(r=>r.messages&&!r.messages.recalled_at).map(r=>r.messages).sort((x,y)=>y.created_at.localeCompare(x.created_at)).slice(0,4);
   const newG=(g.data||[]).filter(x=>x.created_at>since);newG.forEach(x=>GR[x.id]=x);
   const today=isoL(now),imp=[hd?row(`<b>${hd}</b><div class="text-xs mu">Dzień wolny od zajęć</div>`):'',...(a.data||[]).filter(x=>x.created_at.slice(0,10)===today).map(x=>row(`<b>${esc(x.title)}</b>`))].join('')||n('Brak informacji.');
+  const evPanel=evs.length?pn('Nadchodzące wydarzenia',evRows(evs,!pup),lk('pl','Plan'),'pl'):'';
   const ht=pup?C.find(c=>c.id===cid)?.homeroom_teacher_id:null;
   const help=ht?`<section class="pn" style="background:var(--in);color:#fff;border:0"><div class="pb"><b class="text-lg">Potrzebujesz pomocy?</b><p class="text-sm mt-1" style="opacity:.85">Napisz do wychowawcy klasy ${esc(cn(cid))}: ${esc(nm(ht))}.</p><button class="btn am mt-3" onclick="pre={to:'${ht}',subject:''};mtab='new';go('msg')">Napisz do wychowawcy</button></div></section>`:'';
   const c3=pup?help+pn('Ważne dzisiaj',imp)+pn('Frekwencja - ostatnie 3 dni',(ab.data||[]).map(x=>row(`${fdl(x.date)} · lekcja ${x.lesson_no} <span class="tag ${x.status==='late'?'y':x.status==='excused'?'b':'r'}">${AS[x.status]}</span>`)).join('')||n('Brak nieobecności i spóźnień.'),lk('at','Cała frekwencja'),'at')
@@ -553,8 +570,8 @@ V.home=async()=>{
   const c2=(pup?pn('Oceny od ostatniego logowania',newG.map(x=>row(`<div class="flex items-center gap-3"><button class="gc ${gcls(x.value)}" onclick="gDet('${x.id}')">${esc(x.value)}</button><div class="text-sm"><b>${esc(sn(T.find(t=>t.id===x.teaching_id)?.subject_id))}</b><div class="text-xs mu">${me.role==='parent'?esc(nm(x.student_id))+' · ':''}${fd(x.created_at)}</div></div></div>`)).join('')||n('Brak nowych ocen.'),lk('gr','Wszystkie oceny'),'gr'):'')
    +pn('Ogłoszenia',(a.data||[]).map(x=>row(`<b>${esc(x.title)}</b><div class="text-xs mu">${esc(nm(x.author_id))} · ${fd(x.created_at)}</div><p class="text-sm">${esc(plain(x.body).slice(0,140))}${plain(x.body).length>140?'…':''}</p>`)).join('')||n('Brak ogłoszeń.'),lk('ann','Wszystkie'),'ann')
    +pn('Nieprzeczytane wiadomości',msgs.map(x=>`<div class="py-2 cursor-pointer" onclick="mtab='in';go('msg');openMsg('${x.id}')"><b>${esc(x.subject)}</b><div class="text-xs mu">${esc(nm(x.sender_id))} · ${fd(x.created_at)}</div></div>`).join('')||n('Brak nowych wiadomości.'),lk('msg','Skrzynka'),'msg');
-  return `<div class="mb-4"><div class="text-xl font-bold">Dzień dobry, ${esc(me.first_name)}!</div><div class="text-sm mu">${now.toLocaleDateString('pl-PL',{weekday:'long',day:'numeric',month:'long'})} · poprzednie logowanie: ${fd(me.prev_seen)}</div></div>
-  <div class="grid lg:grid-cols-3 gap-4 items-start"><div>${pn('Dzisiejszy plan zajęć',plan,lk('pl','Cały plan'),'pl')}</div><div>${c2}</div><div>${c3}</div></div>`;
+  return `<div class="mb-4"><div class="text-xl font-bold">Dzień dobry, ${esc(me.first_name)}!</div><div class="text-sm mu">${now.toLocaleDateString('pl-PL',{weekday:'long',day:'numeric',month:'long'})}</div></div>
+  <div class="grid lg:grid-cols-3 gap-4 items-start"><div>${pn(nextDay?'Plan na '+(when==='jutro'?'jutro':when.replace(/^we? /,'')):'Dzisiejszy plan zajęć',plan,lk('pl','Cały plan'),'pl')}</div><div>${evPanel}${c2}</div><div>${c3}</div></div>`;
 };
 
 // Wiadomości
@@ -873,17 +890,20 @@ async function homeM(){
   const pup=me.role==='student'||me.role==='parent',stu=me.role==='student'?me.id:sid,cid=pup?ST[stu]?.class_id:null,now=new Date(),wd=now.getDay(),E=Promise.resolve({data:[]}),mt=T.filter(t=>t.teacher_id===me.id).map(t=>t.id),hd=hol(now);
   const scope=r=>pup?r.class_id===cid:mt.includes(r.teaching_id)||r.sub===me.id;
   let nd=addD(now,1),g=0;while(g++<10&&(nd.getDay()<1||nd.getDay()>5||hol(nd)))nd=addD(nd,1);
-  const [a,m,tt,tn,gr,ab,j]=await Promise.all([
+  const [a,m,tt,tn,gr,ab,j,evs]=await Promise.all([
     sb.from('announcements').select('*').order('created_at',{ascending:false}).limit(3),
     sb.from('message_recipients').select('read_at,messages(*)').eq('recipient_id',me.id).is('read_at',null).limit(20),
     wd>=1&&wd<=5&&!hd?sb.from('timetable').select('*').eq('weekday',wd):E,
     sb.from('timetable').select('*').eq('weekday',nd.getDay()),
     pup&&stu?sb.from('grades').select('*').eq('student_id',stu).order('created_at'):E,
     pup&&stu?sb.from('attendance').select('*').eq('student_id',stu).neq('status','present').gte('date',isoL(addD(now,-3))).order('date',{ascending:false}):E,
-    staff()&&(dir()||isHome())?jCount().then(c=>({count:c})):E]);
+    staff()&&(dir()||isHome())?jCount().then(c=>({count:c})):E,evUp(pup,cid,stu)]);
   const les=hd?[]:entries(tt.data||[],mon(now),r=>r.d===isoL(now)&&scope(r)).sort((x,y)=>x.n-y.n),nes=entries(tn.data||[],mon(nd),r=>r.d===isoL(nd)&&scope(r)).sort((x,y)=>x.n-y.n),
     days=Math.round((new Date(isoL(nd)+'T12:00')-new Date(isoL(now)+'T12:00'))/864e5),when=days===1?'jutro':({1:'w poniedziałek',2:'we wtorek',3:'w środę',4:'w czwartek',5:'w piątek'}[nd.getDay()]);
-  const plan=les.length?`<div class="hm-h">Dzisiaj</div>`+hmRows(les,pup,now,true):`<div class="hm-h">Brak zajęć</div>${hd?`<div class="text-sm mu">${esc(hd)}</div>`:''}<div class="hm-sub">Następna lekcja, ${when}</div>`+(nes.length?hmRows(nes.slice(0,4),pup,now,false):'<div class="text-sm mu">Brak lekcji w planie.</div>');
+  const nowM=now.getHours()*60+now.getMinutes(),b0=e=>BELLS[e.n-1]||[],endOf=e=>b0(e)[1]?tmin2(b0(e)[1]):0,startOf=e=>b0(e)[0]?tmin2(b0(e)[0]):0,alive=les.filter(e=>e.st!=='cancel'&&e.st!=='moved'),over=les.length>0&&alive.every(e=>endOf(e)<nowM),
+   cu=alive.find(e=>startOf(e)<=nowM&&nowM<=endOf(e)),nx=alive.find(e=>startOf(e)>nowM),
+   stat=cu?`Trwa: ${esc(sn(cu.subj||T.find(x=>x.id===cu.teaching_id)?.subject_id))} · jeszcze ${endOf(cu)-nowM} min`:nx?`Następna lekcja za ${startOf(nx)-nowM} min`:'';
+  const plan=les.length&&!over?`<div class="hm-h">Dzisiaj</div>${stat?`<div class="hm-sub">${stat}</div>`:''}`+hmRows(les,pup,now,true):`<div class="hm-h">Lekcje ${when==='jutro'?'na jutro':when}</div>${hd?`<div class="text-sm mu">${esc(hd)}</div>`:''}`+(nes.length?hmRows(nes,pup,now,false):'<div class="text-sm mu">Brak lekcji w planie.</div>');
   const by={};(gr.data||[]).filter(x=>!x.replaced_by).forEach(x=>{const s=T.find(t=>t.id===x.teaching_id)?.subject_id;if(s)(by[s]=by[s]||[]).push(x)});
   const gc=Object.keys(by).sort((x,y)=>sn(x).localeCompare(sn(y),'pl')).map(s=>`<div class="hm-gw"><button class="hm-g" onclick="go('gr')"><div class="v">${by[s].slice(-8).map(x=>esc(x.value)).join(', ')}</div><div class="a">średnia <b>${fmtAvg(wavg(by[s]))}</b></div></button><div class="hm-gl">${esc(sn(s))}</div></div>`).join('');
   const unread=(m.data||[]).filter(r=>r.messages&&!r.messages.recalled_at).map(r=>r.messages).sort((x,y)=>y.created_at.localeCompare(x.created_at)).slice(0,3);
@@ -891,7 +911,7 @@ async function homeM(){
   const tot=Object.values(dots).reduce((x,y)=>x+(y||0),0);
   return `<div class="hm-head"><h2>Cześć ${esc(me.first_name)}!</h2><button class="hm-av" onclick="moreSheet()">${esc(me.first_name[0])}${(()=>{const n=NAVT.filter(x=>!mainKeys().includes(x[0])).reduce((a,x)=>a+(dots[x[0]]||0),0);return n?`<em>${n>99?'99+':n}</em>`:''})()}</button></div>
    <div class="hm-c"><div class="hm-date"><img src="icons/icon-192.png" alt=""><div><small>${now.toLocaleDateString('pl-PL',{weekday:'long'})}</small><b>${now.toLocaleDateString('pl-PL',{day:'numeric',month:'long',year:'numeric'})}</b></div><button onclick="go('ps')" title="Powiadomienia">${ic('ps')}</button></div></div>
-   <div class="hm-c">${plan}</div>
+   <div class="hm-c">${plan}</div>${evs.length?sec('Nadchodzące wydarzenia','pl','Plan')+`<div class="hm-c">${evRows(evs,!pup)}</div>`:''}
    ${j.count?`<div class="hm-c"><div class="flex items-center justify-between"><div><b class="text-lg">${j.count}</b> usprawiedliwień do rozpatrzenia</div><button class="btn sm" onclick="go('js')">Przejdź</button></div></div>`:''}
    ${pup?sec('Oceny'+(me.role==='parent'?' - '+esc(nm(stu)):''),'gr')+(gc?`<div class="hm-row">${gc}</div>`:'<div class="hm-c mu text-sm">Brak ocen.</div>'):''}
    ${pup&&(ab.data||[]).length?sec('Frekwencja - ostatnie dni','at','Cała')+`<div class="hm-c">${ab.data.map(x=>`<div class="hm-li"><b>${fdl(x.date)} · lekcja ${x.lesson_no}</b><span>${AS[x.status]}</span></div>`).join('')}</div>`:''}
@@ -903,7 +923,7 @@ function weekM(days,ns,data,cell,td){
   const act=mDay!=null?mDay:Math.max(0,days.findIndex(d=>isoL(d)===td));
   return `<div class="dtabs">${days.map((d,i)=>`<button class="dt${i===act?' on':''}${isoL(d)===td?' tdy':''}" onclick="pickDay(${i})"><small>${DAYS[i+1].slice(0,3)}</small><b>${pad(d.getDate())}</b></button>`).join('')}</div>`
    +days.map((d,i)=>{const ds=isoL(d),ho=hol(d),lst=ns.filter(n=>data.some(x=>x.d===ds&&x.n===n));
-    return `<div class="dp" style="${i===act?'':'display:none'}">${ALLDAY?ALLDAY(ds):''}${ho?`<div class="hol"><b>${esc(ho)}</b><div class="text-xs mu">Dzień wolny od zajęć</div></div>`:lst.length?lst.map(n=>`<div class="dlr"><div class="dn">${n}<small>${(BELLS[n-1]||[]).join('<br>')}</small></div><div>${data.filter(x=>x.d===ds&&x.n===n).map(e=>cell(e,T.find(x=>x.id===e.teaching_id),ds)).join('')}</div></div>`).join(''):'<p class="em">Brak lekcji tego dnia.</p>'}</div>`}).join('')}
+    return `<div class="dp" style="${i===act?'':'display:none'}">${ALLDAY?ALLDAY(ds):''}${ho?`<div class="hol"><b>${esc(ho)}</b><div class="text-xs mu">Dzień wolny od zajęć</div></div>`:lst.length?lst.map(n=>{const mk=ds===td?nowMark(n,lst):null;return `<div class="dlr${mk?' nlc '+mk.st:''}"><div class="dn">${n}<small>${(BELLS[n-1]||[]).join('<br>')}</small></div><div>${data.filter(x=>x.d===ds&&x.n===n).map(e=>cell(e,T.find(x=>x.id===e.teaching_id),ds)).join('')}</div>${mk&&mk.pos!=null?nowLine(mk.pos):''}</div>`}).join(''):'<p class="em">Brak lekcji tego dnia.</p>'}</div>`}).join('')}
 const pickDay=i=>{mDay=i;$$('.dt').forEach((b,j)=>b.classList.toggle('on',j===i));$$('.dp').forEach((q,j)=>q.style.display=j===i?'':'none')};
 let czT;const cardify=()=>{if(!isM())return;$$('#main table:not(.gt):not(.rt),#modal table:not(.gt):not(.rt)').forEach(t=>{
   const hs=[...t.querySelectorAll('thead th')].map(h=>h.textContent.replace(/[↑↓↕]/g,'').trim());t.classList.add('rt');
@@ -1373,25 +1393,26 @@ function chSave(id){const k=CH.find(x=>x.id===id);if(!k)return;const note=v('cen
 /* ================= WYDARZENIA W PLANIE (lekcja / cały dzień / kilka dni) ================= */
 const EVN={test:['Sprawdzian','r'],quiz:['Kartkówka','y'],homework:['Praca domowa','b'],task:['Zadanie','g'],project:['Projekt',''],other:['Wydarzenie','b']};
 let EVC=[],EVADD=false;const EVM={};
-const evTitle=x=>String(x.title||'').split('\n')[0],evDesc=x=>x.description||String(x.title||'').split('\n').slice(1).join('\n').trim();
+const EVR=/^\u2063L\d+\u2063/,evLn=x=>{if(x.lesson_no!=null&&x.lesson_no!=='')return +x.lesson_no;const m=String(x.title||'').match(/^\u2063L(\d+)\u2063/);return m?+m[1]:null};
+const evTitle=x=>String(x.title||'').replace(EVR,'').split('\n')[0],evDesc=x=>x.description||String(x.title||'').replace(EVR,'').split('\n').slice(1).join('\n').trim();
 const evLabel=x=>x.kind==='other'&&evTitle(x)?evTitle(x):(EVN[x.kind]||['Inne',''])[0];
 const evCovers=(x,ds)=>x.date<=ds&&(x.date_to||x.date)>=ds;
 const evTag=x=>{EVM[x.id]=x;const k=EVN[x.kind]||['Inne',''];return `<span class="tag ${k[1]} evp" title="Kliknij, aby zobaczyć szczegóły" onclick="event.stopPropagation();evShow('${x.id}')">${esc(evLabel(x))}</span>`};
 const _wg=weekGrid;
 weekGrid=(data,cell)=>{
   const days=[0,1,2,3,4].map(i=>isoL(addD(wk,i))),cls=new Set(data.map(e=>e.class_id)),
-   al=days.map(ds=>EVC.filter(x=>!x.lesson_no&&cls.has(x.class_id)&&evCovers(x,ds))),
+   al=days.map(ds=>EVC.filter(x=>evLn(x)==null&&cls.has(x.class_id)&&evCovers(x,ds))),
    adTag=x=>`<div class="mt-1">${evTag(x)}${cls.size>1?`<div class="text-xs mu">${esc(cn(x.class_id))}</div>`:''}</div>`;
   ALLDAY=isM()?(ds=>{const a=al[days.indexOf(ds)]||[];return a.length?`<div class="adv"><small>Cały dzień</small>${a.map(adTag).join('')}</div>`:''}):null;
   let h0;
   try{h0=_wg(data,(e,t,ds)=>{
-    const h=cell(e,t,ds),L=EVC.filter(x=>x.lesson_no&&x.class_id===e.class_id&&x.lesson_no===e.n&&evCovers(x,ds)).map(x=>`<div class="text-xs mt-1">${evTag(x)}</div>`).join(''),
+    const h=cell(e,t,ds),L=EVC.filter(x=>evLn(x)===e.n&&x.class_id===e.class_id&&evCovers(x,ds)).map(x=>`<div class="text-xs mt-1">${evTag(x)}</div>`).join(''),
     add=EVADD&&e.st!=='cancel'&&e.st!=='moved'&&(dir()||T.find(y=>y.id===e.teaching_id)?.teacher_id===me.id||e.sub===me.id)?`<div><a class="lk np" onclick="evAdd('${e.class_id}','${ds}',${e.n},'${e.teaching_id}')">+ Wydarzenie</a></div>`:'';
-    return h.replace(/<\/div>\s*$/,L+add+'</div>')})}finally{ALLDAY=null}
+    return h.replace(/<\/div>\s*$/,()=>L+add+'</div>')})}finally{ALLDAY=null}
   if(isM()||!al.some(a=>a.length)||!h0.includes('<div class="tm">'))return h0;
   const row='<div class="tm">cały dzień</div>'+days.map((ds,i)=>hol(new Date(ds+'T12:00'))?'<div class="hol"></div>':'<div>'+al[i].map(adTag).join('')+'</div>').join('');
   return h0.replace('<div class="tm">',row+'<div class="tm">')};
-function evShow(id){const x=EVM[id];if(!x)return;const k=EVN[x.kind]||['Inne',''],hrs=x.lesson_no?(BELLS[x.lesson_no-1]||[]).join(' - '):'',
+function evShow(id){const x0=EVM[id];if(!x0)return;const x={...x0,lesson_no:evLn(x0)};const k=EVN[x.kind]||['Inne',''],hrs=x.lesson_no?(BELLS[x.lesson_no-1]||[]).join(' - '):'',
   when=x.lesson_no?`${fdl(x.date)} · lekcja ${x.lesson_no}${hrs?' ('+hrs+')':''}`:((x.date_to&&x.date_to!==x.date?fdl(x.date)+' - '+fdl(x.date_to):fdl(x.date))+' · cały dzień'),
   who=staff()&&x.student_ids?.length?x.student_ids.map(i=>esc(ln(i))).join(', '):'cała klasa',can=staff()&&(dir()||x.created_by===me.id),ti=evTitle(x),ds=evDesc(x);
   modal(`<div class="box"><h3 class="mh"><span class="tag ${k[1]}">${k[0]}</span>${ti&&ti!==k[0]?' '+esc(ti):''}</h3>
@@ -1401,17 +1422,17 @@ function evShow(id){const x=EVM[id];if(!x)return;const k=EVN[x.kind]||['Inne',''
 const _pl2=V.pl;
 V.pl=async()=>{
   const pup=!staff(),cid=pup?ST[sid]?.class_id:null,r=await sb.from('plan_events').select('*').lte('date',isoL(addD(wk,4))).gte('date_to',isoL(wk));
-  if(r.error)warn('Wydarzenia: '+r.error.message+' (uruchom plan_events.sql w Supabase)');
+  if(r.error)warn('Wydarzenia: '+r.error.message+'');
   EVC=(r.data||[]).filter(e=>!pup||(e.class_id===cid&&(!e.student_ids?.length||e.student_ids.includes(sid))));EVADD=staff();
   try{const h=await _pl2();return (staff()?`<div class="mb-3 np"><button class="btn" onclick="evAddDay()">${ic('plus')} Dodaj wydarzenie</button></div>`:'')+h}finally{EVADD=false;EVC=[]}};
 const evAdd=(cid,d,n,tid)=>evForm(cid,d,n,tid);
 const evAddDay=()=>evForm(plSel&&plSel!=='my'&&!String(plSel).startsWith('t:')?plSel:'',null,null,null);
 function evForm(cid,d,n,tid){const les=n!=null,mine=dir()?C:C.filter(c=>c.homeroom_teacher_id===me.id||T.some(t=>t.teacher_id===me.id&&t.class_id===c.id)),
   L=LNS().map(i=>[i,'Lekcja '+i]),t=T.find(x=>x.id===tid);
-  modal(`<div class="box w"><h3 class="mh">${les?'Wpis do planu · klasa '+esc(cn(cid))+', lekcja '+n:'Nowe wydarzenie'}</h3>${les?`<p class="text-sm mu mb-3">${fdl(d)} · ${esc(sn(t?.subject_id))} · ${(BELLS[n-1]||[]).join(' - ')}<br><b>To wydarzenie dotyczy tylko tej lekcji.</b></p>`:''}
+  modal(`<div class="box w"><h3 class="mh">${les?'Wpis do planu · klasa '+esc(cn(cid))+', lekcja '+n:'Nowe wydarzenie'}</h3>${les?`<p class="text-sm mu mb-3">${fdl(d)} · ${esc(sn(t?.subject_id))} · ${(BELLS[n-1]||[]).join(' - ')}</p>`:''}
    <label class="lb">Rodzaj</label>${seg('evk',Object.entries(EVN).map(([k,x])=>[k,x[0]]),les?'test':'other',()=>{})}
-   <label class="lb mt-3">Nazwa (dla rodzaju „Wydarzenie” widać ją w planie)</label><input type="text" id="evt" class="inp" maxlength="80" placeholder="np. Wycieczka do muzeum">
-   <label class="lb mt-3">Dodatkowy opis (nieobowiązkowy)</label><textarea id="evdsc" rows="3" maxlength="1000" placeholder="np. zbiórka o 8:00 pod szkołą, zabrać drugie śniadanie"></textarea>
+   <label class="lb mt-3">Nazwa</label><input type="text" id="evt" class="inp" maxlength="80" placeholder="np. Wycieczka do muzeum">
+   <label class="lb mt-3">Opis (opcjonalnie)</label><textarea id="evdsc" rows="3" maxlength="1000" placeholder="np. zbiórka o 8:00 pod szkołą, zabrać drugie śniadanie"></textarea>
    ${les?'':`<label class="lb mt-3">Klasy</label>${dd('evc',mine.map(c=>[c.id,'Klasa '+c.name]),cid?[cid]:[],{multi:1,ph:'Wybierz klasy…'})}
    <label class="lb mt-3">Kiedy</label>${seg('evm',[['day','Cały dzień / kilka dni'],['les','Jedna lekcja']],'day',k=>{$('#evd2w').style.display=k==='day'?'':'none';$('#evlw').style.display=k==='les'?'':'none'})}
    <div class="grid grid-cols-2 evg gap-3 mt-2"><div><label class="lb">Od dnia</label>${dp('evd1',isoL(new Date()))}</div><div id="evd2w"><label class="lb">Do dnia (puste = jeden dzień)</label>${dp('evd2','')}</div><div id="evlw" style="display:none"><label class="lb">Lekcja</label>${dd('evl',L,1)}</div></div>`}
@@ -1426,8 +1447,10 @@ function evSave(cid0,d0,n0,tid){const les=n0!=null,cids=les?[cid0]:(FV.evc||[]);
   const title=v('evt').trim()||EVN[FV.evk][0],subj=les?(T.find(x=>x.id===tid)?.subject_id||null):null,desc=v('evdsc').trim();
   const mk=c=>({school_id:me.school_id,class_id:c,kind:FV.evk,title,date:d1,date_to:d2,lesson_no:ln_,subject_id:subj,student_ids:pick?FV.evs:null,created_by:me.id});
   /* opis trafia do kolumny description; gdy jej nie ma w bazie, zapisujemy go w tytule (2. linia) - działa bez zmian w bazie */
-  const ins=async()=>{let r=await sb.from('plan_events').insert(cids.map(c=>({...mk(c),...(desc?{description:desc}:{})})));
-    if(r.error&&desc&&/description|schema cache|column/i.test(r.error.message||''))r=await sb.from('plan_events').insert(cids.map(c=>({...mk(c),title:title+'\n'+desc})));
+  const ins=async()=>{let r=await sb.from('plan_events').insert(cids.map(c=>({...mk(c),...(desc?{description:desc}:{})}))).select();
+    if(r.error&&desc&&/description|schema cache|column/i.test(r.error.message||''))r=await sb.from('plan_events').insert(cids.map(c=>({...mk(c),title:title+'\n'+desc}))).select();
+    /* jeśli baza nie zapisała numeru lekcji, zapisujemy go w tytule - wydarzenie zawsze trafi do właściwej lekcji */
+    if(!r.error&&ln_!=null)for(const x of (r.data||[]).filter(x=>x.lesson_no==null))await sb.from('plan_events').update({title:'\u2063L'+ln_+'\u2063'+(x.title||'')}).eq('id',x.id);
     return r};
   act(ins(),()=>{closeModal();wk=mon(new Date(d1+'T12:00'));rr()},'Dodano wydarzenie')}
 const delEv=async id=>{closeModal();if(await ask('Usunąć wpis?','Usuń'))act(sb.from('plan_events').delete().eq('id',id),rr,'Usunięto')};
@@ -1519,6 +1542,27 @@ const bulkM=(sts,by)=>`<div>${sts.map((p,i)=>`<div class="grw"><span class="arn"
 const _place=place;place=(b,w)=>{_place(b,w);if(isM())$('#popbg').classList.add('show')};
 const _closePop=closePop;closePop=()=>{_closePop();$('#popbg')?.classList.remove('show')};
 document.addEventListener('click',e=>{if(e.target.closest('.arw .ae,.gadd,.dt,.seg button'))try{navigator.vibrate&&navigator.vibrate(8)}catch{}});
+
+/* ===== v46 ===== */
+const hideSplash=()=>{const s=$('#splash');if(!s||s.dataset.h)return;s.dataset.h=1;setTimeout(()=>{s.classList.add('out');setTimeout(()=>s.remove(),400)},Math.max(0,800-performance.now()))};
+setTimeout(hideSplash,10000);
+/* metryczka: gdzie jesteśmy względem lekcji (pos w %, null = brak linii w tym wierszu) */
+const nowMin=()=>{const d=new Date();return d.getHours()*60+d.getMinutes()+d.getSeconds()/60};
+function nowMark(n,ns){const b=BELLS[n-1];if(!b||!b[0])return null;const t=nowMin(),s=tmin2(b[0]),e=tmin2(b[1]),i=ns.indexOf(n),st=t<s?'fut':t>e?'past':'cur';let pos=null;
+  if(st==='cur')pos=(t-s)/(e-s)*100;
+  else if(st==='past'){const nx=ns[i+1],nb=nx!=null&&BELLS[nx-1];if(!nb||t<tmin2(nb[0]))pos=100}
+  else if(i===0)pos=0;
+  return{st,pos}}
+const nowLine=p=>{const d=new Date(),top=p>=100?'calc(100% + 3px)':p<=0?'-3px':p+'%';return `<i class="nl" style="top:${top}"><b>${pad(d.getHours())}:${pad(d.getMinutes())}</b></i>`};
+/* nadchodzące wydarzenia (7 dni) na ekranie Start */
+const evUp=async(pup,cid,stu)=>{try{const r=await sb.from('plan_events').select('*').gte('date_to',isoL(new Date())).lte('date',isoL(addD(new Date(),7))).order('date');if(r.error)return[];
+  return(r.data||[]).filter(x=>pup?(x.class_id===cid&&(!x.student_ids?.length||x.student_ids.includes(stu))):(dir()||C.some(c=>c.id===x.class_id&&c.homeroom_teacher_id===me.id)||T.some(y=>y.teacher_id===me.id&&y.class_id===x.class_id))).slice(0,6)}catch{return[]}};
+const evDay=ds=>{const t=isoL(new Date());return ds<=t?'dziś':ds===isoL(addD(new Date(),1))?'jutro':new Date(ds+'T12:00').toLocaleDateString('pl-PL',{weekday:'short',day:'numeric',month:'numeric'})};
+const evRows=(L,st)=>L.map(x=>`<div class="flex items-center gap-2 py-2 border-b last:border-0" style="border-color:var(--ln)"><span class="text-xs mu" style="min-width:68px">${evDay(x.date)}</span><div class="flex-1">${evTag(x)}</div><span class="text-xs mu">${st?'kl. '+esc(cn(x.class_id)):''}${evLn(x)!=null?(st?' · ':'')+'lekcja '+evLn(x):''}</span></div>`).join('');
+/* powiadomienie o nowym wydarzeniu w planie (osobny kanał, nie psuje reszty) */
+function evLive(){if(staff())return;sb.channel('pe').on('postgres_changes',{event:'INSERT',schema:'public',table:'plan_events'},p=>{const x=p.new,ids=me.role==='student'?[me.id]:KIDS;
+  if(x.created_by===me.id||!ids.some(i=>ST[i]?.class_id===x.class_id&&(!x.student_ids?.length||x.student_ids.includes(i))))return;
+  toast('Nowe wydarzenie w planie: '+evLabel(x),'info',6000);beep();if(!dirty&&!$('#modal').classList.contains('show')&&(tab==='pl'||tab==='home'))render(true)}).subscribe()}
 
 init();
 </script>
