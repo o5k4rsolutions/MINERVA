@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#1E2A78">
+<title>Świadectwa - Minerva</title>
+<link rel="icon" href="https://dziennik-minerva.pages.dev/themes/icon-dark.svg">
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<style>
+:root{--in:#1E2A78;--am:#F5A524;--bg:#EEF1F6;--ln:#e0e5ee;--mu:#64708a;--tx:#1b2238;--ez:cubic-bezier(.2,.8,.2,1)}
+*{box-sizing:border-box}html,body{height:100%}
+body{margin:0;font-family:'Open Sans',sans-serif;background:var(--bg);color:var(--tx);-webkit-print-color-adjust:exact;print-color-adjust:exact}
+button{font:inherit;cursor:pointer}.mu{color:var(--mu)}
+@keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@keyframes pop{0%{transform:scale(.9);opacity:0}100%{transform:scale(1);opacity:1}}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+/* ---------- splash ---------- */
+#splash{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;flex-direction:column;overflow:hidden;background:radial-gradient(ellipse at 50% 38%,#2f3fa8 0%,#1E2A78 45%,#0d1445 100%);transition:opacity .5s ease,transform .6s cubic-bezier(.6,0,.2,1),visibility .5s}
+#splash.out{opacity:0;transform:scale(1.06);pointer-events:none;visibility:hidden}
+#splash .orb{position:absolute;border-radius:50%;filter:blur(60px);opacity:.5;animation:orb 7s ease-in-out infinite alternate}
+#splash .o1{width:46vmax;height:46vmax;left:-14vmax;top:-12vmax;background:#3d52d9}#splash .o2{width:38vmax;height:38vmax;right:-12vmax;bottom:-14vmax;background:#F5A524;opacity:.28;animation-delay:-3s}
+@keyframes orb{from{transform:translate(0,0) scale(1)}to{transform:translate(4vmax,3vmax) scale(1.15)}}
+#splash .ring{position:absolute;width:min(78vw,520px);aspect-ratio:1;border-radius:50%;border:1.5px solid #ffffff1c;animation:ringp 3.2s ease-out infinite}#splash .r2{animation-delay:1.6s}
+@keyframes ringp{0%{transform:scale(.35);opacity:0}25%{opacity:.9}100%{transform:scale(1.15);opacity:0}}
+#splash .lg{width:min(66vw,340px);animation:lgIn 1.1s var(--ez) both}
+#splash .lg img{display:block;width:100%;clip-path:inset(0 100% 0 0);animation:wipe 1s .25s cubic-bezier(.65,0,.2,1) forwards,glow 2.4s 1.3s ease-in-out infinite alternate}
+@keyframes lgIn{from{opacity:0;transform:translateY(18px) scale(.88);filter:blur(8px)}to{opacity:1;transform:none;filter:none}}
+@keyframes wipe{to{clip-path:inset(0 0 0 0)}}@keyframes glow{from{filter:drop-shadow(0 0 0 #F5A52400)}to{filter:drop-shadow(0 0 14px #F5A5248c)}}
+#splash .bar{position:relative;width:190px;height:4px;border-radius:4px;background:#ffffff26;margin-top:2.2rem;overflow:hidden;opacity:0;animation:fadeUp .5s .9s both}
+#splash .bar:after{content:"";position:absolute;inset:0;width:42%;border-radius:4px;background:linear-gradient(90deg,#F5A524,#ffd37a);animation:barRun 1.25s ease-in-out infinite}
+@keyframes barRun{0%{transform:translateX(-110%)}100%{transform:translateX(260%)}}
+#splash .tx{margin-top:.9rem;color:#ffffffb8;font-size:.8rem;font-weight:600;letter-spacing:.04em;opacity:0;animation:fadeUp .5s 1.1s both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+/* ---------- gate ---------- */
+#gate{position:fixed;inset:0;z-index:9000;background:linear-gradient(135deg,#1E2A78,#0d1445);display:none;align-items:center;justify-content:center;padding:1.5rem;text-align:center;color:#fff}
+#gate.on{display:flex}#gate .gb{max-width:420px;animation:pop .4s var(--ez)}
+#gate .gi{font-size:3.4rem}#gate h2{margin:.6rem 0 .4rem;font-size:1.35rem}#gate p{color:#ffffffc0;margin:0 0 1.4rem}
+/* ---------- layout ---------- */
+.hdr{height:60px;background:linear-gradient(135deg,#1E2A78,#2f3fa8);color:#fff;display:flex;align-items:center;gap:1rem;padding:0 1.2rem;box-shadow:0 4px 16px #1e2a7844;position:relative;z-index:5}
+.hdr img{height:30px}.hdr h1{font-size:1.05rem;margin:0;font-weight:800;letter-spacing:.01em}.hdr .sp{flex:1}
+.app{display:grid;grid-template-columns:270px 400px 1fr;height:calc(100vh - 60px)}
+.col{overflow:auto;border-right:1px solid var(--ln)}.col.l{background:#fff}.col.m{background:#F7F9FC;padding:1rem}.col.r{background:#dfe4ee;border:0;padding:1rem}
+.btn{background:var(--in);color:#fff;border:0;border-radius:8px;padding:.5rem 1rem;font-weight:600;font-size:.88rem;display:inline-flex;align-items:center;gap:.4rem;transition:transform .18s var(--ez),box-shadow .2s,background .15s}
+.btn:hover{background:#2b3a9c;transform:translateY(-1px);box-shadow:0 6px 16px #1e2a7833}.btn:active{transform:scale(.96)}.btn.am{background:var(--am);color:var(--in)}.btn.am:hover{background:#ffb83d}.btn.sm{padding:.3rem .65rem;font-size:.8rem}
+.gh{background:#fff;border:1px solid #cbd3e1;color:var(--in);border-radius:8px;padding:.45rem .85rem;font-weight:600;font-size:.85rem;display:inline-flex;align-items:center;gap:.4rem;transition:transform .18s var(--ez),background .15s}.gh:hover{background:#f4f6fb;transform:translateY(-1px)}.gh:active{transform:scale(.96)}
+.gh.sm{padding:.25rem .6rem;font-size:.78rem}.gh.red{color:#b91c1c}.hdr .gh{background:#ffffff22;border:0;color:#fff}.hdr .gh:hover{background:#ffffff38}
+select,input[type=text],input[type=number],input[type=date],textarea{border:1px solid #cbd3e1;border-radius:8px;padding:.45rem .6rem;width:100%;background:#fff;font:inherit;font-size:.88rem;color:var(--tx)}
+select:focus,input:focus,textarea:focus{outline:2px solid var(--am);border-color:var(--am)}
+.hdr select{width:auto;background:#ffffff22;color:#fff;border:0;font-weight:600}.hdr select option{color:#000}
+.lb{display:block;font-size:.75rem;font-weight:700;color:#475569;margin:.7rem 0 .25rem}
+.sec{background:#fff;border:1px solid var(--ln);border-radius:12px;padding:.9rem 1rem;margin-bottom:.8rem;animation:rise .4s var(--ez) both}
+.sec h4{margin:0 0 .3rem;font-size:.92rem;color:var(--in);font-weight:800;display:flex;align-items:center;gap:.4rem}
+.sec:nth-child(2){animation-delay:.05s}.sec:nth-child(3){animation-delay:.1s}.sec:nth-child(4){animation-delay:.15s}.sec:nth-child(5){animation-delay:.2s}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:.6rem}
+.si{display:flex;gap:.6rem;align-items:center;padding:.6rem .8rem;border-bottom:1px solid #eef1f6;cursor:pointer;transition:background .15s,transform .18s var(--ez);border-left:3px solid transparent}
+.si:hover{background:#f4f6fb;transform:translateX(2px)}.si.on{background:#eef1ff;border-left-color:var(--am)}
+.si input{width:auto;accent-color:var(--in)}.si b{font-size:.88rem;display:block}.si small{color:var(--mu);font-size:.72rem}
+.dot{width:9px;height:9px;border-radius:50%;flex:0 0 9px;background:#22a55b}.dot.w{background:var(--am)}.dot.e{background:#e11d48}
+.tag{display:inline-block;padding:.05rem .5rem;border-radius:999px;font-size:.72rem;font-weight:700;background:#eef1f6;color:#475569}.tag.g{background:#dcfce7;color:#166534}.tag.r{background:#fee2e2;color:#991b1b}.tag.b{background:#e0e7ff;color:var(--in)}
+.gc{display:inline-flex;align-items:center;justify-content:center;min-width:28px;height:28px;border-radius:8px;font-weight:700;border:1.5px solid #d5dbe7;background:#fff;font-size:.85rem}
+table.gt{width:100%;border-collapse:collapse;font-size:.82rem}.gt td,.gt th{padding:.3rem .3rem;border-bottom:1px solid #eef1f6;text-align:left}.gt th{color:var(--mu);font-size:.7rem;text-transform:uppercase}
+.gt input{width:54px;text-align:center;padding:.25rem}
+.chip{display:inline-flex;align-items:center;gap:.3rem;background:#eef1ff;color:var(--in);border-radius:999px;padding:.2rem .6rem;font-size:.76rem;font-weight:600;margin:0 .3rem .3rem 0;border:0;transition:transform .15s}.chip:hover{transform:scale(1.04)}
+.chip.sug{background:#fff7e6;color:#9a5b00;border:1px dashed var(--am)}
+.ach{display:flex;gap:.4rem;margin-bottom:.35rem;align-items:center;animation:pop .25s var(--ez)}.ach input{flex:1}
+.bhx{background:linear-gradient(135deg,#eef1ff,#fff);border:1px solid #d9deff;border-radius:10px;padding:.7rem .8rem;margin-bottom:.4rem}
+.bhx big{font-size:1.15rem;font-weight:800;color:var(--in)}
+.bar{background:#e3e8f3;height:8px;border-radius:8px;overflow:hidden;margin:.4rem 0}.bar i{display:block;height:100%;background:linear-gradient(90deg,#F5A524,#22a55b);transition:width .5s var(--ez)}
+#toasts{position:fixed;right:16px;bottom:16px;z-index:9500;display:flex;flex-direction:column;gap:8px}
+.toast{padding:.65rem 1rem;border-radius:10px;color:#fff;background:var(--in);box-shadow:0 8px 24px #0004;animation:rise .35s var(--ez) both;font-size:.88rem;max-width:360px}.toast.ok{background:#15803d}.toast.bad{background:#b91c1c}
+#modal{position:fixed;inset:0;background:#0b1030aa;z-index:9400;display:none;align-items:center;justify-content:center;padding:1rem}#modal.show{display:flex;animation:fade .2s}
+#modal .box{background:#fff;border-radius:16px;padding:1.3rem;max-width:520px;width:100%;max-height:90vh;overflow:auto;animation:pop .3s var(--ez)}
+#modal h3{margin:0 0 .6rem;color:var(--in)}
+.banner{background:#fff7e6;border:1px solid #ffd58a;color:#7a4b00;border-radius:10px;padding:.6rem .8rem;font-size:.8rem;margin-bottom:.8rem}
+.pvtabs{display:flex;gap:.4rem;margin-bottom:.7rem;align-items:center;flex-wrap:wrap}.pvtabs .sp{flex:1}
+.pvw{margin:0 auto .9rem;box-shadow:0 8px 30px #1e2a7833;border-radius:2px;background:#fff;overflow:hidden;animation:pop .4s var(--ez)}.pvs{transform-origin:0 0}
+.save{font-size:.75rem;color:var(--mu);margin-left:.4rem}
+/* ---------- BLANKIET / ŚWIADECTWO (A4) ---------- */
+.pg{width:210mm;height:296mm;position:relative;background:#fff;overflow:hidden;color:#14193a;font-family:'Open Sans',sans-serif;break-after:page;page-break-after:always;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.pg .frm{position:absolute;inset:0;pointer-events:none}
+.fr1{position:absolute;inset:7mm;border:1.4mm solid #1E2A78}.fr2{position:absolute;inset:10mm;border:.35mm solid #F5A524}.fr3{position:absolute;inset:11.6mm;border:.2mm solid #1E2A78}
+.gil{position:absolute;inset:12mm;background:repeating-radial-gradient(circle at 28% 18%,transparent 0 1.1mm,rgba(30,42,120,.05) 1.1mm 1.3mm),repeating-radial-gradient(circle at 74% 82%,transparent 0 1.1mm,rgba(245,165,36,.08) 1.1mm 1.3mm)}
+.wm{position:absolute;left:50%;top:54%;width:118mm;transform:translate(-50%,-50%);opacity:.055}
+.cn{position:absolute;width:5.2mm;height:5.2mm;background:#F5A524;transform:rotate(45deg);border:.5mm solid #1E2A78}
+.cn.a{left:4.4mm;top:4.4mm}.cn.b{right:4.4mm;top:4.4mm}.cn.c{left:4.4mm;bottom:4.4mm}.cn.d{right:4.4mm;bottom:4.4mm}
+.stripe{position:absolute;left:12mm;right:12mm;top:13.2mm;height:3.6mm;background:#c8102e;box-shadow:0 5.4mm 0 -1.4mm #c8102e}
+.serial{position:absolute;right:15mm;bottom:12.8mm;font-size:6.5pt;letter-spacing:.18em;color:#1E2A78;opacity:.7;font-weight:700}
+.stamp{position:absolute;width:30mm;height:30mm;border:.3mm dashed #9aa4c2;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:6.5pt;color:#9aa4c2;text-align:center}
+.in{position:absolute;inset:0;padding:20mm 25mm 17mm}
+.pg .logo{height:14mm;display:block;margin:0 auto 1.5mm}
+.pg .sch{text-align:center;font-size:8.5pt;letter-spacing:.16em;text-transform:uppercase;color:#1E2A78;font-weight:700}
+.pg h1.tt{font-family:'Playfair Display',serif;font-size:26pt;text-align:center;letter-spacing:.09em;margin:5.5mm 0 0;color:#1E2A78;font-weight:600}
+.pg .rule{border-top:.35mm solid #F5A524;width:44mm;margin:2.2mm auto 2.4mm;position:relative}
+.pg .rule:after{content:"";position:absolute;left:50%;top:-1.4mm;width:2.4mm;height:2.4mm;background:#F5A524;transform:translateX(-50%) rotate(45deg)}
+.pg .sub{text-align:center;font-size:10pt;color:#3b4468}
+.pg .who{text-align:center;margin-top:5mm;font-size:10pt;color:#3b4468}
+.pg .nm{font-family:'Playfair Display',serif;font-size:19pt;text-align:center;font-weight:600;margin:1mm 0;color:#14193a}
+.pg .bd{text-align:center;font-size:10pt;color:#3b4468}
+.pg .intro{margin:5mm 0 2.5mm;font-size:9.8pt;line-height:1.45;text-align:center;color:#2b3350}
+.ct{width:100%;border-collapse:collapse;font-size:10pt}
+.ct th{background:#1E2A78;color:#fff;font-weight:700;font-size:8pt;letter-spacing:.06em;text-transform:uppercase;padding:1.6mm 2.5mm;text-align:left;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.ct td{padding:0 2.5mm;height:var(--rh,7.2mm);border-bottom:.2mm solid #c9d0e6}.ct td:first-child,.ct th:first-child{width:9mm;text-align:center;padding:0 1mm}
+.ct td:last-child{font-weight:700;width:48mm}.ct tr:nth-child(even) td{background:#f5f7fd}
+.pg .beh{margin-top:4.5mm;display:flex;justify-content:space-between;align-items:center;border:.4mm solid #1E2A78;padding:2.6mm 4mm;font-size:10.5pt}.pg .beh b{font-size:12pt;color:#1E2A78}
+.h2{font-family:'Playfair Display',serif;font-size:14pt;color:#1E2A78;margin:0 0 1.6mm;font-weight:600;display:flex;align-items:center;gap:2.5mm}.h2:after{content:"";flex:1;border-top:.25mm solid #F5A524}
+.blk{margin-bottom:6.5mm}.p2h{display:flex;justify-content:space-between;font-size:8.5pt;color:#3b4468;border-bottom:.3mm solid #1E2A78;padding-bottom:1.6mm;margin-bottom:6mm}
+.kv{display:grid;grid-template-columns:repeat(4,1fr);gap:2mm}.kv div{border:.25mm solid #c9d0e6;padding:2mm 2.4mm;font-size:8pt;color:#3b4468}.kv b{display:block;font-size:13pt;color:#1E2A78;margin-top:.5mm}
+.al{margin:0;padding:0;list-style:none;font-size:10pt;line-height:1.5}.al li{padding-left:5.5mm;position:relative;margin-bottom:1.2mm}.al li:before{content:"";position:absolute;left:0;top:2.2mm;width:2mm;height:2mm;background:#F5A524;transform:rotate(45deg)}
+.promo{border:.5mm solid #1E2A78;padding:4.5mm 5mm;text-align:center;font-size:12pt;line-height:1.5;background:linear-gradient(180deg,#f5f7fd,#fff)}.promo b{color:#1E2A78}
+.sig{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8mm;margin-top:14mm;align-items:end;text-align:center;font-size:8pt;color:#3b4468}.sig div.l{border-top:.3mm solid #14193a;padding-top:1.5mm}
+.pg .foot{position:absolute;left:25mm;right:25mm;bottom:16mm;font-size:6.8pt;color:#6b7491;text-align:center;line-height:1.4}
+.pg .where{font-size:10pt;margin-top:8mm}
+.noform .frm{display:none!important}
+#printRoot{display:none}
+@page{size:A4;margin:0}
+@media print{body{background:#fff}body>*:not(#printRoot){display:none!important}#printRoot{display:block}.pg{margin:0}.pg:last-child{break-after:auto;page-break-after:auto}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+</style>
+</head>
+<body>
+<div id="splash"><i class="orb o1"></i><i class="orb o2"></i><i class="ring"></i><i class="ring r2"></i><div class="lg"><img src="https://dziennik-minerva.pages.dev/themes/logo-horizontal-white.svg" alt="Minerva"></div><div class="bar"></div><div class="tx">Uruchamianie aplikacji Świadectwa…</div></div>
+<div id="gate"><div class="gb"><div class="gi">🖥️</div><h2>Nie można uruchomić aplikacji Świadectwa</h2><p>Otwórz ją na komputerze lub laptopie.</p><button class="btn am" onclick="goBack()">Wróć do dziennika</button></div></div>
+
+<div id="app" style="display:none">
+  <div class="hdr">
+    <img src="https://dziennik-minerva.pages.dev/themes/logo-horizontal-white.svg" alt="Minerva">
+    <h1>Świadectwa</h1>
+    <span class="sp"></span>
+    <label style="font-size:.8rem;opacity:.85">Klasa</label><select id="selC" onchange="pickClass(this.value)"></select>
+    <label style="font-size:.8rem;opacity:.85">Rok szkolny</label><select id="selY" onchange="pickYear(+this.value)"></select>
+    <button class="gh" onclick="rulesModal()">⚙ Zasady zachowania</button>
+    <button class="gh" onclick="goBack()">← Dziennik</button>
+  </div>
+  <div class="app">
+    <div class="col l">
+      <div style="padding:.7rem .8rem;border-bottom:1px solid var(--ln);position:sticky;top:0;background:#fff;z-index:2">
+        <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.5rem"><input type="checkbox" id="all" onchange="selAll(this.checked)" style="width:auto;accent-color:#1E2A78"><b style="font-size:.85rem" id="cnt"></b></div>
+        <label class="lb" style="margin:.2rem 0"><input type="checkbox" id="frm" checked onchange="optForm()" style="width:auto;accent-color:#1E2A78"> Drukuj razem z blankietem</label>
+        <button class="btn am" style="width:100%;justify-content:center;margin-top:.5rem" onclick="printSel()">🖨 Drukuj zaznaczonych</button>
+      </div>
+      <div id="list"></div>
+    </div>
+    <div class="col m" id="ed"></div>
+    <div class="col r" id="pv"></div>
+  </div>
+</div>
+<div id="printRoot"></div><div id="modal"></div><div id="toasts"></div>
+
+<script>
+const URL_SB='https://tsoxtjxfskvgiruraoau.supabase.co',KEY_SB='sb_publishable_oU23IIberCIeZksCjK5dFA_iMd0cNZB';
+const sb=supabase.createClient(URL_SB,KEY_SB);
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const isoL=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+const fdl=s=>s?new Date(s+'T12:00').toLocaleDateString('pl-PL',{day:'numeric',month:'long',year:'numeric'})+' r.':'............';
+const BEH=['wzorowe','bardzo dobre','dobre','poprawne','nieodpowiednie','naganne'];
+const GW={6:'celujący',5:'bardzo dobry',4:'dobry',3:'dostateczny',2:'dopuszczający',1:'niedostateczny'};
+const DEF_RULES={start:100,plus:10,minus:10,wz:180,bdb:140,db:100,pop:60,nieo:0};
+const ORDER=[/polski/,/angielski|niemiecki|francuski|hiszpa|rosyjski|obcy|włosk/,/historia(?! i)/,/wiedza o społ|wos/,/przyroda/,/geografia/,/biologia/,/chemia/,/fizyka/,/matematyka/,/informatyka/,/plastyka/,/muzyka/,/technika/,/wychowanie fizyczne|wf/,/bezpiecze/,/doradztwo/,/wychowanie do życia|wdż/,/religia/,/etyka/];
+const toast=(m,t='ok',ms=3500)=>{const e=document.createElement('div');e.className='toast '+t;e.textContent=m;$('#toasts').appendChild(e);setTimeout(()=>{e.style.transition='.3s';e.style.opacity=0;setTimeout(()=>e.remove(),300)},ms)};
+const warn=m=>toast(m,'bad',5000);
+const modal=h=>{const m=$('#modal');m.innerHTML=h;m.classList.add('show')},closeModal=()=>$('#modal').classList.remove('show');
+$('#modal').addEventListener('click',e=>{if(e.target.id==='modal')closeModal()});
+
+/* ---------- urządzenie ---------- */
+const isDesktop=()=>!/Android|iPhone|iPad|iPod|Mobile|Tablet/i.test(navigator.userAgent)&&!(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1)&&matchMedia('(min-width:1024px)').matches;
+function goBack(){try{if(document.referrer){const u=new URL(document.referrer);if(u.origin===location.origin&&!/drukowanie-swiadectw/.test(u.pathname)){location.href=document.referrer;return}}}catch{}location.href='/dziennik/'}
+function gateCheck(){const g=$('#gate');const bad=!isDesktop();g.classList.toggle('on',bad);return !bad}
+addEventListener('resize',()=>{if(!gateCheck())return;fitPv()});
+
+/* ---------- stan ---------- */
+let me,P={},C=[],ST={},SUB=[],T=[],school='';
+let cid=null,year=null,stu=null,sel=new Set(),NOTES={},TG={},ATT={},CD={},pvMode='both',dbOK=true,bannerShown=false,saveT={};
+const LS=(k,d)=>{try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch{return d}},LSset=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch{}};
+let RULES={...DEF_RULES,...LS('cert_rules',{})};
+let ISSUE=LS('cert_issue',{place:''});
+const nm=id=>P[id]?P[id].first_name+' '+P[id].last_name:'-',ln=id=>P[id]?P[id].last_name+' '+P[id].first_name:'-';
+const dir=()=>me.role==='director';
+const curClass=()=>C.find(c=>c.id===cid);
+const students=()=>Object.values(P).filter(p=>p.role==='student'&&ST[p.id]?.class_id===cid).sort((a,b)=>a.last_name.localeCompare(b.last_name,'pl')||a.first_name.localeCompare(b.first_name,'pl'));
+const yr=()=>({from:year+'-09-01',to:(year+1)+'-08-31'});
+const yLabel=()=>year+'/'+(year+1);
+const defYear=()=>{const d=new Date();return d.getMonth()>=7?d.getFullYear():d.getFullYear()-1};
+const defIssueDate=()=>{const d=new Date(year+1,5,26,12);while(d.getDay()!==5)d.setDate(d.getDate()-1);return isoL(d)};
+async function pgAll(mk){let all=[],f=0;for(;;){const {data,error}=await mk(f,f+999);if(error)throw error;all=all.concat(data);if(data.length<1000)break;f+=1000}return all}
+
+/* ---------- start ---------- */
+const hideSplash=()=>{const s=$('#splash');if(!s||s.dataset.h)return;s.dataset.h=1;setTimeout(()=>{s.classList.add('out');setTimeout(()=>s.remove(),700)},Math.max(0,1900-performance.now()))};
+setTimeout(hideSplash,10000);
+async function boot(){
+  if(!gateCheck()){hideSplash();return}
+  const {data:{session}}=await sb.auth.getSession();if(!session){location.href='/login';return}
+  const {data:m,error}=await sb.from('profiles').select('*').eq('id',session.user.id).maybeSingle();
+  if(error||!m){hideSplash();return fatal('Błąd odczytu konta',error?.message||'Brak profilu użytkownika.')}
+  me=m;
+  const [p,c,s,t,st,sc]=await Promise.all([sb.from('profiles').select('*'),sb.from('classes').select('*').order('name'),sb.from('subjects').select('*'),sb.from('teaching').select('*'),sb.from('students').select('*'),sb.from('schools').select('name').single()]);
+  for(const r of [p,c,s,t,st])if(r.error){hideSplash();return fatal('Błąd wczytywania danych',r.error.message)}
+  P={};p.data.forEach(x=>P[x.id]=x);C=c.data;SUB=s.data;T=t.data;ST={};st.data.forEach(x=>ST[x.profile_id]=x);school=sc.data?.name||'';
+  const mine=dir()?C:C.filter(c=>c.homeroom_teacher_id===me.id);
+  if(!mine.length){hideSplash();return fatal('Brak dostępu','Aplikacja Świadectwa jest dostępna tylko dla wychowawców klas i dyrekcji.')}
+  C=mine;year=defYear();cid=C[0].id;
+  $('#selC').innerHTML=C.map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join('');
+  $('#selY').innerHTML=[year-1,year,year+1].map(y=>`<option value="${y}" ${y===year?'selected':''}>${y}/${y+1}</option>`).join('');
+  $('#app').style.display='block';
+  await loadClass();hideSplash();
+}
+const fatal=(t,m)=>{$('#app').style.display='none';const g=$('#gate');g.querySelector('.gi').textContent='⚠️';g.querySelector('h2').textContent=t;g.querySelector('p').textContent=m;g.classList.add('on')};
+async function pickClass(v){cid=v;await loadClass()}
+async function pickYear(y){year=y;await loadClass()}
+
+async function loadClass(){
+  $('#ed').innerHTML='<div class="sec"><p class="mu">Wczytywanie…</p></div>';
+  const sts=students(),ids=sts.map(s=>s.id),r=yr();
+  NOTES={};TG={};ATT={};CD={};sel=new Set(ids);stu=ids[0]||null;
+  if(ids.length){
+    try{
+      const [n,g,a]=await Promise.all([
+        pgAll((f,t)=>sb.from('notes').select('*').in('student_id',ids).gte('created_at',r.from).lte('created_at',r.to+'T23:59:59').order('created_at').range(f,t)),
+        pgAll((f,t)=>sb.from('term_grades').select('*').in('student_id',ids).eq('term','y').eq('kind','final').range(f,t)).catch(()=>[]),
+        pgAll((f,t)=>sb.from('attendance').select('student_id,status,date').in('student_id',ids).neq('status','present').gte('date',r.from).lte('date',r.to).range(f,t)).catch(()=>[])]);
+      n.forEach(x=>(NOTES[x.student_id]??=[]).push(x));g.forEach(x=>TG[x.student_id+'|'+x.teaching_id]=x.value);a.forEach(x=>(ATT[x.student_id]??=[]).push(x));
+    }catch(e){warn('Nie udało się pobrać wszystkich danych: '+(e.message||e))}
+    await loadCD(ids);
+  }
+  renderAll();
+}
+async function loadCD(ids){
+  dbOK=true;let rows=[];
+  const {data,error}=await sb.from('certificate_data').select('*').eq('school_year',year).in('student_id',ids);
+  if(error){dbOK=false}else rows=data;
+  ids.forEach(id=>{const db=rows.find(x=>x.student_id===id)?.data,ls=LS('cert:'+year+':'+id,null);CD[id]={...(ls||{}),...(db||{})}});
+  if(!dbOK&&!bannerShown){bannerShown=true;warn('Tabela certificate_data nie jest jeszcze utworzona - dane zapisują się tylko w tej przeglądarce.')}
+}
+function saveCD(id){clearTimeout(saveT[id]);$('#sv')&&($('#sv').textContent='Zapisywanie…');
+  saveT[id]=setTimeout(async()=>{
+    LSset('cert:'+year+':'+id,CD[id]);
+    if(dbOK){const {error}=await sb.from('certificate_data').upsert({student_id:id,school_year:year,data:CD[id],updated_by:me.id,updated_at:new Date().toISOString()},{onConflict:'student_id,school_year'});if(error){dbOK=false;warn('Zapis do bazy nie powiódł się (zapisano lokalnie): '+error.message)}}
+    $('#sv')&&($('#sv').textContent=dbOK?'Zapisano w bazie ✓':'Zapisano lokalnie')},500)}
+
+/* ---------- obliczenia ---------- */
+const subjectsOf=()=>{const seen=new Set(),out=[];T.filter(t=>t.class_id===cid).forEach(t=>{if(!seen.has(t.subject_id)){seen.add(t.subject_id);out.push({sid:t.subject_id,tid:t.id,name:SUB.find(s=>s.id===t.subject_id)?.name||'-'})}});
+  const idx=n=>{const i=ORDER.findIndex(r=>r.test(n.toLowerCase()));return i<0?99:i};return out.sort((a,b)=>idx(a.name)-idx(b.name)||a.name.localeCompare(b.name,'pl'))};
+const cnts=id=>{const n=NOTES[id]||[];return{r:n.filter(x=>x.kind==='remark').length,p:n.filter(x=>x.kind==='praise').length}};
+const behPts=id=>{const c=cnts(id);return RULES.start+c.p*RULES.plus-c.r*RULES.minus};
+const behLbl=p=>p>=RULES.wz?BEH[0]:p>=RULES.bdb?BEH[1]:p>=RULES.db?BEH[2]:p>=RULES.pop?BEH[3]:p>=RULES.nieo?BEH[4]:BEH[5];
+const behOf=id=>CD[id]?.behavior||behLbl(behPts(id));
+const gradeOf=(id,s)=>{const o=CD[id]?.grades?.[s.sid];return o!==undefined&&o!==''?String(o):(TG[id+'|'+s.tid]||'')};
+const avgOf=id=>{const v=subjectsOf().map(s=>+gradeOf(id,s)).filter(x=>x>=1&&x<=6);return v.length?v.reduce((a,b)=>a+b,0)/v.length:null};
+const missing=id=>subjectsOf().filter(s=>!gradeOf(id,s)).length;
+const fem=id=>{const g=CD[id]?.gender;if(g)return g==='f';const f=(P[id]?.first_name||'').trim();return /a$/i.test(f)&&!/^(kuba|barnaba|bonawentura|jarema|kosma|zawisza|jan[a]?$)/i.test(f)||/^(jana)$/i.test(f)};
+const distAuto=id=>{const a=avgOf(id);return a!==null&&missing(id)===0&&a>=4.75&&['wzorowe','bardzo dobre'].includes(behOf(id))};
+const dist=id=>{const d=CD[id]?.dist;return d==='yes'?true:d==='no'?false:distAuto(id)};
+const failed=id=>subjectsOf().some(s=>gradeOf(id,s)==='1');
+const ROM=['','I','II','III','IV','V','VI','VII','VIII','IX','X'];
+const nextClass=()=>{const n=curClass()?.name||'',m=n.trim().match(/^(\d+)(.*)$/),r=n.trim().match(/^(VIII|VII|VI|IV|V|III|II|I)(.*)$/i);
+  if(m)return{num:+m[1],name:(+m[1]+1)+m[2]};if(r){const i=ROM.indexOf(r[1].toUpperCase());return{num:i,name:ROM[i+1]+r[2]}}return{num:0,name:''}};
+const promoAuto=id=>failed(id)?'not':nextClass().num>=8?'grad':dist(id)?'promo_d':'promo';
+const promoOf=id=>CD[id]?.promo||promoAuto(id);
+const attOf=id=>{const a=ATT[id]||[];return{abs:a.filter(x=>x.status==='absent').length,exc:a.filter(x=>x.status==='excused').length,late:a.filter(x=>x.status==='late').length}};
+const wych=()=>P[curClass()?.homeroom_teacher_id];
+const dyr=()=>Object.values(P).find(p=>p.role==='director');
+const status=id=>{const m=missing(id),cd=CD[id]||{};return failed(id)?'e':(m||!(cd.birth_date||P[id]?.birth_date)||!cd.birth_place)?'w':''};
+
+/* ---------- widok ---------- */
+function renderAll(){renderList();renderEd();renderPv()}
+function renderList(){
+  const sts=students();$('#cnt').textContent=`Uczniowie: ${sts.length} (zaznaczono ${sel.size})`;$('#all').checked=sts.length>0&&sel.size===sts.length;
+  $('#list').innerHTML=sts.length?sts.map((p,i)=>{const c=cnts(p.id);return `<div class="si ${p.id===stu?'on':''}" onclick="pickStu('${p.id}')"><input type="checkbox" ${sel.has(p.id)?'checked':''} onclick="event.stopPropagation();togSel('${p.id}',this.checked)"><div style="flex:1;min-width:0"><b>${i+1}. ${esc(ln(p.id))}</b><small>uwagi ${c.r} · pochwały ${c.p} · zachowanie: ${esc(behOf(p.id))}</small></div><i class="dot ${status(p.id)}" title="${status(p.id)==='e'?'Ocena niedostateczna':status(p.id)==='w'?'Braki w danych':'Gotowe'}"></i></div>`}).join(''):'<p class="mu" style="padding:1rem">W tej klasie nie ma uczniów.</p>'}
+const pickStu=id=>{stu=id;renderList();renderEd();renderPv()};
+const togSel=(id,on)=>{on?sel.add(id):sel.delete(id);renderList()};
+const selAll=on=>{sel=on?new Set(students().map(s=>s.id)):new Set();renderList()};
+const optForm=()=>renderPv();
+
+function renderEd(){
+  const id=stu,box=$('#ed');if(!id){box.innerHTML='<div class="sec"><p class="mu">Brak uczniów w tej klasie.</p></div>';return}
+  const cd=CD[id]||(CD[id]={}),subs=subjectsOf(),c=cnts(id),pts=behPts(id),auto=behLbl(pts),pr=(NOTES[id]||[]).filter(n=>n.kind==='praise'),rm=(NOTES[id]||[]).filter(n=>n.kind==='remark'),ac=attOf(id),ach=cd.ach||[];
+  const pct=Math.max(0,Math.min(100,(pts-RULES.nieo+30)/(RULES.wz-RULES.nieo+60)*100));
+  box.innerHTML=`
+  ${!dbOK?'<div class="banner">Dane dodatkowe (osiągnięcia, miejsce urodzenia itd.) zapisują się tylko w tej przeglądarce, bo w bazie brak tabeli <b>certificate_data</b>. Uruchom plik <b>swiadectwa.sql</b> w Supabase.</div>':''}
+  <div class="sec"><h4>👤 ${esc(nm(id))} <span class="save" id="sv"></span></h4>
+   <div class="row2"><div><label class="lb">Płeć (do odmiany tekstu)</label><select onchange="setF('gender',this.value)"><option value="" ${!cd.gender?'selected':''}>Automatycznie (${fem(id)?'uczennica':'uczeń'})</option><option value="f" ${cd.gender==='f'?'selected':''}>Uczennica</option><option value="m" ${cd.gender==='m'?'selected':''}>Uczeń</option></select></div>
+   <div><label class="lb">Data urodzenia</label><input type="date" value="${esc(cd.birth_date||P[id]?.birth_date||'')}" onchange="setF('birth_date',this.value)"></div></div>
+   <label class="lb">Miejsce urodzenia</label><input type="text" placeholder="np. Warszawa" value="${esc(cd.birth_place||'')}" oninput="setF('birth_place',this.value,true)"></div>
+
+  <div class="sec"><h4>📚 Oceny roczne ${missing(id)?`<span class="tag r">brak: ${missing(id)}</span>`:'<span class="tag g">komplet</span>'}</h4>
+   ${subs.length?`<table class="gt"><thead><tr><th>Przedmiot</th><th>Dziennik</th><th>Ręcznie</th></tr></thead><tbody>${subs.map(s=>{const d=TG[id+'|'+s.tid]||'',o=cd.grades?.[s.sid]??'';return `<tr><td>${esc(s.name)}</td><td>${d?`<span class="gc">${d}</span>`:'<span class="mu">-</span>'}</td><td><input type="text" maxlength="1" value="${esc(o)}" placeholder="${d||''}" oninput="setG('${s.sid}',this.value)"></td></tr>`}).join('')}</tbody></table>
+   <p class="mu" style="font-size:.75rem;margin:.5rem 0 0">Oceny roczne pobierane są z dziennika. Pole „Ręcznie” nadpisuje ocenę tylko na świadectwie. Średnia: <b>${avgOf(id)!==null?avgOf(id).toFixed(2).replace('.',','):'-'}</b></p>`:'<p class="mu">Klasa nie ma przypisanych przedmiotów.</p>'}</div>
+
+  <div class="sec"><h4>🌟 Zachowanie</h4>
+   <div class="bhx"><div class="mu" style="font-size:.75rem">Propozycja na podstawie wpisów w roku ${yLabel()}</div><big>${esc(auto)}</big>
+   <div style="font-size:.8rem;margin-top:.2rem"><span class="tag r">uwagi: ${c.r}</span> <span class="tag g">pochwały: ${c.p}</span> <span class="tag b">punkty: ${pts}</span></div><div class="bar"><i style="width:${pct}%"></i></div></div>
+   <label class="lb">Ocena zachowania na świadectwie</label>
+   <select onchange="setF('behavior',this.value);renderList();renderEd();renderPv()"><option value="">Zgodnie z propozycją (${esc(auto)})</option>${BEH.map(b=>`<option ${cd.behavior===b?'selected':''}>${b}</option>`).join('')}</select>
+   ${rm.length||pr.length?`<details style="margin-top:.6rem"><summary style="cursor:pointer;font-size:.8rem;font-weight:600;color:var(--in)">Wpisy w dzienniku (${rm.length+pr.length})</summary>${[...rm,...pr].sort((a,b)=>a.created_at<b.created_at?1:-1).map(n=>`<p style="font-size:.78rem;margin:.35rem 0">${n.kind==='praise'?'👍':'⚠️'} ${esc(n.body)} <span class="mu">· ${new Date(n.created_at).toLocaleDateString('pl-PL')}</span></p>`).join('')}</details>`:''}</div>
+
+  <div class="sec"><h4>🏆 Szczególne osiągnięcia</h4>
+   <div id="achl">${ach.map((a,i)=>`<div class="ach"><input type="text" value="${esc(a)}" oninput="setAch(${i},this.value)"><button class="gh sm red" onclick="delAch(${i})">✕</button></div>`).join('')}</div>
+   <button class="gh sm" onclick="addAch('')">+ Dodaj osiągnięcie</button>
+   ${pr.length?`<div style="margin-top:.7rem"><div class="mu" style="font-size:.72rem;margin-bottom:.3rem">Pochwały z dziennika - kliknij, aby dodać:</div>${pr.filter(n=>!ach.includes(n.body)).map(n=>`<button class="chip sug" title="${esc(n.body)}" onclick="addAch(this.dataset.t)" data-t="${esc(n.body)}">+ ${esc(n.body.length>46?n.body.slice(0,44)+'…':n.body)}</button>`).join('')||'<span class="mu" style="font-size:.75rem">Wszystkie pochwały już dodane.</span>'}</div>`:''}</div>
+
+  <div class="sec"><h4>🎓 Promocja i wyróżnienie</h4>
+   <label class="lb">Rozstrzygnięcie</label><select onchange="setF('promo',this.value);renderPv()"><option value="">Automatycznie (${promoTxt(promoAuto(id),id).replace(/<[^>]+>/g,'')})</option>${[['promo','Otrzymał(a) promocję'],['promo_d','Promocja z wyróżnieniem'],['not','Nie otrzymał(a) promocji'],['grad','Ukończył(a) szkołę'],['grad_d','Ukończył(a) szkołę z wyróżnieniem']].map(([k,l])=>`<option value="${k}" ${cd.promo===k?'selected':''}>${l}</option>`).join('')}</select>
+   <div class="row2"><div><label class="lb">Klasa programowo wyższa</label><input type="text" value="${esc(cd.next_class??nextClass().name)}" oninput="setF('next_class',this.value,true)"></div>
+   <div><label class="lb">Wyróżnienie (czerwony pasek)</label><select onchange="setF('dist',this.value);renderList();renderEd();renderPv()"><option value="">Auto (${distAuto(id)?'tak':'nie'})</option><option value="yes" ${cd.dist==='yes'?'selected':''}>Tak</option><option value="no" ${cd.dist==='no'?'selected':''}>Nie</option></select></div></div>
+   <label class="lb"><input type="checkbox" ${cd.hideAtt?'checked':''} onchange="setF('hideAtt',this.checked);renderPv()" style="width:auto"> Nie drukuj frekwencji</label>
+   <p class="mu" style="font-size:.74rem;margin:.2rem 0 0">Frekwencja w roku: usprawiedliwione ${ac.exc} godz., nieusprawiedliwione ${ac.abs} godz., spóźnienia ${ac.late}.</p></div>
+
+  <div class="sec"><h4>📍 Wydanie (dla całej klasy)</h4>
+   <div class="row2"><div><label class="lb">Miejscowość</label><input type="text" value="${esc(ISSUE.place||'')}" placeholder="np. Mostówka" oninput="setIssue('place',this.value)"></div>
+   <div><label class="lb">Data wydania</label><input type="date" value="${esc(ISSUE['d'+year]||defIssueDate())}" onchange="setIssue('d'+year,this.value)"></div></div></div>`}
+function setF(k,v,quiet){const cd=CD[stu]||(CD[stu]={});if(v===''||v===false)delete cd[k];else cd[k]=v;saveCD(stu);quiet?pvSoon():(0);if(k==='birth_date'||k==='birth_place')renderList()}
+function setG(s,v){const cd=CD[stu];v=v.trim();if(v&&!/^[1-6]$/.test(v)){warn('Dozwolone oceny: 1-6.');return}(cd.grades??={});v?cd.grades[s]=v:delete cd.grades[s];saveCD(stu);renderList();pvSoon()}
+function addAch(t){const cd=CD[stu];(cd.ach??=[]).push(t||'');saveCD(stu);renderEd();renderPv();if(!t){const i=$$('#achl input');i[i.length-1]?.focus()}}
+function setAch(i,v){CD[stu].ach[i]=v;saveCD(stu);pvSoon()}
+function delAch(i){CD[stu].ach.splice(i,1);saveCD(stu);renderEd();renderPv()}
+function setIssue(k,v){ISSUE[k]=v;LSset('cert_issue',ISSUE);pvSoon()}
+let pvT;const pvSoon=()=>{clearTimeout(pvT);pvT=setTimeout(renderPv,200)};
+
+/* ---------- świadectwo (HTML) ---------- */
+function promoTxt(k,id){const f=fem(id),nc=esc(CD[id]?.next_class??nextClass().name)||'…',st=f?'Uczennica':'Uczeń';
+  return {promo:`${st} <b>otrzymał${f?'a':''} promocję</b> do klasy programowo wyższej <b>${nc}</b>.`,promo_d:`${st} <b>otrzymał${f?'a':''} promocję</b> do klasy programowo wyższej <b>${nc}</b> <b>z wyróżnieniem</b>.`,not:`${st} <b>nie otrzymał${f?'a':''} promocji</b> do klasy programowo wyższej.`,grad:`${st} <b>ukończył${f?'a':''} szkołę</b>.`,grad_d:`${st} <b>ukończył${f?'a':''} szkołę z wyróżnieniem</b>.`}[k]}
+function certHTML(id,withForm){
+  const cd=CD[id]||{},f=fem(id),subs=subjectsOf(),c=curClass(),bd=cd.birth_date||P[id]?.birth_date||'',beh=behOf(id),dst=dist(id),av=avgOf(id),ac=attOf(id),w=wych(),d=dyr();
+  const rh=subs.length>17?5.6:subs.length>14?6.3:subs.length>11?7:7.8;
+  const where=(ISSUE.place?esc(ISSUE.place)+', ':'')+'dnia '+fdl(ISSUE['d'+year]||defIssueDate());
+  const frame=`<div class="frm">${dst?'<div class="stripe"></div>':''}<div class="gil"></div><img class="wm" src="https://dziennik-minerva.pages.dev/themes/icon-dark.svg" alt=""><div class="fr1"></div><div class="fr2"></div><div class="fr3"></div><i class="cn a"></i><i class="cn b"></i><i class="cn c"></i><i class="cn d"></i></div>`;
+  const p1=`<section class="pg ${withForm?'':'noform'}">${frame}<div class="in">
+   <img class="logo" src="https://dziennik-minerva.pages.dev/themes/logo-horizontal-light.svg" alt="">
+   <div class="sch">${esc(school||'Szkoła')}</div>
+   <h1 class="tt">ŚWIADECTWO SZKOLNE</h1><div class="rule"></div>
+   <div class="sub">za rok szkolny ${yLabel()}</div>
+   <div class="who">${f?'uczennicy':'ucznia'} klasy <b>${esc(c?.name||'')}</b></div>
+   <div class="nm">${esc(nm(id))}</div>
+   <div class="bd">urodzon${f?'ej':'ego'} ${bd?fdl(bd):'............'}${cd.birth_place?' w '+esc(cd.birth_place):' w ............'}</div>
+   <div class="intro">${f?'otrzymała':'otrzymał'} w roku szkolnym ${yLabel()} następujące roczne oceny klasyfikacyjne z obowiązkowych zajęć edukacyjnych:</div>
+   <table class="ct" style="--rh:${rh}mm"><thead><tr><th>Lp.</th><th>Zajęcia edukacyjne</th><th>Roczna ocena klasyfikacyjna</th></tr></thead><tbody>${subs.map((s,i)=>{const g=gradeOf(id,s);return `<tr><td>${i+1}</td><td>${esc(s.name)}</td><td>${g?GW[g]:'............'}</td></tr>`}).join('')}</tbody></table>
+   <div class="beh"><span>Roczna ocena klasyfikacyjna zachowania</span><b>${esc(beh)}</b></div></div>${withForm?'<div class="serial">MINERVA · 1/2</div>':''}</section>`;
+  const p2=`<section class="pg ${withForm?'':'noform'}">${frame}<div class="in" style="padding-top:22mm">
+   <div class="p2h"><span><b>${esc(nm(id))}</b> · klasa ${esc(c?.name||'')}</span><span>rok szkolny ${yLabel()}</span></div>
+   <div class="blk"><div class="h2">Podsumowanie</div><div class="kv"><div>Średnia ocen<b>${av!==null?av.toFixed(2).replace('.',','):'-'}</b></div><div>Zachowanie<b style="font-size:11pt">${esc(beh)}</b></div>${cd.hideAtt?'':`<div>Godz. usprawiedliwione<b>${ac.exc}</b></div><div>Godz. nieusprawiedliwione<b>${ac.abs}</b></div>`}</div></div>
+   <div class="blk"><div class="h2">Szczególne osiągnięcia</div>${(cd.ach||[]).filter(x=>x.trim()).length?`<ul class="al">${cd.ach.filter(x=>x.trim()).map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`:'<div style="font-size:10pt;color:#6b7491">-</div>'}</div>
+   <div class="blk"><div class="h2">Rozstrzygnięcie Rady Pedagogicznej</div><div class="promo">${promoTxt(promoOf(id),id)}</div></div>
+   <div class="where">${where}</div>
+   <div class="sig"><div><div class="l">${esc(w?nm(w.id):'')}<br>Wychowawca klasy</div></div>${withForm?'<div style="display:flex;justify-content:center"><div class="stamp">miejsce na<br>pieczęć szkoły</div></div>':'<div></div>'}<div><div class="l">${esc(d?nm(d.id):'')}<br>Dyrektor szkoły</div></div></div>
+   <div style="margin-top:12mm;font-size:8pt;color:#3b4468;width:75mm"><div style="border-top:.3mm solid #14193a;padding-top:1.5mm">Podpis rodzica / opiekuna prawnego<br>(potwierdzenie odbioru)</div></div>
+   <div class="foot">Dokument wygenerowany na podstawie danych z dziennika elektronicznego Minerva. Ważny po opatrzeniu pieczęcią szkoły i podpisami.</div></div>${withForm?'<div class="serial">MINERVA · 2/2</div>':''}</section>`;
+  return {p1,p2}}
+function fitPv(){const w=$('#pv');if(!w)return;const s=Math.min(1.1,(w.clientWidth-32)/794);$$('.pvw').forEach(e=>{e.style.width=794*s+'px';e.style.height=1118*s+'px';e.firstElementChild.style.transform=`scale(${s})`})}
+function renderPv(){
+  const id=stu,box=$('#pv');if(!id){box.innerHTML='';return}
+  const wf=$('#frm').checked,h=certHTML(id,wf);
+  box.innerHTML=`<div class="pvtabs"><button class="${pvMode==='both'?'btn':'gh'} sm" onclick="pvM('both')">Obie strony</button><button class="${pvMode==='1'?'btn':'gh'} sm" onclick="pvM('1')">Strona 1</button><button class="${pvMode==='2'?'btn':'gh'} sm" onclick="pvM('2')">Strona 2</button><span class="sp"></span><button class="btn am sm" onclick="printOne()">🖨 Drukuj tego ucznia</button></div>
+  ${pvMode!=='2'?`<div class="pvw"><div class="pvs" style="width:794px">${h.p1}</div></div>`:''}${pvMode!=='1'?`<div class="pvw"><div class="pvs" style="width:794px">${h.p2}</div></div>`:''}`;
+  fitPv()}
+const pvM=m=>{pvMode=m;renderPv()};
+
+/* ---------- drukowanie ---------- */
+async function doPrint(ids){
+  if(!ids.length)return warn('Zaznacz przynajmniej jednego ucznia.');
+  const probl=ids.filter(i=>status(i)!=='').length;
+  if(probl&&!confirm(`Dla ${probl} z ${ids.length} uczniów brakuje danych (oceny, data lub miejsce urodzenia) albo jest ocena niedostateczna. Drukować mimo to?`))return;
+  if(!ISSUE.place&&!confirm('Nie wpisano miejscowości wydania. Drukować bez niej?'))return;
+  const wf=$('#frm').checked,root=$('#printRoot');
+  root.innerHTML=ids.map(i=>{const h=certHTML(i,wf);return h.p1+h.p2}).join('');
+  try{await document.fonts.ready;await Promise.all([...root.querySelectorAll('img')].map(im=>im.complete?1:new Promise(r=>{im.onload=im.onerror=r})))}catch{}
+  const clear=()=>{root.innerHTML='';removeEventListener('afterprint',clear)};addEventListener('afterprint',clear);
+  setTimeout(()=>window.print(),150)}
+const printOne=()=>doPrint([stu]),printSel=()=>doPrint(students().map(s=>s.id).filter(i=>sel.has(i)));
+
+/* ---------- zasady zachowania ---------- */
+function rulesModal(){
+  const R=RULES,f=(k,l)=>`<div><label class="lb">${l}</label><input type="number" id="rl_${k}" value="${R[k]}"></div>`;
+  modal(`<div class="box"><h3>Zasady oceniania zachowania</h3><p class="mu" style="font-size:.82rem;margin-top:0">Ocena jest proponowana automatycznie: punkty startowe + (pochwały × punkty) − (uwagi × punkty). Wychowawca zawsze może zmienić ocenę ręcznie przy uczniu.</p>
+  <div class="row2">${f('start','Punkty startowe')}<div></div>${f('plus','Punkty za pochwałę (+)')}${f('minus','Punkty za uwagę (−)')}</div>
+  <h4 style="margin:.9rem 0 0;color:var(--in);font-size:.9rem">Progi punktowe (od ilu punktów)</h4>
+  <div class="row2">${f('wz','Wzorowe od')}${f('bdb','Bardzo dobre od')}${f('db','Dobre od')}${f('pop','Poprawne od')}${f('nieo','Nieodpowiednie od')}<div><label class="lb">Naganne</label><div class="mu" style="font-size:.82rem;padding:.5rem 0">poniżej progu „nieodpowiednie”</div></div></div>
+  <div style="display:flex;gap:.5rem;justify-content:space-between;margin-top:1rem"><button class="gh" onclick="rulesReset()">Przywróć domyślne</button><div style="display:flex;gap:.5rem"><button class="gh" onclick="closeModal()">Anuluj</button><button class="btn" onclick="rulesSave()">Zapisz</button></div></div></div>`)}
+function rulesSave(){const n={};for(const k of Object.keys(DEF_RULES)){const v=+$('#rl_'+k).value;if(!Number.isFinite(v))return warn('Wpisz poprawne liczby.');n[k]=v}
+  if(!(n.wz>n.bdb&&n.bdb>n.db&&n.db>n.pop&&n.pop>n.nieo))return warn('Progi muszą maleć: wzorowe > bardzo dobre > dobre > poprawne > nieodpowiednie.');
+  RULES=n;LSset('cert_rules',n);closeModal();toast('Zapisano zasady');renderAll()}
+const rulesReset=()=>{RULES={...DEF_RULES};LSset('cert_rules',RULES);closeModal();toast('Przywrócono domyślne zasady');renderAll()};
+
+boot().catch(e=>{hideSplash();fatal('Błąd uruchamiania',e.message||String(e))});
+</script>
+</body>
+</html>
