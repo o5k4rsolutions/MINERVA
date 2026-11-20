@@ -315,42 +315,42 @@ tbody tr:nth-child(even) td{background:#fafbfd}tbody tr:hover td{background:#fff
 @media(max-width:767px){#modal.show .box{animation:sheet .3s var(--ez) both}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}#splash .lg img{clip-path:none}}
 </style>
-<style id="v48">
-.tl{position:relative;margin:.3rem 0 .6rem;user-select:none}
-.tlh{position:absolute;left:0;right:0;height:0;border-top:2px solid #e3e6ee}
-.tlh span{position:absolute;left:0;top:4px;font-size:.78rem;font-weight:600;color:var(--tx)}
-.tlc{position:absolute;left:54px;right:0;top:0;bottom:0}
-.tlk{position:absolute;box-sizing:border-box;border-top:3px solid #a9adbd;border-bottom:3px solid #a9adbd;background:#f0f1f7;padding:.3rem .6rem .35rem;display:flex;flex-direction:column;justify-content:space-between;overflow:hidden;color:var(--tx)}
-.tlk.pk{cursor:pointer}.tlk.pk:active{filter:brightness(.96)}
-.tlk.dn{background:#e1f5c4;border-color:#8fb56b}
-.tlk.cn{background:repeating-linear-gradient(135deg,#fdf5f5 0 11px,#f9e6e6 11px 12px);border-color:#d64545}
-.tlk.mv{background:#fff8e6;border-color:#e0a82e}
-.tlr{display:flex;justify-content:space-between;align-items:flex-start;gap:.4rem;min-height:1.5rem}
-.tlg{display:flex;flex-wrap:wrap;gap:.25rem;margin-left:-.6rem;align-items:center}
-.tlm{font-weight:700;font-size:.86rem;color:#4a5068;white-space:nowrap;margin-left:auto}
-.tlk.dn .tlm{color:#2d6a2d}.tlk.cn .tlm{color:#c53030}.tlk.mv .tlm{color:#a16207}
-.tlt{display:inline-block;padding:.05rem .65rem .05rem .55rem;border-radius:0 999px 999px 0;font-size:.78rem;font-weight:600;text-transform:uppercase;letter-spacing:.02em;color:#fff;line-height:1.35}
-.tlt.r{background:#d64545}.tlt.y{background:#d99a1c}.tlt.b{background:#2563eb}.tlt.p{background:#8e44ad}
-.tlb{display:flex;justify-content:space-between;align-items:flex-end;gap:.4rem}
-.tlb b{display:block;font-size:.95rem;line-height:1.25}.tlb small{display:block;font-size:.84rem;color:#2b3350;line-height:1.3}
-.tlk.cn .tlb{opacity:.85}
-.tla{flex:0 0 auto;width:34px;height:34px;border-radius:50%;border:0;background:#3b4256;color:#fff;display:flex;align-items:center;justify-content:center;padding:0}
-.tla svg{width:18px;height:18px}
-.tle{display:flex;gap:.25rem;flex-wrap:wrap;margin-top:.15rem}
-.tlnow{position:absolute;left:0;right:0;height:0;border-top:2px solid #2f7a3a;z-index:6;pointer-events:none}
-.tlnow b{position:absolute;left:0;top:-15px;background:#2f7a3a;color:#fff;border-radius:999px;font-size:.95rem;font-weight:600;padding:.2rem .7rem;line-height:1.2}
-#offl,#appgate{position:fixed;inset:0;z-index:100001;display:none;align-items:center;justify-content:center;flex-direction:column;text-align:center;padding:1.5rem;background:#fff;color:var(--tx)}
-#offl.on,#appgate.on{display:flex}
-#offl .oi{width:72px;height:72px;border-radius:50%;background:#fdecec;color:#c53030;display:flex;align-items:center;justify-content:center;margin-bottom:1rem}
-#offl h2,#appgate h2{font-size:1.3rem;font-weight:800;margin:.2rem 0 .4rem}
-#offl p,#appgate p{color:var(--mu);max-width:360px;font-size:.95rem}
-#appgate{justify-content:flex-start;overflow:auto;padding-top:max(2rem,env(safe-area-inset-top))}
-#appgate .gs{text-align:left;max-width:380px;width:100%;margin-top:1rem}
-#appgate .gs .ist{display:flex;gap:.7rem;align-items:flex-start;padding:.55rem 0;border-top:1px solid #eef1f6;font-size:.9rem}
-#appgate .gs .ist i{flex:0 0 26px;height:26px;border-radius:50%;background:var(--in);color:#fff;font-style:normal;font-weight:700;font-size:.8rem;display:flex;align-items:center;justify-content:center}
+<style id="v48">/* v48: wygląd planu, offline, bramka instalacji */
+.lsn{background:#eceff7;border:0;border-top:3px solid #a9b3d1;border-radius:10px;padding:.55rem .7rem;min-height:78px;transition:background .2s}
+.lsn .lt{color:#4a5578;font-variant-numeric:tabular-nums}
+.lsn.ok{background:#e2f6c9;border-top-color:#78b43a}.lsn.ok .lt{color:#2c6a17}
+.lsn.x{opacity:1;background:repeating-linear-gradient(135deg,#fff5f5 0 9px,#fbe3e3 9px 10px);border-top-color:#d63b3b}
+.lsn.x .lt{color:#c22d2d}.lsn.x b{text-decoration:line-through;text-decoration-thickness:1px}
+.nlc.past .lsn{opacity:.72}.nlc.cur .lsn{box-shadow:0 0 0 2px var(--in),0 6px 18px -8px rgba(30,42,120,.5)}
+.dh{border-radius:12px;background:#f3f5fa;margin-bottom:2px}.dh.tdy{background:var(--in);color:#fff}.dh.tdy small{color:#fff}
+.pnl{display:flex;flex-wrap:wrap;gap:.4rem 1rem;font-size:.76rem;color:var(--mu);margin:0 0 .75rem}
+.pnl span{display:inline-flex;align-items:center;gap:.4rem}.pnl i{width:12px;height:12px;border-radius:4px;display:inline-block}
+.pnl .g{background:#78b43a}.pnl .n{background:#a9b3d1}.pnl .r{background:#d63b3b}.pnl .v{background:#7b2f93}
+#off,#gate{position:fixed;inset:0;z-index:99999;display:none;align-items:center;justify-content:center;padding:calc(24px + env(safe-area-inset-top,0px)) 24px calc(24px + env(safe-area-inset-bottom,0px));text-align:center;font-family:'Open Sans',system-ui,sans-serif;color:#fff;background:linear-gradient(160deg,#1E2A78,#12184a)}
+#off.on,#gate.on{display:flex}
+#off .bx,#gate .bx{max-width:360px;width:100%}
+#off svg{width:84px;height:84px;margin-bottom:1rem}
+#off h2,#gate h2{font-size:1.4rem;font-weight:800;margin:0 0 .5rem}
+#off p,#gate p,#gate li{font-size:.95rem;line-height:1.5;opacity:.88;margin:0}
+#off button,#gate button{margin-top:1.4rem;width:100%;padding:.9rem 1rem;border:0;border-radius:14px;background:#fff;color:#1E2A78;font:700 1rem 'Open Sans',system-ui,sans-serif}
+#gate img{width:72px;height:72px;border-radius:18px;margin-bottom:1rem}
+#gate ol{text-align:left;margin:1.2rem 0 0;padding-left:1.3rem;display:grid;gap:.6rem}
+#gate .sv{display:inline-block;vertical-align:-4px}
 </style>
 </head>
 <body>
+<div id="off" role="alert"><div class="bx"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2 8.8a15 15 0 0 1 4-2.4M22 8.8a15 15 0 0 0-10-3.3M5 12.5a10 10 0 0 1 3-1.9M19 12.5a10 10 0 0 0-3.5-2M8.5 16a5 5 0 0 1 2-1.1M15.5 16a5 5 0 0 0-1.4-1M12 19.5h.01M3 3l18 18"/></svg><h2>Brak połączenia z internetem</h2><p>Sprawdź Wi‑Fi lub dane komórkowe. Dziennik wróci automatycznie, gdy sieć znów będzie dostępna.</p><button type="button" onclick="offTry()">Spróbuj ponownie</button></div></div>
+<div id="gate"><div class="bx"><img src="icons/icon-192.png" alt="" onerror="this.style.display='none'"><h2>Dziennik działa tylko jako aplikacja</h2><p>W przeglądarce na telefonie dziennik jest wyłączony. Zainstaluj go, a potem otwórz z ikony na ekranie głównym.</p><div id="gst"></div></div></div>
+<script>
+(function(){var o=document.getElementById('off');
+function chk(){o.classList.toggle('on',!navigator.onLine)}
+addEventListener('offline',chk);addEventListener('online',function(){chk();if(!o.classList.contains('on')&&window.__wasOff)location.reload()});
+addEventListener('offline',function(){window.__wasOff=1});chk();
+window.offTry=function(){if(navigator.onLine)location.reload();else{o.classList.remove('on');setTimeout(chk,400)}};
+window.offShow=function(){o.classList.add('on')};
+})();
+</script>
+
 <div id="splash"><i class="orb o1"></i><i class="orb o2"></i><i class="ring"></i><i class="ring r2"></i><div class="lg"><img src="themes/logo-horizontal-white.svg" alt="Minerva" onerror="if(!this.dataset.f){this.dataset.f=1;this.src='https://dziennik-minerva.pages.dev/themes/logo-horizontal-white.svg'}"></div><div class="bar"></div><div class="tx">Wczytywanie dziennika<i>.</i><i>.</i><i>.</i></div></div>
 <script>document.getElementById('splash').classList.add('on')</script>
 <div class="md:flex min-h-screen">
@@ -552,7 +552,7 @@ function nav(){document.body.classList.toggle('ish',tab==='home');
   const tot=Object.values(dots).reduce((a,b)=>a+(b||0),0);document.title=(tot?`(${tot}) `:'')+'Dziennik - Minerva';try{if(navigator.setAppBadge){tot?navigator.setAppBadge(tot):navigator.clearAppBadge()}navigator.serviceWorker&&navigator.serviceWorker.controller&&navigator.serviceWorker.controller.postMessage({type:'badge',n:tot})}catch{}
   const t=[['home','Start',''],['gr','Oceny','Dziennik'],['at','Frekwencja','Dziennik'],['pl','Plan lekcji','Dziennik'],['nt','Uwagi i pochwały','Dziennik']];
   if(me.role==='parent'||(staff()&&(dir()||isHome())))t.push(['js','Usprawiedliwienia','Dziennik']);
-  if(staff()&&(dir()||isHome()))t.push(['cl','Moja klasa','Dziennik'],['sw','Świadectwa','Dziennik']);
+  if(staff()&&(dir()||isHome()))t.push(['cl','Moja klasa','Dziennik']);
   t.push(['msg','Wiadomości','Komunikacja'],['ann','Ogłoszenia','Komunikacja']);if(dir())t.push(['ad','Administracja','Szkoła']);t.push(['ps','Powiadomienia','Konto']);
   const item=([k,l])=>`<button class="nv ${k===tab?'on':''}" onclick="go('${k}')">${ic(k)}<span>${l}</span>${dots[k]?`<em>${dots[k]>99?'99+':dots[k]}</em>`:''}</button>`;
   let pg='';const hd=t.map(x=>{const lb=x[2]!==pg&&x[2]?`<div class="ng">${x[2]}</div>`:'';pg=x[2];return lb+item(x)}).join('');
@@ -641,8 +641,7 @@ V.home=async()=>{
   let les=hd?[]:entries(tt.data||[],mon(now),r=>r.d===isoL(now)&&sc0(r)).sort((a,b)=>a.n-b.n),nextDay=false;
   const nes=entries(tn.data||[],mon(nd),r=>r.d===isoL(nd)&&sc0(r)).sort((a,b)=>a.n-b.n),dn=Math.round((new Date(isoL(nd)+'T12:00')-new Date(isoL(now)+'T12:00'))/864e5),when=dn===1?'jutro':({1:'w poniedziałek',2:'we wtorek',3:'w środę',4:'w czwartek',5:'w piątek'}[nd.getDay()]);
   if(les.filter(e=>e.st!=='cancel'&&e.st!=='moved').every(pastE)){les=nes;nextDay=true}
-  const planDs=nextDay?isoL(nd):isoL(now);await loadDone(planDs,planDs,[...new Set(les.map(e=>e.teaching_id))],pup?[me.role==='student'?me.id:sid]:null);
-  const plan=(hd?`<p class="tag r mb-2">${hd}</p>`:'')+(les.length?tlRender(les,planDs,{mode:pup?'class':'teacher',click:e=>{const dead=e.st==='cancel'||e.st==='moved',nogo=pup||nextDay||dead||(e.st==='sub'&&e.sub!==me.id&&!dir());return nogo?'':`curT='${e.teaching_id}';curL=${e.n};curD=isoL(new Date());atManual=false;go('at')`}}):n('Brak lekcji w planie.'));
+  const plan=(hd?`<p class="tag r mb-2">${hd}</p>`:'')+(les.length?les.map(e=>{const t=T.find(x=>x.id===e.teaching_id),dead=e.st==='cancel'||e.st==='moved',nogo=pup||nextDay||dead||(e.st==='sub'&&e.sub!==me.id&&!dir());return `<div class="flex items-center gap-3 py-2 border-b last:border-0" style="border-color:var(--ln)${nogo?'':';cursor:pointer'}${dead||(!nextDay&&pastE(e))?';opacity:.55':''}" ${nogo?'':`title="Sprawdź obecność" onclick="curT='${e.teaching_id}';curL=${e.n};curD=isoL(new Date());atManual=false;go('at')"`}><span class="av">${e.n}</span><div class="flex-1"><div class="font-semibold"${dead?' style="text-decoration:line-through"':''}>${esc(sn(e.subj||t?.subject_id))}</div><div class="text-xs mu">${pup||e.st==='sub'?esc(nm(e.sub||t?.teacher_id)):'klasa '+esc(cn(e.class_id))}${!pup&&e.st==='sub'?' · klasa '+esc(cn(e.class_id)):''}</div>${chTag(e)}</div><div class="text-xs mu">${(BELLS[e.n-1]||[]).join('-')}</div></div>`}).join(''):n('Brak lekcji w planie.'));
   const msgs=(m.data||[]).filter(r=>r.messages&&!r.messages.recalled_at).map(r=>r.messages).sort((x,y)=>y.created_at.localeCompare(x.created_at)).slice(0,4);
   const newG=(g.data||[]).filter(x=>x.created_at>since);newG.forEach(x=>GR[x.id]=x);
   const today=isoL(now),imp=[hd?row(`<b>${hd}</b><div class="text-xs mu">Dzień wolny od zajęć</div>`):'',...(a.data||[]).filter(x=>x.created_at.slice(0,10)===today).map(x=>row(`<b>${esc(x.title)}</b>`))].join('')||n('Brak informacji.');
@@ -946,7 +945,7 @@ V.pl=async()=>{
   if(!cid&&!mineT)return sel+pn('Plan zajęć','<p class="em">Brak przypisanej klasy.</p>');
   const q=sb.from('timetable').select('*');const {data,error}=await(mineT?q.in('teaching_id',T.filter(t=>t.teacher_id===ptid).map(t=>t.id)):q.eq('class_id',cid));if(error)throw error;
   const ids=T.filter(t=>t.teacher_id===ptid).map(t=>t.id),es=entries(data,wk,mineT?(r=>ids.includes(r.teaching_id)||r.sub===ptid):(r=>r.class_id===cid));
-  await loadDone(isoL(wk),isoL(addD(wk,4)),[...new Set(es.map(e=>e.teaching_id))],pup?[me.role==='student'?me.id:sid]:null);TLV={mode:(pup||!mineT)?'class':'teacher'};try{return sel+pn(mineT?(ptid===me.id?'Mój plan zajęć':'Plan nauczyciela - '+esc(nm(ptid))):'Plan zajęć - klasa '+esc(cn(cid)),weekGrid(es,(e,t)=>`<div class="lsn${e.st==='cancel'||e.st==='moved'?' x':''}"><div class="lt">${(BELLS[e.n-1]||[]).join(' - ')}</div><b>${esc(sn(e.subj||t?.subject_id))}</b><div class="text-xs">${mineT?(e.st==='sub'?esc(nm(e.sub))+' · ':'')+'klasa '+esc(cn(e.class_id)):esc(nm(e.sub||t?.teacher_id))}</div>${chTag(e)}</div>`),wkNav()+`<button class="btn sm np" onclick="window.print()">${ic('print')} Drukuj</button>`,'pl')}finally{TLV=null}
+  return sel+pn(mineT?(ptid===me.id?'Mój plan zajęć':'Plan nauczyciela - '+esc(nm(ptid))):'Plan zajęć - klasa '+esc(cn(cid)),weekGrid(es,(e,t)=>`<div class="lsn${e.st==='cancel'||e.st==='moved'?' x':''}${doneCls(e)}"><div class="lt">${(BELLS[e.n-1]||[]).join(' - ')}</div><b>${esc(sn(e.subj||t?.subject_id))}</b><div class="text-xs">${mineT?(e.st==='sub'?esc(nm(e.sub))+' · ':'')+'klasa '+esc(cn(e.class_id)):esc(nm(e.sub||t?.teacher_id))}</div>${chTag(e)}</div>`),wkNav()+`<button class="btn sm np" onclick="window.print()">${ic('print')} Drukuj</button>`,'pl');
 };
 
 /* ===== ekran Start jak w aplikacji mobilnej ===== */
@@ -1007,7 +1006,7 @@ function weekM(days,ns,data,cell,td){
   const act=mDay!=null?mDay:Math.max(0,days.findIndex(d=>isoL(d)===td));
   return `<div class="dtabs">${days.map((d,i)=>`<button class="dt${i===act?' on':''}${isoL(d)===td?' tdy':''}" onclick="pickDay(${i})"><small>${DAYS[i+1].slice(0,3)}</small><b>${pad(d.getDate())}</b></button>`).join('')}</div>`
    +days.map((d,i)=>{const ds=isoL(d),ho=hol(d),lst=ns.filter(n=>data.some(x=>x.d===ds&&x.n===n));
-    return `<div class="dp" style="${i===act?'':'display:none'}">${ALLDAY?ALLDAY(ds):''}${ho?`<div class="hol"><b>${esc(ho)}</b><div class="text-xs mu">Dzień wolny od zajęć</div></div>`:lst.length?TLV?tlRender(data.filter(x=>x.d===ds),ds,TLV):lst.map(n=>{const mk=ds===td?nowMark(n,lst):null;return `<div class="dlr${mk?' nlc '+mk.st:''}"><div class="dn">${n}<small>${(BELLS[n-1]||[]).join('<br>')}</small></div><div>${data.filter(x=>x.d===ds&&x.n===n).map(e=>cell(e,T.find(x=>x.id===e.teaching_id),ds)).join('')}</div>${mk&&mk.pos!=null?nowLine(mk.pos):''}</div>`}).join(''):'<p class="em">Brak lekcji tego dnia.</p>'}</div>`}).join('')}
+    return `<div class="dp" style="${i===act?'':'display:none'}">${ALLDAY?ALLDAY(ds):''}${ho?`<div class="hol"><b>${esc(ho)}</b><div class="text-xs mu">Dzień wolny od zajęć</div></div>`:lst.length?lst.map(n=>{const mk=ds===td?nowMark(n,lst):null;return `<div class="dlr${mk?' nlc '+mk.st:''}"><div class="dn">${n}<small>${(BELLS[n-1]||[]).join('<br>')}</small></div><div>${data.filter(x=>x.d===ds&&x.n===n).map(e=>cell(e,T.find(x=>x.id===e.teaching_id),ds)).join('')}</div>${mk&&mk.pos!=null?nowLine(mk.pos):''}</div>`}).join(''):'<p class="em">Brak lekcji tego dnia.</p>'}</div>`}).join('')}
 const pickDay=i=>{mDay=i;$$('.dt').forEach((b,j)=>b.classList.toggle('on',j===i));$$('.dp').forEach((q,j)=>q.style.display=j===i?'':'none')};
 let czT;const cardify=()=>{if(!isM())return;$$('#main table:not(.gt):not(.rt),#modal table:not(.gt):not(.rt)').forEach(t=>{
   const hs=[...t.querySelectorAll('thead th')].map(h=>h.textContent.replace(/[↑↓↕]/g,'').trim());t.classList.add('rt');
@@ -1508,7 +1507,7 @@ V.pl=async()=>{
   const pup=!staff(),cid=pup?ST[sid]?.class_id:null,r=await sb.from('plan_events').select('*').lte('date',isoL(addD(wk,4))).gte('date_to',isoL(wk));
   if(r.error)warn('Wydarzenia: '+r.error.message+'');
   EVC=(r.data||[]).filter(e=>!pup||(e.class_id===cid&&(!e.student_ids?.length||e.student_ids.includes(sid))));EVADD=staff();
-  try{const h=await _pl2();return (staff()?`<div class="mb-3 np"><button class="btn" onclick="evAddDay()">${ic('plus')} Dodaj wydarzenie</button></div>`:'')+h}finally{EVADD=false;EVC=[]}};
+  try{await loadDone();const h=await _pl2();return legend()+(staff()?`<div class="mb-3 np"><button class="btn" onclick="evAddDay()">${ic('plus')} Dodaj wydarzenie</button></div>`:'')+h}finally{EVADD=false;EVC=[]}};
 const evAdd=(cid,d,n,tid)=>evForm(cid,d,n,tid);
 const evAddDay=()=>evForm(plSel&&plSel!=='my'&&!String(plSel).startsWith('t:')?plSel:'',null,null,null);
 function evForm(cid,d,n,tid){const les=n!=null,mine=dir()?C:C.filter(c=>c.homeroom_teacher_id===me.id||T.some(t=>t.teacher_id===me.id&&t.class_id===c.id)),
@@ -1649,15 +1648,7 @@ function evLive(){if(staff())return;sb.channel('pe').on('postgres_changes',{even
   toast('Nowe wydarzenie w planie: '+evLabel(x),'info',6000);beep();if(!dirty&&!$('#modal').classList.contains('show')&&(tab==='pl'||tab==='home'))render(true)}).subscribe()}
 
 /* ===== v47 ===== */
-ICO.sw='<path d="M6 3h12a1 1 0 011 1v16a1 1 0 01-1 1H6a1 1 0 01-1-1V4a1 1 0 011-1z"/><path d="M8.5 8h7M8.5 11.5h7M8.5 15h3"/><circle cx="16" cy="16.5" r="2.2"/>';
 const animIn=()=>{const m=$('#main');if(!m)return;m.classList.remove('ain');void m.offsetWidth;m.classList.add('ain');clearTimeout(animIn.t);animIn.t=setTimeout(()=>m.classList.remove('ain'),1100)};
-/* aplikacja Świadectwa (osobna strona, tylko komputer) */
-const CERT_URL='https://dziennik-minerva.pages.dev/drukowanie-swiadectw';
-const isDesktop=()=>!/Android|iPhone|iPad|iPod|Mobile|Tablet/i.test(navigator.userAgent)&&!(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1)&&matchMedia('(min-width:1024px)').matches;
-function openCerts(){
-  modal(`<div class="box" style="text-align:center"><div style="font-size:2.4rem">🛠️</div><h3 class="mh" style="margin-top:.4rem">Świadectwa</h3><p class="mu">System w trakcie tworzenia...</p><div class="flex justify-center mt-4"><button class="btn" onclick="closeModal()">Rozumiem</button></div></div>`)}
-{const _go=go;go=function(k){if(k==='sw'){closeModal&&closeModal();return openCerts()}return _go(k)}}
-window.addEventListener('pageshow',e=>{if(e.persisted)document.body.style.opacity='1'});
 /* test powiadomienia: z obsługą błędów i zgody */
 pushTest=async()=>{try{
   if(!('Notification' in window))return warn('Ta przeglądarka nie obsługuje powiadomień.');
@@ -1670,76 +1661,29 @@ pushTest=async()=>{try{
   toast('Wysłano testowe powiadomienie - jeśli go nie widzisz, sprawdź ustawienia powiadomień urządzenia (tryb skupienia / nie przeszkadzać).','info',6000)
  }catch(e){warn('Nie udało się pokazać powiadomienia: '+(e.message||e))}};
 
+/* ===== v48 ===== */
+/* plan: zielony = obecność sprawdzona (i uczeń obecny) + wpisany temat */
+let DONE=new Set();
+async function loadDone(){DONE=new Set();try{
+  const f=isoL(wk),t=isoL(addD(wk,4)),pup=!staff();
+  const [tp,at]=await Promise.all([
+    pageAll(()=>sb.from('lesson_topics').select('teaching_id,date,lesson_no,topic').gte('date',f).lte('date',t)),
+    pageAll(()=>{let q=sb.from('attendance').select('teaching_id,date,lesson_no,status').gte('date',f).lte('date',t);return pup?q.eq('student_id',sid):q})]);
+  const top=new Set(tp.filter(x=>(x.topic||'').trim()).map(x=>x.teaching_id+'|'+x.date+'|'+x.lesson_no));
+  at.forEach(x=>{const k=x.teaching_id+'|'+x.date+'|'+x.lesson_no;if(top.has(k)&&(!pup||x.status==='present'))DONE.add(k)})
+}catch(e){}}
+const doneCls=e=>e.st==='cancel'||e.st==='moved'?'':DONE.has(e.teaching_id+'|'+e.d+'|'+e.n)?' ok':'';
+const legend=()=>`<div class="pnl np"><span><i class="g"></i>obecność sprawdzona, temat wpisany</span><span><i class="n"></i>zajęcia bez wpisu</span><span><i class="r"></i>odwołane</span><span><i class="v"></i>zastępstwo</span></div>`;
+/* offline także przy błędzie ładowania bibliotek lub zapytań */
+if(typeof supabase==='undefined'){offShow()}
+addEventListener('unhandledrejection',e=>{if(!navigator.onLine)offShow()});
+/* bramka: przeglądarka w telefonie = tylko aplikacja */
+var GATE=false;
+if(MOBILE&&!STANDALONE){GATE=true;const g=document.getElementById('gate'),sh='<svg class="sv" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M8 7l4-4 4 4"/><path d="M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/></svg>';
+  const draw=()=>{document.getElementById('gst').innerHTML=(IOS?`<ol><li>Otwórz tę stronę w <b>Safari</b>.</li><li>Stuknij <b>Udostępnij</b> ${sh} na pasku.</li><li>Wybierz <b>„Dodaj do ekranu początkowego”</b>.</li><li>Uruchom <b>Dziennik Minerva</b> z ikony.</li></ol>`:`${deferredInstall?`<button type="button" onclick="doInstall()">Zainstaluj aplikację</button>`:''}<ol><li>Stuknij menu przeglądarki <b>⋮</b>.</li><li>Wybierz <b>„Zainstaluj aplikację”</b> lub <b>„Dodaj do ekranu głównego”</b>.</li><li>Uruchom <b>Dziennik Minerva</b> z ikony.</li></ol>`)};
+  draw();addEventListener('beforeinstallprompt',()=>setTimeout(draw,0));g.classList.add('on');document.getElementById('splash')&&(document.getElementById('splash').style.display='none')}
 
-/* ===== v48: plan dnia jako os czasu, brak internetu, blokada przegladarki na telefonie ===== */
-const PXM=2.3;let TLV=null,DONE={A:{},Tp:{}};
-async function pgAll(q){let out=[];for(let p=0;p<8;p++){const r=await q().range(p*1000,p*1000+999);if(r.error||!r.data)break;out=out.concat(r.data);if(r.data.length<1000)break}return out}
-async function loadDone(d1,d2,tids,sids){
-  DONE={A:{},Tp:{}};if(!tids||!tids.length)return;
-  try{
-    const [a,tp]=await Promise.all([
-      pgAll(()=>{let q=sb.from('attendance').select('teaching_id,lesson_no,date,student_id,status').gte('date',d1).lte('date',d2).in('teaching_id',tids);if(sids&&sids.length)q=q.in('student_id',sids);return q.order('date')}),
-      pgAll(()=>sb.from('lesson_topics').select('teaching_id,lesson_no,date,topic').gte('date',d1).lte('date',d2).in('teaching_id',tids).order('date'))]);
-    a.forEach(r=>{const k=r.date+'|'+r.teaching_id+'|'+r.lesson_no;(DONE.A[k]=DONE.A[k]||[]).push(r)});
-    tp.forEach(r=>{if(r.topic&&String(r.topic).trim())DONE.Tp[r.date+'|'+r.teaching_id+'|'+r.lesson_no]=1});
-  }catch{DONE={A:{},Tp:{}}}}
-/* zielone = sprawdzona obecnosc (uczen/rodzic: uczen obecny) i wpisany temat */
-function lsDone(e){const k=e.d+'|'+e.teaching_id+'|'+e.n;if(!DONE.Tp[k])return false;const rows=DONE.A[k]||[];if(!rows.length)return false;
-  if(me.role==='student'||me.role==='parent'){const id=me.role==='student'?me.id:sid,r=rows.find(x=>x.student_id===id);return !!r&&(r.status==='present'||r.status==='late')}
-  return true}
-const TLCH='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>';
-function tlRender(list,ds,o){o=o||{};
-  const it=list.map(e=>{const b=BELLS[e.n-1];return b&&b[0]?{e,s:tmin2(b[0]),f:tmin2(b[1])}:null}).filter(Boolean).sort((a,b)=>a.s-b.s||a.e.n-b.e.n);
-  if(!it.length)return '<p class="em">Brak lekcji.</p>';
-  const t0=Math.floor((Math.min(...it.map(x=>x.s))-20)/60)*60,t1=Math.ceil(Math.max(...it.map(x=>x.f))/60)*60;
-  let cols=[],cur=[],cend=0;const fin=()=>{const n=Math.max(1,...cur.map(x=>x.c+1));cur.forEach(x=>x.n=n);cur=[]};
-  it.forEach(x=>{if(cur.length&&x.s>=cend)fin();if(!cur.length){cend=0;cols=[]}let c=0;while(cols[c]!=null&&cols[c]>x.s)c++;cols[c]=x.f;x.c=c;cur.push(x);cend=Math.max(cend,x.f)});fin();
-  let h=`<div class="tl" style="height:${(t1-t0)*PXM+8}px">`;
-  for(let m=t0;m<=t1;m+=60)h+=`<div class="tlh" style="top:${(m-t0)*PXM}px"><span>${pad(m/60)}:00</span></div>`;
-  h+='<div class="tlc">';
-  it.forEach(x=>{const e=x.e,t=T.find(y=>y.id===e.teaching_id),st=e.st,key=e.d+'|'+e.n+'|'+e.class_id+'|'+e.teaching_id+'|'+st;
-    if(st)ENT[key]=e;
-    const done=(!st||st==='sub'||st==='in')&&lsDone(e),cls=st==='cancel'?'cn':st==='moved'?'mv':done?'dn':'';
-    const tag={cancel:'<span class="tlt r">odwołane</span>',moved:'<span class="tlt y">przeniesione</span>',in:'<span class="tlt b">przeniesione tu</span>',sub:'<span class="tlt p">zastępstwo</span>'}[st]||'';
-    let sub2;if(o.mode==='teacher')sub2=(st==='sub'?esc(nm(e.sub))+' · ':'')+'klasa '+esc(cn(e.class_id));else sub2=esc(nm(e.sub||t?.teacher_id));
-    const ev=(typeof EVC!=='undefined'?EVC.filter(q=>evLn(q)===e.n&&q.class_id===e.class_id&&evCovers(q,e.d)):[]).map(evTag).join('');
-    const add=typeof EVADD!=='undefined'&&EVADD&&st!=='cancel'&&st!=='moved'&&(dir()||t?.teacher_id===me.id||e.sub===me.id)?`<a class="lk np" style="font-size:.8rem" onclick="event.stopPropagation();evAdd('${e.class_id}','${e.d}',${e.n},'${e.teaching_id}')">+ Wydarzenie</a>`:'';
-    const ck=o.click?o.click(e):'';
-    h+=`<div class="tlk ${cls}${ck?' pk':''}" ${ck?`onclick="${ck}"`:''} style="top:${(x.s-t0)*PXM}px;height:${(x.f-x.s)*PXM}px;left:calc(${x.c}*100%/${x.n});width:calc(100%/${x.n} - ${x.n>1?4:0}px)">
-     <div class="tlr"><div class="tlg">${tag}</div><span class="tlm">${BELLS[e.n-1].join(' - ')}</span></div>
-     <div class="tlb"><div style="min-width:0"><b>${esc(sn(e.subj||t?.subject_id))}</b><small>${sub2}</small>${ev||add?`<div class="tle">${ev}${add}</div>`:''}</div>${st?`<button class="tla" aria-label="Szczegóły" onclick="event.stopPropagation();chDet('${key}')">${TLCH}</button>`:''}</div></div>`});
-  h+='</div>';
-  if(ds===isoL(new Date())){const nm_=nowMin();if(nm_>=t0&&nm_<=t1){const d=new Date();h+=`<div class="tlnow" style="top:${(nm_-t0)*PXM}px"><b>${pad(d.getHours())}:${pad(d.getMinutes())}</b></div>`}}
-  return h+'</div>'}
-
-/* brak internetu */
-(function(){
-  document.body.insertAdjacentHTML('beforeend','<div id="offl" role="alert"><div class="oi"><svg viewBox="0 0 24 24" width="38" height="38" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 8.8a15 15 0 0120 0M5 12.5a10 10 0 0114 0M8.5 16a5 5 0 017 0"/><circle cx="12" cy="19.5" r=".6"/><path d="M3 3l18 18"/></svg></div><h2>Brak połączenia z internetem</h2><p>Dziennik wymaga połączenia z internetem. Sprawdź Wi-Fi lub dane komórkowe i spróbuj ponownie.</p><button class="btn" style="margin-top:1.2rem" onclick="offChk(true)">Spróbuj ponownie</button></div>');
-  let was=false;
-  window.offChk=async function(manual){
-    let on=navigator.onLine;
-    if(manual&&on){try{await fetch(location.pathname+'?_='+Date.now(),{method:'HEAD',cache:'no-store'})}catch{on=false}}
-    document.getElementById('offl').classList.toggle('on',!on);
-    if(on&&was){was=false;try{typeof refresh==='function'&&refresh(true)}catch{}}
-    if(!on)was=true};
-  addEventListener('offline',()=>offChk());addEventListener('online',()=>offChk(true));
-  document.addEventListener('visibilitychange',()=>{if(!document.hidden)offChk()});
-  offChk()})();
-
-/* dziennik w przegladarce telefonu: tylko aplikacja */
-const PHONE=/iPhone|iPod/i.test(navigator.userAgent)||(ANDR&&/Mobile/i.test(navigator.userAgent)),GATE=PHONE&&!STANDALONE;
-function gateShow(){
-  const sh='<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:-4px"><path d="M12 3v12M8 7l4-4 4 4"/><path d="M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/></svg>';
-  const st=IOS?['Otwórz dziennik w przeglądarce <b>Safari</b>.','Stuknij przycisk <b>Udostępnij</b> '+sh+' na pasku przeglądarki.','Wybierz <b>„Dodaj do ekranu początkowego”</b> i stuknij <b>„Dodaj”</b>.','Uruchom <b>Dziennik Minerva</b> z ikony na ekranie głównym.']
-   :['Stuknij menu przeglądarki <b>⋮</b> (prawy górny róg w Chrome).','Wybierz <b>„Zainstaluj aplikację”</b> albo <b>„Dodaj do ekranu głównego”</b> i potwierdź.','Uruchom <b>Dziennik Minerva</b> z ikony na ekranie głównym.'];
-  const el=document.getElementById('appgate')||document.body.appendChild(Object.assign(document.createElement('div'),{id:'appgate'}));
-  el.innerHTML=`<img src="icons/icon-192.png" width="72" height="72" style="border-radius:18px" alt=""><h2 style="margin-top:1rem">Dziennik działa tylko w aplikacji</h2><p>W przeglądarce telefonu dziennik jest niedostępny. Zainstaluj aplikację Dziennik Minerva i otwórz ją z ikony na ekranie głównym.</p>
-   ${!IOS&&deferredInstall?'<button class="btn" style="margin-top:1.1rem" onclick="doInstall()">Zainstaluj aplikację</button>':''}
-   <div class="gs">${st.map((x,i)=>`<div class="ist"><i>${i+1}</i><div>${x}</div></div>`).join('')}</div>`;
-  el.classList.add('on')}
-if(GATE){gateShow();addEventListener('beforeinstallprompt',()=>setTimeout(gateShow,50));addEventListener('appinstalled',()=>gateShow());const s=document.getElementById('splash');s&&s.remove()}
-
-if(!GATE)init();
+if(!(typeof GATE!=='undefined'&&GATE))init();
 </script>
 </body>
 </html>
