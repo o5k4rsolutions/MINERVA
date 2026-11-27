@@ -2,12 +2,12 @@
 <html lang="pl">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#1E2A78">
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#14231c">
 <meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Minerva"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png"><link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
 <title>Dziennik - Minerva</title>
 <link rel="icon" href="https://dziennik-minerva.pages.dev/themes/icon-dark.svg">
-<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700;9..144,800&family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.tailwindcss.com/3.4.17"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <style>
@@ -1754,5 +1754,63 @@ if(MOBILE&&!STANDALONE){GATE=true;const g=document.getElementById('gate'),sh='<s
 
 if(!(typeof GATE!=='undefined'&&GATE))init();
 </script>
+<style id="skin">
+:root{--in:#14231c;--am:#c8452d;--bg:#f2ebdc;--ln:#d9cdb5;--mu:#7b705d;--tx:#1d1a14;--paper:#fffcf4;--gold:#b8892b;--ink2:#25392f;--serif:'Fraunces',Georgia,serif}
+body{font-family:'Hanken Grotesk',system-ui,sans-serif;background:var(--bg) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='.8' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 .4 0 0 0 0 .32 0 0 0 0 .2 0 0 0 .07 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");color:var(--tx)}
+h1,h2,h3,.ph h3,.mh,.hm-head h2,.hm-h,.hm-sec b,.st b{font-family:var(--serif);letter-spacing:-.01em}
+:focus-visible{outline:2px solid var(--am);outline-offset:2px}
+/* panele */
+.pn,.st div,.tile,.hm-c,.hm-g{background:var(--paper);border:1px solid var(--ln);border-radius:6px;box-shadow:3px 3px 0 #d9cdb566}
+.hm-c,.hm-g{border-radius:10px}
+.ph{background:transparent;border-bottom:1.5px solid var(--in);border-radius:0;padding:.85rem 1.1rem}
+.ph h3{font-size:1.12rem;font-weight:700;color:var(--in)}.ph h3 .ic{color:var(--am)}
+.st b{font-size:2rem;font-weight:800;color:var(--in)}.st span{text-transform:uppercase;letter-spacing:.08em;font-size:.68rem;font-weight:700}
+.tile:hover{border-color:var(--am);box-shadow:5px 5px 0 var(--am)}
+/* przyciski i pola */
+.btn{background:var(--in);border-radius:4px;letter-spacing:.01em}.btn:hover{background:var(--ink2)}
+.btn.am{background:var(--am);color:#fff7ec}.btn.am:hover{background:#d95a3f}
+.gh{background:transparent;border:1.5px solid var(--in);color:var(--in);border-radius:4px}.gh:hover{background:var(--in);color:var(--paper)}
+.gh.red{color:#9d2a1a;border-color:#9d2a1a}.gh.red:hover{background:#9d2a1a;color:#fff}
+input[type=text],input[type=password],input[type=date],textarea,.inp,.ddb{background:#fffdf7;border:1px solid #c9bb9d;border-radius:4px}
+input:focus,textarea:focus{outline:2px solid var(--am);border-color:var(--am)}
+.lb{text-transform:uppercase;letter-spacing:.07em;font-size:.68rem;color:var(--mu)}
+#pop,#modal .box{background:var(--paper);border:1.5px solid var(--in);border-radius:8px;box-shadow:6px 6px 0 #14231c33}
+.pi:hover{background:#f1e9d6}.pi.on{background:#ebe0c6}
+.seg{background:#e6dcc4;border-radius:4px}.seg button{border-radius:3px;color:#5b5037}.seg button.on{background:var(--in);color:var(--paper);box-shadow:none}
+.cb,.ck i{border-radius:3px;border-color:#9c8f72}.pi.on .cb,.ck.on i{background:var(--in);border-color:var(--in)}
+.ck{background:#fffdf7;border-color:#c9bb9d;border-radius:4px}.ck.on{background:#ebe0c6;border-color:var(--in)}
+.cg button.on{background:var(--in)}.cg button.td{box-shadow:inset 0 0 0 1.5px var(--am)}
+/* tabele */
+th{font-size:.66rem;text-transform:uppercase;letter-spacing:.09em;color:var(--in);background:#efe6d1;border-bottom:1.5px solid var(--in)}
+td{border-bottom:1px solid #e6dcc6}
+tbody tr:nth-child(even) td{background:#faf4e6}tbody tr:hover td,tr.hv:hover td{background:#f3e8cc}
+.gt th{background:#efe6d1}.att th.hc:hover{background:#f3e8cc}
+/* oceny: pieczątki */
+.gc{font-family:var(--serif);font-weight:800;border-radius:4px;background:var(--paper);border:1.5px solid #bfb294;box-shadow:none}
+.g1{color:#a3271a;border-color:#a3271a}.g2{color:#bb5415;border-color:#bb5415}.g3{color:#9a7414;border-color:#9a7414}.g4{color:#58742a;border-color:#58742a}.g5{color:#2c6a43;border-color:#2c6a43}.g6{color:#1d5a5a;border-color:#1d5a5a}
+.gc:hover{transform:rotate(-4deg) scale(1.08)}
+/* tagi */
+.tag{border-radius:3px;background:#e6dcc4;color:#3d3522;text-transform:uppercase;letter-spacing:.04em;font-size:.66rem}
+.tag.g{background:#dbe8cf;color:#2c5a22}.tag.r{background:#f2d3c9;color:#8c2415}.tag.y{background:#f3e4b5;color:#74540d}.tag.b{background:#d3e1e0;color:#1d4c4c}
+/* nawigacja */
+.side,#mnav{background:var(--in);color:var(--paper)}
+.side .nv,.nv{color:#cdc6b0;font-weight:600;border-radius:0 4px 4px 0}
+.nv:hover,.side .nv:hover{background:#ffffff14;color:#fff}
+.nv.on,.side .nv.on{background:var(--paper);color:var(--in);border-left:4px solid var(--am)}
+#mnav .nv.on{background:transparent;color:var(--paper);border-top-color:var(--am)}
+.nv em,.qk em,.hm-av em{background:var(--am)}
+.av{background:var(--am);font-family:var(--serif)}.qk{background:var(--paper);border-color:var(--in)}.qk:hover{background:var(--gold)}
+/* lekcje, frekwencja */
+.lc{background:var(--paper);border:1px solid #c9bb9d;border-radius:6px;box-shadow:none}
+.lc:not(:disabled):hover{border-color:var(--in);transform:none;box-shadow:3px 3px 0 #14231c33}
+.lc.on{background:#f3e8cc;border-color:var(--in);box-shadow:3px 3px 0 var(--am)}
+.hm-ls.cur{background:#f3e8cc}.hm-li,.hm-ls{border-color:#e6dcc6}
+.hm-head h2{font-size:1.9rem}.hm-av{background:var(--in);color:var(--paper);font-family:var(--serif)}
+.hm-date button{background:#e6dcc4}.hm-sec a{color:var(--am)}
+.toast{background:var(--in);border-radius:4px;border-left:4px solid var(--gold)}.toast.ok{background:#2c5a22}.toast.bad{background:#8c2415}
+.abar{background:var(--paper);border-top:1.5px solid var(--in)}
+.skel{background:#e6dcc4}
+::selection{background:var(--am);color:#fff}
+</style>
 </body>
 </html>
