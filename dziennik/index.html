@@ -551,6 +551,67 @@ tr.today td{background:#FFF6E0}.att .myc,.myc{background:#FFF4D6!important}
  #main>*{animation:tIn .38s var(--ez) both}
 }
 </style>
+<style id="v55">
+/* ===== v55: okna pełnoekranowe/panel, oceny okresowe, ładowanie, tablet i komputer ===== */
+.fh .ftt{flex:1;min-width:0}.fh .mh{margin:0;font-size:1.1rem;letter-spacing:-.02em}
+.fcard{background:#fff;border-radius:22px;padding:1.15rem;box-shadow:var(--sh)}
+.fcard .mh{display:none}
+.ffoot{flex-shrink:0;display:flex!important;gap:.6rem;flex-wrap:wrap;justify-content:flex-end;padding:.8rem 1rem calc(.8rem + env(safe-area-inset-bottom,0px));background:#fffffff2;backdrop-filter:blur(14px);border-top:1px solid var(--ln);margin:0!important}
+.ffoot>*{flex:1 1 auto;justify-content:center;margin:0!important}
+@media(min-width:768px){
+ #modal:has(.box.pg){justify-content:flex-end;align-items:stretch;padding:0;background:#0c1034a6;backdrop-filter:blur(6px)}
+ #modal .box.pg{width:min(580px,100%);max-width:none!important;height:100%;max-height:none!important;border-radius:28px 0 0 28px!important;animation:drawIn .34s var(--ez) both!important}
+ #modal .box.pg.w{width:min(780px,100%)}
+ .ffoot>*{flex:0 0 auto}
+}
+@keyframes drawIn{from{transform:translateX(70px);opacity:0}to{transform:none;opacity:1}}
+
+/* oceny okresowe / proponowane — osobny tryb */
+.trw{display:grid;grid-template-columns:30px minmax(0,1fr) auto auto;gap:.5rem .7rem;align-items:center;padding:.85rem 0;border-bottom:1px solid #EFF2F9}
+.trw .arn{align-self:start;margin-top:.15rem}
+.tgl{display:flex;flex-direction:column;align-items:center;gap:.3rem}
+.tgl small{font-size:.62rem;text-transform:uppercase;letter-spacing:.05em;color:var(--mu);font-weight:800}
+.trw .tg{width:56px!important;height:52px;font-size:1.35rem;font-weight:800;border-radius:15px;padding:0!important;text-align:center}
+.trw .grm b{display:block}.trw .grm small{color:var(--mu);font-size:.74rem}.trw .grm small b{display:inline;color:var(--in)}
+
+/* ekran ładowania */
+#splash .spin{position:absolute;width:min(76vw,460px);aspect-ratio:1;border-radius:50%;background:conic-gradient(from 0deg,#F5A52400 0%,#F5A524d0 20%,#F5A52400 42%);-webkit-mask:radial-gradient(circle,#0000 61%,#000 61.5%,#000 63%,#0000 63.5%);mask:radial-gradient(circle,#0000 61%,#000 61.5%,#000 63%,#0000 63.5%);animation:rot 3s linear infinite}
+@keyframes rot{to{transform:rotate(360deg)}}
+#splash .pt{position:absolute;bottom:-12px;left:var(--x);width:var(--s,5px);height:var(--s,5px);border-radius:50%;background:#ffffffb0;opacity:0;animation:ptUp 5.5s var(--d,0s) linear infinite}
+@keyframes ptUp{0%{transform:translate(0,0);opacity:0}15%{opacity:.85}100%{transform:translate(24px,-108vh);opacity:0}}
+#splash .pgw{position:relative;margin-top:2.6rem;width:min(64vw,270px);animation:fadeUp .5s .8s both}
+#splash .pgb{height:6px;border-radius:6px;background:#ffffff24;overflow:hidden}
+#splash .pgb i{display:block;height:100%;width:100%;border-radius:6px;transform-origin:left;background:linear-gradient(90deg,#F5A524,#ffe0a0,#F5A524);background-size:200% 100%;animation:pgf 3.4s .6s cubic-bezier(.45,0,.2,1) both,pgs 1.3s linear infinite}
+@keyframes pgf{from{transform:scaleX(.02)}to{transform:scaleX(1)}}@keyframes pgs{to{background-position:-200% 0}}
+#splash .pgm{position:relative;height:1.4rem;margin-top:.95rem;text-align:center;color:#ffffffc8;font-size:.84rem;font-weight:600;letter-spacing:.02em}
+#splash .pgm span{position:absolute;inset:0;opacity:0;animation:tmsg 1s both}
+#splash .pgm span:nth-child(1){animation-delay:.8s}#splash .pgm span:nth-child(2){animation-delay:1.75s}#splash .pgm span:nth-child(3){animation-delay:2.7s}
+#splash .pgm span:nth-child(4){animation:tlast .5s 3.65s both}
+@keyframes tmsg{0%{opacity:0;transform:translateY(8px)}18%,78%{opacity:1;transform:none}100%{opacity:0;transform:translateY(-8px)}}
+@keyframes tlast{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+#splash .sfoot{position:absolute;bottom:calc(26px + env(safe-area-inset-bottom,0px));color:#ffffff80;font-size:.68rem;letter-spacing:.24em;text-transform:uppercase;font-weight:700;animation:fadeUp .6s 1.2s both}
+#splash{transition:opacity .6s ease,transform .7s cubic-bezier(.6,0,.2,1),filter .6s,visibility .6s}
+#splash.out{filter:blur(12px);transform:scale(1.06)}
+
+/* tablet i komputer */
+@media(min-width:768px){
+ .side{margin:12px 0 12px 12px;height:calc(100vh - 24px)!important;top:12px!important;border-radius:26px;box-shadow:var(--sh2);overflow:hidden}
+ .top{margin:12px 12px 0 12px;border-radius:20px;border:0!important;box-shadow:var(--sh);top:12px!important}
+ .ph{padding-top:1.1rem}
+}
+@media(min-width:768px) and (max-width:1099px){
+ .side{width:80px!important}
+ .side>div.p-4:first-child{padding:1rem .6rem}.side>div.p-4:first-child img{display:none}
+ .side>div.p-4:first-child:before{content:"M";display:flex;align-items:center;justify-content:center;width:46px;height:46px;margin:0 auto;border-radius:15px;background:linear-gradient(135deg,#F5A524,#FFC55C);color:#1E2A78;font-weight:800;font-size:1.4rem}
+ .side>div.px-4,.side>div.border-t,.side .ng{display:none}
+ .side .nv{position:relative;justify-content:center;padding:.85rem 0;margin:3px 10px;width:calc(100% - 20px)}.side .nv span{display:none}
+ .side .nv .ic{width:1.5em;height:1.5em}.side .nv em{position:absolute;top:4px;right:8px;margin:0}
+ main{padding:1.2rem 1rem 3rem!important}
+ .st{grid-template-columns:repeat(2,1fr)}
+}
+@media(min-width:1100px){.side{width:17rem!important}main{max-width:84rem}.st{grid-template-columns:repeat(4,1fr)}}
+@media(min-width:900px){.pw{min-width:0}}
+</style>
 </head>
 <body>
 <div id="off" role="alert"><div class="bx"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2 8.8a15 15 0 0 1 4-2.4M22 8.8a15 15 0 0 0-10-3.3M5 12.5a10 10 0 0 1 3-1.9M19 12.5a10 10 0 0 0-3.5-2M8.5 16a5 5 0 0 1 2-1.1M15.5 16a5 5 0 0 0-1.4-1M12 19.5h.01M3 3l18 18"/></svg><h2>Brak połączenia z internetem</h2><p>Sprawdź Wi‑Fi lub dane komórkowe. Dziennik wróci automatycznie, gdy sieć znów będzie dostępna.</p><button type="button" onclick="offTry()">Spróbuj ponownie</button></div></div>
@@ -565,7 +626,7 @@ window.offShow=function(){o.classList.add('on')};
 })();
 </script>
 
-<div id="splash"><i class="orb o1"></i><i class="orb o2"></i><i class="ring"></i><i class="ring r2"></i><div class="lg"><img src="themes/logo-horizontal-white.svg" alt="Minerva" onerror="if(!this.dataset.f){this.dataset.f=1;this.src='https://dziennik-minerva.pages.dev/themes/logo-horizontal-white.svg'}"></div><div class="bar"></div><div class="tx">Wczytywanie dziennika<i>.</i><i>.</i><i>.</i></div></div>
+<div id="splash"><i class="orb o1"></i><i class="orb o2"></i><i class="ring"></i><i class="ring r2"></i><i class="spin"></i><i class="pt" style="--x:8%;--d:0s;--s:5px"></i><i class="pt" style="--x:22%;--d:1.2s;--s:7px"></i><i class="pt" style="--x:37%;--d:0.5s;--s:4px"></i><i class="pt" style="--x:52%;--d:2.1s;--s:6px"></i><i class="pt" style="--x:66%;--d:0.8s;--s:5px"></i><i class="pt" style="--x:81%;--d:1.7s;--s:7px"></i><i class="pt" style="--x:93%;--d:0.3s;--s:4px"></i><div class="lg"><img src="themes/logo-horizontal-white.svg" alt="Minerva" onerror="if(!this.dataset.f){this.dataset.f=1;this.src='https://dziennik-minerva.pages.dev/themes/logo-horizontal-white.svg'}"></div><div class="pgw"><div class="pgb"><i></i></div><div class="pgm"><span>Łączenie z dziennikiem</span><span>Wczytywanie planu lekcji</span><span>Sprawdzanie ocen i frekwencji</span><span>Prawie gotowe</span></div></div><div class="sfoot">Dziennik elektroniczny</div></div>
 <script>document.getElementById('splash').classList.add('on')</script>
 <div class="md:flex min-h-screen">
 <aside class="side md:w-60 md:h-screen md:sticky md:top-0 md:flex md:flex-col shrink-0">
@@ -960,20 +1021,23 @@ V.gr=async()=>{
   const sts=classStudents(t.class_id),{data:g,error}=await sb.from('grades').select('*').eq('teaching_id',t.id).order('created_at');if(error)throw error;
   const by=p=>g.filter(x=>x.student_id===p.id),s1=a=>a.filter(x=>sem(x)===1),s2=a=>a.filter(x=>sem(x)===2),all=a=>a;
   const cav=f=>{const v=sts.map(p=>wavg(f(by(p)))).filter(x=>x!=null);return v.length?v.reduce((a,b)=>a+b,0)/v.length:null};
-  const bar=`<div class="flex flex-wrap items-end gap-3 mb-3 np"><button class="gh" onclick="gmode='list';rr()">${ic('back')} Przedmioty</button><div style="width:300px">${dd('gt',ts.map(x=>[x.id,tl(x)]),curT,{on:x=>{curT=x;rr()}})}</div>${seg('gm',[['one','Oceny'],['bulk','Oceny seryjnie']],gmode,k=>{gmode=k;rr()})}<button class="gh" onclick="atFor('${t.id}')">Frekwencja</button><button class="gh" onclick="window.print()">${ic('print')} Drukuj</button></div><p class="text-sm mb-3"><b>Klasa:</b> ${esc(cn(t.class_id))}, <b>Przedmiot:</b> ${esc(sn(t.subject_id))}, <b>Nauczyciel:</b> ${esc(nm(t.teacher_id))}</p>`;
-  const barM=`<div class="flex flex-wrap gap-2 mb-3 np"><button class="gh sm" onclick="gmode='list';rr()">${ic('back')} Przedmioty</button><button class="gh sm" onclick="gmode='${gmode==='bulk'?'one':'bulk'}';rr()">${gmode==='bulk'?'Pojedyncze oceny':'Oceny seryjnie'}</button><button class="gh sm" onclick="atFor('${t.id}')">Frekwencja</button></div>`,ttlM=esc(cn(t.class_id))+' · '+esc(sn(t.subject_id));
+  const bar=`<div class="flex flex-wrap items-end gap-3 mb-3 np"><button class="gh" onclick="gmode='list';rr()">${ic('back')} Przedmioty</button><div style="width:300px">${dd('gt',ts.map(x=>[x.id,tl(x)]),curT,{on:x=>{curT=x;rr()}})}</div>${seg('gm',[['one','Oceny'],['bulk','Oceny seryjnie'],['term','Okresowe i propon.']],gmode,k=>{gmode=k;rr()})}<button class="gh" onclick="atFor('${t.id}')">Frekwencja</button><button class="gh" onclick="window.print()">${ic('print')} Drukuj</button></div><p class="text-sm mb-3"><b>Klasa:</b> ${esc(cn(t.class_id))}, <b>Przedmiot:</b> ${esc(sn(t.subject_id))}, <b>Nauczyciel:</b> ${esc(nm(t.teacher_id))}</p>`;
+  const barM=`<div class="flex flex-wrap gap-2 mb-3 np"><button class="gh sm" onclick="gmode='list';rr()">${ic('back')} Przedmioty</button>${seg('gm',[['one','Oceny'],['bulk','Seryjnie'],['term','Okresowe']],gmode,k=>{gmode=k;rr()})}<button class="gh sm" onclick="atFor('${t.id}')">Frekwencja</button></div>`,ttlM=esc(cn(t.class_id))+' · '+esc(sn(t.subject_id));
   if(!sts.length)return pn('Szczegóły lekcji',bar+'<p class="em">W tej klasie nie ma jeszcze uczniów.</p>','','gr');
   if(gmode==='bulk'){
     const W=LNS().map(n=>[String(n),'Waga '+n]),PR=['Sprawdzian','Kartkówka','Odpowiedź ustna','Praca domowa','Aktywność'];
     return pn(isM()?'Oceny seryjne · '+ttlM:'Oceny seryjne',(isM()?barM:bar)+`<div class="grid md:grid-cols-3 gap-3 mb-2"><div><label class="lb">Za co</label><input type="text" id="bc"></div><div><label class="lb">Waga</label>${dd('bw',W,GW,{on:x=>GW=x})}</div><div><label class="lb">Data</label>${dp('bd',isoL(new Date()))}</div></div><div class="mb-3">${PR.map(x=>`<button class="gh sm mr-1 mb-1" onclick="$('#bc').value='${x}';dirty=true">${x}</button>`).join('')}</div>`
      +(isM()?bulkM(sts,by):'')+tblB(['Nr','Nazwisko i imię','Dotychczasowe oceny','Średnia','Nowa ocena'],sts.map((p,i)=>`<tr><td class="mu">${i+1}</td><td style="white-space:nowrap"><b>${esc(ln(p.id))}</b></td><td>${chips(by(p))}</td><td>${fa(wavg(by(p)))}</td><td><input type="text" class="ni inp" data-s="${p.id}" placeholder="np. 4+, +, 18/20, 85%" maxlength="8" style="max-width:150px" onkeydown="if(event.key==='Enter'){event.preventDefault();$$('.ni')[${i+1}]?.focus()}"></td></tr>`))+(isM()?'<div class="abar"><button class="btn" style="flex:1;justify-content:center" onclick="saveGrades()">Zapisz wpisane oceny</button></div>':`<button class="btn mt-3" onclick="saveGrades()">Zapisz wpisane oceny</button>`),'','gr');
   }
+  
+  if(isM()&&gmode==='term'){const per=gtp,cl=a=>per==='1'?s1(a):per==='2'?s2(a):a;
+    return pn(ttlM,barM+`<div class="mb-2">${seg('gp',[['1','Okres 1'],['2','Okres 2'],['y','Rok']],gtp,k=>{gtp=k;rr()})}</div><p class="text-sm mu mb-3">Wpisz ocenę 1-6. Puste pole oznacza brak oceny.</p><div class="gt" id="mgl">${sts.map((p,i)=>{const a=by(p),c=cl(a);return `<div class="trw"><span class="arn">${i+1}</span><div class="grm"><b>${esc(ln(p.id))}</b><small>średnia <b>${fa(wavg(c))}</b></small><div class="grc">${c.length?chips(c):'<span class="mu text-sm">Brak ocen</span>'}</div></div><label class="tgl"><small>Propon.</small>${tgi(p.id,per,'proposed')}</label><label class="tgl"><small>Ocena</small>${tgi(p.id,per,'final')}</label></div>`}).join('')}</div>`+`<div class="abar"><button class="btn" style="flex:1;justify-content:center" onclick="saveTerm('${t.id}')">Zapisz oceny okresowe</button></div>`,'','gr')}
   if(isM()){
-    const cur=gsem==='2'?s2:s1,mrows=sts.map((p,i)=>{const a=by(p),c=cur(a);return `<div class="grw"><span class="arn">${i+1}</span><div class="grm"><b>${esc(ln(p.id))}</b><div class="grc">${c.length?chips(c):'<span class="mu text-sm">Brak ocen</span>'}</div><small>średnia okresu <b>${fa(wavg(c))}</b> · roczna <b>${fa(wavg(a))}</b></small><div class="tgm">Propon. ${tgi(p.id,gsem,'proposed')} Ocena ${tgi(p.id,gsem,'final')} · Rok ${tgi(p.id,'y','proposed')} ${tgi(p.id,'y','final')}</div></div><button type="button" class="gadd" title="Dodaj ocenę" onclick="gradeModal('${p.id}')">${ic('plus')}</button></div>`}).join('');
-    return pn(ttlM,barM+`<div class="mb-3">${seg('gs',[['1','Okres 1'],['2','Okres 2']],gsem,k=>{gsem=k;rr()})}</div><div class="gt" id="mgl">${mrows}<div class="grw" style="border-top:1px solid #eef1f6"><span></span><div class="grm"><b>Średnia klasy</b><small>okres: <b>${fa(cav(cur))}</b> · roczna: <b>${fa(cav(all))}</b></small></div><span></span></div></div>`+`<div class="abar"><button class="btn" style="flex:1;justify-content:center" onclick="saveTerm('${t.id}')">Zapisz oceny okresowe</button></div>`,'','gr')}
+    const cur=gsem==='2'?s2:s1,mrows=sts.map((p,i)=>{const a=by(p),c=cur(a);return `<div class="grw"><span class="arn">${i+1}</span><div class="grm"><b>${esc(ln(p.id))}</b><div class="grc">${c.length?chips(c):'<span class="mu text-sm">Brak ocen</span>'}</div><small>średnia okresu <b>${fa(wavg(c))}</b> · roczna <b>${fa(wavg(a))}</b></small><div class="tgm">Propon. ${tv(p.id,gsem,'proposed')} Ocena ${tv(p.id,gsem,'final')} · Rok ${tv(p.id,'y','proposed')} ${tv(p.id,'y','final')}</div></div><button type="button" class="gadd" title="Dodaj ocenę" onclick="gradeModal('${p.id}')">${ic('plus')}</button></div>`}).join('');
+    return pn(ttlM,barM+`<div class="mb-3">${seg('gs',[['1','Okres 1'],['2','Okres 2']],gsem,k=>{gsem=k;rr()})}</div><div class="gt" id="mgl">${mrows}<div class="grw" style="border-top:1px solid #eef1f6"><span></span><div class="grm"><b>Średnia klasy</b><small>okres: <b>${fa(cav(cur))}</b> · roczna: <b>${fa(cav(all))}</b></small></div><span></span></div></div>`,'','gr')}
   return pn('Szczegóły lekcji - oceny',bar+`<div class="overflow-x-auto"><table class="gt"><thead><tr><th rowspan="2">Nr</th><th rowspan="2" style="text-align:left">Nazwisko i imię</th><th rowspan="2"></th><th colspan="4">Okres 1</th><th colspan="4">Okres 2</th><th colspan="3">Rok</th></tr><tr><th>Oceny</th><th>Śr.</th><th>Propon.</th><th>Ocena</th><th>Oceny</th><th>Śr.</th><th>Propon.</th><th>Ocena</th><th>Śr.</th><th>Propon.</th><th>Ocena</th></tr></thead><tbody>`
-   +sts.map((p,i)=>{const a=by(p);return `<tr><td class="mu">${i+1}</td><td style="white-space:nowrap"><b>${esc(ln(p.id))}</b></td><td><button class="gh sm" title="Dodaj ocenę" onclick="gradeModal('${p.id}')">${ic('plus')}</button></td><td>${chips(s1(a))}</td><td>${fa(wavg(s1(a)))}</td><td>${tgi(p.id,'1','proposed')}</td><td>${tgi(p.id,'1','final')}</td><td>${chips(s2(a))}</td><td>${fa(wavg(s2(a)))}</td><td>${tgi(p.id,'2','proposed')}</td><td>${tgi(p.id,'2','final')}</td><td><b>${fa(wavg(a))}</b></td><td>${tgi(p.id,'y','proposed')}</td><td>${tgi(p.id,'y','final')}</td></tr>`}).join('')
-   +`</tbody><tfoot><tr><td></td><td style="text-align:left" colspan="2">Średnia klasy</td><td></td><td>${fa(cav(s1))}</td><td></td><td></td><td></td><td>${fa(cav(s2))}</td><td></td><td></td><td>${fa(cav(all))}</td><td></td><td></td></tr></tfoot></table></div>`,`<button class="btn sm" onclick="saveTerm('${t.id}')">Zapisz oceny okresowe</button>`,'gr');
+   +sts.map((p,i)=>{const a=by(p);return `<tr><td class="mu">${i+1}</td><td style="white-space:nowrap"><b>${esc(ln(p.id))}</b></td><td><button class="gh sm" title="Dodaj ocenę" onclick="gradeModal('${p.id}')">${ic('plus')}</button></td><td>${chips(s1(a))}</td><td>${fa(wavg(s1(a)))}</td><td>${tgx(p.id,'1','proposed')}</td><td>${tgx(p.id,'1','final')}</td><td>${chips(s2(a))}</td><td>${fa(wavg(s2(a)))}</td><td>${tgx(p.id,'2','proposed')}</td><td>${tgx(p.id,'2','final')}</td><td><b>${fa(wavg(a))}</b></td><td>${tgx(p.id,'y','proposed')}</td><td>${tgx(p.id,'y','final')}</td></tr>`}).join('')
+   +`</tbody><tfoot><tr><td></td><td style="text-align:left" colspan="2">Średnia klasy</td><td></td><td>${fa(cav(s1))}</td><td></td><td></td><td></td><td>${fa(cav(s2))}</td><td></td><td></td><td>${fa(cav(all))}</td><td></td><td></td></tr></tfoot></table></div>`,gmode==='term'?`<button class="btn sm" onclick="saveTerm('${t.id}')">Zapisz oceny okresowe</button>`:'','gr');
 };
 const openT=(id,m)=>{curT=id;gN=m;go('gr')};
 const atFor=id=>{curT=id;curD=isoL(new Date());atManual=true;go('at')};
@@ -1695,6 +1759,7 @@ async function saveTerm(tid){const up=[],del=[];
   const res=await Promise.all(r),e=res.find(x=>x.error);if(e)return warn(e.error.message);toast('Zapisano oceny okresowe');rr()}
 const _gr=V.gr;
 let TGM={};
+let gtp='1';const tgx=(i,t,k)=>gmode==='term'?tgi(i,t,k):tv(i,t,k);
 const tgi=(i,t,k)=>{const o=TGM[i+'|'+t+'|'+k]||'';return `<input type="text" class="inp tg" maxlength="1" inputmode="numeric" data-s="${i}" data-t="${t}" data-k="${k}" data-o="${o}" value="${o}" style="width:42px;text-align:center;padding:.3rem" oninput="dirty=true">`};
 const tv=(s,t,k)=>{const v=TGM[s+'|'+t+'|'+k];return v?`<span class="gc g${v}" style="cursor:default">${v}</span>`:'<span class="mu">-</span>'};
 V.gr=async()=>{TGM={};
@@ -1892,7 +1957,7 @@ const _place=place;place=(b,w)=>{_place(b,w);if(isM())$('#popbg').classList.add(
 const _closePop=closePop;closePop=()=>{_closePop();$('#popbg')?.classList.remove('show')};
 document.addEventListener('click',e=>{if(e.target.closest('.arw .ae,.gadd,.dt,.seg button'))try{navigator.vibrate&&navigator.vibrate(8)}catch{}});
 
-const hideSplash=()=>{const s=$('#splash');if(!s||s.dataset.h)return;s.dataset.h=1;setTimeout(()=>{s.classList.add('out');setTimeout(()=>s.remove(),400)},Math.max(0,1900-performance.now()))};
+const hideSplash=()=>{const s=$('#splash');if(!s||s.dataset.h)return;s.dataset.h=1;setTimeout(()=>{s.classList.add('out');setTimeout(()=>s.remove(),400)},Math.max(0,4200-performance.now()))};
 setTimeout(hideSplash,10000);
 const nowMin=()=>{const d=new Date();return d.getHours()*60+d.getMinutes()+d.getSeconds()/60};
 function nowMark(n,ns){if(!(MOBILE&&STANDALONE))return null;const b=BELLS[n-1];if(!b||!b[0])return null;const t=nowMin(),s=tmin2(b[0]),e=tmin2(b[1]),i=ns.indexOf(n),st=t<s?'fut':t>e?'past':'cur';let pos=null;
@@ -1942,6 +2007,7 @@ if(MOBILE&&!STANDALONE){GATE=true;const g=document.getElementById('gate'),sh='<s
 if(!(typeof GATE!=='undefined'&&GATE))init();
 </script>
 <script>
+/* v54: „Więcej” jako pełny ekran */
 moreSheet=function(){
   const rest=NAVT.filter(x=>!mainKeys().includes(x[0])&&x[0]!=='ps').concat((dir()||isHome())?[['tr','Wycieczki']]:[]).concat([['ps','Powiadomienia']]);
   const fs=document.documentElement.dataset.fs||'0';
@@ -1958,6 +2024,24 @@ moreSheet=function(){
      <button class="frw red" onclick="logout()"><span>Wyloguj się</span><span>›</span></button>
     </div>
    </div></div>`)};
+</script>
+<script>
+/* v55: każde okno (poza potwierdzeniami) = pełny ekran na telefonie, panel boczny na większych ekranach */
+(function(){const m=document.getElementById('modal');
+ function enh(){const b=m.querySelector(':scope>.box');if(!b||b.dataset.e||b.classList.contains('full')||b.querySelector('#my'))return;b.dataset.e=1;
+  const mh=b.querySelector(':scope>.mh'),ft=[...b.children].filter(x=>x.classList.contains('justify-end')).pop();
+  const fh=document.createElement('div');fh.className='fh';const hd=document.createElement('div');hd.className='ftt';
+  if(mh)hd.appendChild(mh);else hd.innerHTML='<h3 class="mh">Szczegóły</h3>';
+  const x=document.createElement('button');x.type='button';x.className='fx';x.setAttribute('aria-label','Zamknij');x.onclick=()=>closeModal();
+  x.innerHTML='<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>';
+  fh.append(hd,x);
+  const fb=document.createElement('div');fb.className='fb';const fc=document.createElement('div');fc.className='fcard';
+  [...b.childNodes].forEach(n=>{if(n!==ft)fc.appendChild(n)});fb.appendChild(fc);
+  b.append(fh,fb);if(ft){ft.classList.add('ffoot');b.appendChild(ft)}
+  b.classList.add('full','pg')}
+ new MutationObserver(enh).observe(m,{childList:true});
+ addEventListener('keydown',e=>{if(e.key==='Escape'&&m.classList.contains('show')&&!m.querySelector('#my'))closeModal()});
+})();
 </script>
 </body>
 </html>
