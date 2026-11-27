@@ -664,36 +664,9 @@ td,th{overflow-wrap:anywhere}.tag,.chip{max-width:100%;white-space:normal;line-h
 
 /* wiadomości */
 .ms-top{display:flex;flex-wrap:wrap;gap:.7rem;align-items:center;justify-content:space-between;margin-bottom:1rem}
-.ms-new{flex:0 0 auto}
-.ms-l{display:flex;flex-direction:column;gap:.15rem}
-.ms-r{display:flex;align-items:center;gap:.8rem;width:100%;text-align:left;border:0;background:none;padding:.75rem .5rem;border-radius:18px;color:var(--tx);transition:background .15s}
-.ms-r:hover{background:#F5F7FF}.ms-r:active{background:#EEF0FD}
-.ms-a{width:48px;height:48px;border-radius:50%;flex-shrink:0;background:var(--in3);color:var(--in);font-weight:800;font-size:1.1rem;display:flex;align-items:center;justify-content:center;text-transform:uppercase}
-.ms-a.g{background:linear-gradient(135deg,var(--in),var(--in2));color:#fff}
-.ms-m{flex:1;min-width:0;display:flex;flex-direction:column;gap:.1rem}
-.ms-h{display:flex;align-items:baseline;justify-content:space-between;gap:.6rem}.ms-h b{font-size:.98rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
-.ms-h time{font-size:.72rem;color:var(--mu);flex-shrink:0}
-.ms-s{font-size:.88rem;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.ms-p{font-size:.82rem;color:var(--mu);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.ms-r.un .ms-h b,.ms-r.un .ms-s{font-weight:800}.ms-r.un .ms-h time{color:var(--in);font-weight:700}
-.ms-u{font-style:normal;background:var(--in);color:#fff;border-radius:999px;font-size:.7rem;font-weight:700;min-width:22px;height:22px;line-height:22px;text-align:center;padding:0 6px;flex-shrink:0}
-.ms-n{background:#EEF1F8;color:var(--mu);border-radius:999px;font-size:.7rem;font-weight:700;padding:.1rem .5rem;flex-shrink:0}
-.ms-fab{display:none}
-@media(max-width:767px){.ms-new{display:none}.ms-fab{display:flex;position:fixed;right:1.1rem;bottom:calc(92px + env(safe-area-inset-bottom));width:58px;height:58px;border-radius:20px;border:0;align-items:center;justify-content:center;color:#2a1b00;background:linear-gradient(135deg,#FFB93B,#F5A524);box-shadow:0 14px 28px -10px #f5a524;z-index:30}.ms-fab .ic{width:1.5em;height:1.5em}}
-.ms-v{max-width:820px;margin:0 auto}
-.ms-vh{display:flex;justify-content:space-between;gap:.6rem;flex-wrap:wrap;margin-bottom:.9rem}
-.ms-vt h2{margin:0 0 .5rem;font-size:1.35rem;font-weight:800;letter-spacing:-.03em;overflow-wrap:anywhere}.ms-pt{display:flex;flex-wrap:wrap;gap:.3rem;margin-bottom:1rem}
-.ms-bl{display:flex;flex-direction:column;gap:.7rem;margin-bottom:1rem}
-.ms-b{max-width:88%;padding:.8rem 1rem;border-radius:20px;box-shadow:var(--sh);background:#fff;overflow-wrap:anywhere}
-.ms-b.me{align-self:flex-end;background:linear-gradient(135deg,#1E2A78,#2F3FA8);color:#fff;border-bottom-right-radius:6px}
-.ms-b.ot{align-self:flex-start;border-bottom-left-radius:6px}
-.ms-bh{display:flex;justify-content:space-between;gap:1rem;font-size:.74rem;margin-bottom:.35rem;opacity:.85}.ms-bh b{font-weight:800}
-.ms-b.me a,.ms-b.me .mu{color:#cfd6ff}
-.ms-bf{display:flex;justify-content:flex-end;gap:.8rem;font-size:.72rem;margin-top:.35rem;opacity:.85}.ms-bf a{cursor:pointer;text-decoration:underline}
-.ms-c{position:sticky;bottom:calc(86px + env(safe-area-inset-bottom));background:#fff;border-radius:22px;box-shadow:var(--sh2);padding:.9rem}
-.ms-ct{font-size:.75rem;color:var(--mu);margin-bottom:.5rem}
-.ms-send{width:100%;justify-content:center;margin-top:.6rem}
-@media(min-width:768px){.ms-c{bottom:1rem}.ms-send{width:auto}}
+.msg-meta{display:flex;flex-direction:column;gap:.3rem;padding-bottom:.9rem;border-bottom:1px solid var(--ln);font-size:.9rem}
+.msg-mr{display:flex;gap:.6rem}.msg-mr span{width:3.2rem;flex-shrink:0;color:var(--mu)}.msg-mr b{font-weight:600;overflow-wrap:anywhere}
+.msg-body{margin-top:1rem;max-width:75ch;overflow-wrap:anywhere;line-height:1.55}
 
 /* logowanie w aplikacji */
 #lgv{position:fixed;inset:0;z-index:9000;display:none;flex-direction:column;overflow:auto;color:#fff;background:radial-gradient(900px 520px at 15% -10%,#3445C2 0%,#3445C200 60%),radial-gradient(700px 520px at 100% 110%,#4a2f9a 0%,#4a2f9a00 55%),linear-gradient(160deg,#101659,#1E2A78 55%,#0c1034)}
@@ -1083,66 +1056,45 @@ V.msgOld=async()=>{
 };
 const MK=/\n*⟦to:([^⟧]*)⟧\s*$/;
 const msgNorm=s=>String(s||'').replace(/^(\s*(re|odp)\s*:\s*)+/i,'').trim();
-let MTH=null;
-async function msgThreads(){
-  const [i,s]=await Promise.all([sb.from('message_recipients').select('read_at,messages(*)').eq('recipient_id',me.id),sb.from('messages').select('*').eq('sender_id',me.id).order('created_at',{ascending:false}).limit(100)]);
-  if(i.error)throw i.error;if(s.error)throw s.error;
-  const rc=s.data.length?(await sb.from('message_recipients').select('message_id,recipient_id,read_at').in('message_id',s.data.map(m=>m.id))).data||[]:[];
+let MLIST=[];
+async function msgLoad(){
+  const [i,sn]=await Promise.all([sb.from('message_recipients').select('read_at,messages(*)').eq('recipient_id',me.id),sb.from('messages').select('*').eq('sender_id',me.id).order('created_at',{ascending:false}).limit(200)]);
+  if(i.error)throw i.error;if(sn.error)throw sn.error;
+  const rc=sn.data.length?(await sb.from('message_recipients').select('message_id,recipient_id,read_at').in('message_id',sn.data.map(m=>m.id))).data||[]:[];
   const all=[];
   i.data.forEach(r=>{if(r.messages)all.push({...r.messages,mine:false,unread:!r.read_at})});
-  s.data.forEach(m=>{const o={...m,mine:true,unread:false,rq:rc.filter(x=>x.message_id===m.id)},k=all.findIndex(x=>x.id===m.id);if(k>=0)all[k]=o;else all.push(o)});
-  const map=new Map(),by={};
-  all.sort((a,b)=>a.created_at<b.created_at?-1:1).forEach(m=>{
-    const mk=String(m.body||'').match(MK);m.text=String(m.body||'').replace(MK,'');
-    const ids=mk?mk[1].split(',').filter(Boolean):m.mine?(m.rq||[]).map(x=>x.recipient_id):[];
-    m.parts=new Set([m.sender_id,me.id,...ids]);
-    const key=msgNorm(m.subject).toLowerCase()+'|'+[...m.parts].sort().join(',');
-    let t=map.get(key);if(!t){t={key,subj:msgNorm(m.subject),parts:m.parts,msgs:[]};map.set(key,t)}
-    t.msgs.push(m);m.parts.forEach(x=>t.parts.add(x));by[m.id]=t});
-  const list=[...map.values()].map(t=>({...t,last:t.msgs[t.msgs.length-1],unread:t.msgs.filter(m=>m.unread).length}));
-  list.forEach(t=>t.msgs.forEach(m=>by[m.id]=t));
-  list.sort((a,b)=>a.last.created_at<b.last.created_at?1:-1);
-  return{list,by}}
-const msgOthers=t=>[...t.parts].filter(x=>x!==me.id);
-const msgWho=t=>{const o=msgOthers(t).map(nm);return o.length?o.slice(0,2).join(', ')+(o.length>2?' +'+(o.length-2):''):nm(me.id)};
-const msgTime=iso=>{const d=new Date(iso),n=new Date();return d.toDateString()===n.toDateString()?d.toLocaleTimeString('pl-PL',{hour:'2-digit',minute:'2-digit'}):d.toLocaleDateString('pl-PL',{day:'numeric',month:'short'})};
-const msgSnip=m=>m.recalled_at?'(wiadomość wycofana)':m.text.replace(/\s+/g,' ').replace(/[*_#>`]/g,'').trim().slice(0,90);
+  sn.data.forEach(m=>{const o={...m,mine:true,unread:false,rq:rc.filter(x=>x.message_id===m.id)},k=all.findIndex(x=>x.id===m.id);if(k>=0)all[k]=o;else all.push(o)});
+  all.forEach(m=>{const mk=String(m.body||'').match(MK);m.text=String(m.body||'').replace(MK,'');
+    const ids=mk?mk[1].split(',').filter(Boolean):(m.rq||[]).map(x=>x.recipient_id);
+    m.to=[...new Set(ids)].filter(x=>x!==m.sender_id);if(!m.to.length&&!m.mine)m.to=[me.id]});
+  all.sort((x,y)=>x.created_at<y.created_at?1:-1);
+  return all}
+const msgTo=m=>{const n=m.to.map(nm);return n.length?n.slice(0,2).join(', ')+(n.length>2?' +'+(n.length-2):''):'-'};
 V.msg=async()=>{
-  const TH=await msgThreads();MTH=TH;
+  const L=await msgLoad();MLIST=L;
   if(mtab==='new')return `<div class="mb-3"><button class="gh sm" onclick="mtab='in';rr()">${ic('back')} Wiadomości</button></div>`+compose();
-  const un=TH.list.reduce((a,t)=>a+t.unread,0),f=mtab==='unread'||mtab==='out'?mtab:'in';
-  const rows=f==='unread'?TH.list.filter(t=>t.unread):f==='out'?TH.list.filter(t=>t.msgs.some(m=>m.mine)):TH.list;
-  const row=t=>{const o=msgOthers(t);return `<button class="ms-r${t.unread?' un':''}" onclick="openMsg('${t.last.id}')"><span class="ms-a${o.length>1?' g':''}">${o.length>1?o.length:esc((nm(o[0]||me.id)||'?')[0])}</span><span class="ms-m"><span class="ms-h"><b>${esc(msgWho(t))}</b><time>${msgTime(t.last.created_at)}</time></span><span class="ms-s">${esc(t.subj)}</span><span class="ms-p">${t.last.mine?'Ty: ':''}${esc(msgSnip(t.last))}</span></span>${t.unread?`<em class="ms-u">${t.unread}</em>`:t.msgs.length>1?`<small class="ms-n">${t.msgs.length}</small>`:''}</button>`};
-  const body=`<input type="text" placeholder="Szukaj w wiadomościach…" class="mb-3" oninput="const q=this.value.toLowerCase();$$('.ms-r').forEach(r=>r.style.display=r.textContent.toLowerCase().includes(q)?'':'none')"><div class="ms-l">${rows.length?rows.map(row).join(''):'<p class="em">Brak wiadomości.</p>'}</div>`;
-  return `<div class="ms-top">${seg('mf',[['in','Wszystkie'],['unread','Nieprzeczytane'+(un?' ('+un+')':'')],['out','Wysłane']],f,k=>{mtab=k;rr()})}<button class="btn ms-new" onclick="mtab='new';rr()">${ic('edit')} Nowa wiadomość</button></div>`
-   +pn('Wiadomości',body,`<button class="gh sm" onclick="refresh()">Odśwież</button>${un?`<button class="gh sm" onclick="markAll()">Oznacz jako przeczytane</button>`:''}`,'msg')
-   +`<button class="ms-fab" onclick="mtab='new';rr()" aria-label="Nowa wiadomość">${ic('edit')}</button>`};
+  const f=mtab==='out'?'out':'in',inb=f==='in',un=L.filter(m=>!m.mine&&m.unread).length;
+  const rows=L.filter(m=>inb?!m.mine:m.mine);MIDS=inb?rows.map(m=>m.id):[];
+  const allck=inb?ck('ms_all',false,''):'';if(inb)DD.ms_all={on:x=>{MIDS.forEach(i=>FV['ms_'+i]=x);$$('.mt td:first-child .ck').forEach(b=>b.classList.toggle('on',x))}};
+  const tb=rows.length?`<div class="overflow-x-auto"><table class="mt"><thead><tr>${inb?`<th style="width:44px">${allck}</th>`:''}<th>${inb?'Nadawca':'Odbiorcy'}</th><th>Temat</th><th>${inb?'Otrzymano':'Wysłano'}</th><th>Przeczytano</th></tr></thead><tbody>${rows.map(m=>{const o=`onclick="openMsg('${m.id}')"`,b=m.unread?'font-bold':'';
+    const rd=m.mine&&m.rq&&m.rq.length?m.rq.filter(x=>x.read_at).length+'/'+m.rq.length:'';
+    return `<tr class="hv msg-row">${inb?`<td>${ck('ms_'+m.id,false,'')}</td>`:''}<td ${o} class="${b}">${esc(inb?nm(m.sender_id):msgTo(m))}</td><td ${o} class="${b}">${m.unread?'<span class="tag r" style="padding:0 .4rem">nowa</span> ':''}${m.recalled_at?'<i class="mu">(wycofana)</i> ':''}${esc(msgNorm(m.subject))}</td><td ${o} class="text-xs mu" style="white-space:nowrap">${fd(m.created_at)}</td><td ${o}>${inb?(!m.unread?ic('check','text-green-600'):''):`<span class="text-xs mu">${rd}</span>`}</td></tr>`}).join('')}</tbody></table></div>`:'<p class="em">Brak wiadomości.</p>';
+  const acts=(inb&&rows.length?`<button class="gh sm red" onclick="delSel()">${ic('trash')} Usuń zaznaczone</button>`:'')+(un&&inb?`<button class="gh sm" onclick="markAll()">Oznacz jako przeczytane</button>`:'');
+  return `<div class="ms-top">${seg('mf',[['in','Odebrane'+(un?' ('+un+')':'')],['out','Wysłane']],f,k=>{mtab=k;rr()})}<button class="btn" onclick="mtab='new';rr()">${ic('edit')} Nowa wiadomość</button></div>`
+   +pn(inb?'Odebrane':'Wysłane',`<input type="text" placeholder="Szukaj…" class="mb-3" oninput="const q=this.value.toLowerCase();$$('.msg-row').forEach(r=>r.style.display=r.textContent.toLowerCase().includes(q)?'':'none')">`+tb,acts,'msg')};
 async function openMsg(id,silent){
-  let TH;try{TH=await msgThreads()}catch(e){return warn('Nie można otworzyć wiadomości')}
-  const th=TH.by[id];if(!th)return warn('Nie można otworzyć wiadomości');
-  const un=th.msgs.filter(m=>m.unread).map(m=>m.id);
-  if(un.length)await sb.from('message_recipients').update({read_at:new Date().toISOString()}).in('message_id',un).eq('recipient_id',me.id).is('read_at',null);
-  const keep=$('#rbody')?.value||'';
-  detail=id;rid++;MTH=TH;dirty=false;
-  const oth=msgOthers(th),hasIn=th.msgs.some(m=>!m.mine);
-  const bub=m=>{const d=m.recalled_at?new Date(m.recalled_at):null,rd=m.mine&&m.rq&&m.rq.length?m.rq.filter(x=>x.read_at).length+'/'+m.rq.length:'',rl=m.mine&&m.rq?m.rq.map(x=>nm(x.recipient_id)+(x.read_at?' - przeczytano '+fd(x.read_at):' - nieprzeczytano')).join('\n'):'';
-    return `<div class="ms-b ${m.mine?'me':'ot'}"><div class="ms-bh"><b>${m.mine?'Ty':esc(nm(m.sender_id))}</b><span>${fd(m.created_at)}</span></div>${d?`<p class="italic mu">Wiadomość wycofana przez nadawcę ${d.toLocaleDateString('pl-PL')} o ${d.toLocaleTimeString('pl-PL',{hour:'2-digit',minute:'2-digit'})}.</p>`:`<div class="ms-bt">${fmt(m.text)}</div>`}<div class="ms-bf">${rd?`<span title="${esc(rl)}">${ic('check')} ${rd}</span>`:''}${!d&&m.mine&&staff()?`<a onclick="recall('${m.id}')">Wycofaj</a>`:''}</div></div>`};
-  $('#main').innerHTML=`<div class="ms-v"><div class="ms-vh"><button class="gh sm" onclick="detail=null;render()">${ic('back')} Wróć</button>${hasIn?`<button class="gh sm red" onclick="delThread('${id}')">${ic('trash')} Usuń rozmowę</button>`:''}</div>
-   <div class="ms-vt"><h2>${esc(th.subj)}</h2><div class="ms-pt">${oth.map(x=>`<span class="chip" style="padding:.2rem .7rem">${esc(nm(x))}</span>`).join('')||'<span class="mu text-sm">Tylko Ty</span>'}</div></div>
-   <div class="ms-bl">${th.msgs.map(bub).join('')}</div>
-   ${oth.length?`<div class="ms-c"><div class="ms-ct">Odpowiedź trafi do wszystkich uczestników rozmowy (${oth.length})</div>${tbar('rbody')}<textarea id="rbody" rows="3" placeholder="Napisz odpowiedź…" oninput="dirty=true">${esc(keep)}</textarea><button class="btn ms-send" onclick="sendReply('${id}')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4z"/></svg> Wyślij do wszystkich</button></div>`:''}</div>`;
-  if(keep)dirty=true;
-  if(!silent)requestAnimationFrame(()=>window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'}));
+  let L;try{L=await msgLoad()}catch(e){return warn('Nie można otworzyć wiadomości')}
+  const m=L.find(x=>x.id===id);if(!m)return warn('Nie można otworzyć wiadomości');
+  if(m.unread)await sb.from('message_recipients').update({read_at:new Date().toISOString()}).eq('message_id',id).eq('recipient_id',me.id).is('read_at',null);
+  detail=id;rid++;MLIST=L;dirty=false;
+  const d=m.recalled_at?new Date(m.recalled_at):null;
+  const rec=m.mine&&m.rq&&m.rq.length?`<div class="mt-4"><div class="text-sm mu mb-1">Odbiorcy i godzina odczytu</div>`+tbl(['Odbiorca','Przeczytano'],m.rq.slice().sort((x,y)=>ln(x.recipient_id).localeCompare(ln(y.recipient_id),'pl')).map(r=>`<tr><td>${esc(nm(r.recipient_id))}</td><td>${r.read_at?ic('check','text-green-600')+' '+fd(r.read_at):'<span class="mu">nieprzeczytano</span>'}</td></tr>`))+'</div>':'';
+  const meta=(l,v)=>`<div class="msg-mr"><span>${l}</span><b>${v}</b></div>`;
+  $('#main').innerHTML=pn(esc(msgNorm(m.subject)),`<div class="msg-meta">${meta('Od',esc(m.mine?nm(me.id):nm(m.sender_id)))}${meta('Do',esc(m.to.map(nm).join(', ')||'-'))}${meta('Data',fd(m.created_at))}</div>
+   ${d?`<p class="mt-4 italic mu">Wiadomość wycofana przez nadawcę ${d.toLocaleDateString('pl-PL')} o ${d.toLocaleTimeString('pl-PL',{hour:'2-digit',minute:'2-digit'})}.</p>`:`<div class="msg-body">${fmt(m.text)}</div>`}
+   ${rec}
+   <div class="flex gap-2 mt-4 flex-wrap">${!d&&!m.mine?`<button class="btn" onclick="reply('${m.id}')">Odpowiedz</button>`:''}${!m.mine?`<button class="gh red" onclick="delOne('${id}')">${ic('trash')} Usuń</button>`:''}${!d&&m.mine&&staff()?`<button class="gh red" onclick="recall('${id}')">Wycofaj wiadomość</button>`:''}</div>`,`<button class="gh sm" onclick="detail=null;render()">${ic('back')} Wróć</button>`,'msg');
   calcDots().then(nav)}
-async function sendReply(id){const th=MTH&&MTH.by[id];if(!th)return;const body=v('rbody').trim();if(!body)return warn('Wpisz treść odpowiedzi.');
-  const to=msgOthers(th);if(!to.length)return;
-  await act(sb.rpc('send_message',{p_subject:'Re: '+th.subj,p_body:body+'\n\n⟦to:'+to.join(',')+'⟧',p_to:to}),()=>{dirty=false;openMsg(id,true)},'Wysłano do '+to.length+' os.')}
-const delThread=async id=>{const th=MTH&&MTH.by[id];if(!th)return;const ids=th.msgs.filter(m=>!m.mine).map(m=>m.id);if(!ids.length)return;
-  if(!await ask('Usunąć tę rozmowę ze skrzynki?','Usuń'))return;
-  const r=await sb.from('message_recipients').delete().eq('recipient_id',me.id).in('message_id',ids).select();
-  if(r.error)return warn('Błąd usuwania: '+r.error.message);
-  if(!r.data.length)return warn('Nic nie usunięto - uruchom delete_messages.sql w Supabase.');
-  detail=null;mtab='in';await calcDots();nav();toast('Rozmowa usunięta');rr()};
 
 const msortBy=k=>{msort=[k,msort[0]===k?-msort[1]:1];rr()};
 const delSel=async()=>{const ids=MIDS.filter(i=>FV['ms_'+i]);if(!ids.length)return warn('Zaznacz wiadomości do usunięcia.');
@@ -1167,7 +1119,7 @@ function compose(){
    <label class="lb mt-3">Temat</label><input type="text" id="sub" value="${esc(p0.subject||'')}"><label class="lb mt-3">Treść</label>${tbar('body')}<textarea id="body" rows="9">${esc(p0.body||'')}</textarea><button class="btn mt-3" onclick="sendMsg()">Wyślij wiadomość</button>`,'','edit');
 }
 const reply=async id=>{const {data:m}=await sb.from('messages').select('*').eq('id',id).single();if(!m)return warn('Nie można otworzyć wiadomości');
-  pre={to:m.sender_id,subject:'Re: '+m.subject.replace(/^Re: /,''),body:'\n\n\n--- '+nm(m.sender_id)+', '+fd(m.created_at)+' ---\n'+m.body};mtab='new';rr()};
+  pre={to:m.sender_id,subject:'Re: '+msgNorm(m.subject),body:'\n\n\n--- '+nm(m.sender_id)+', '+fd(m.created_at)+' ---\n'+String(m.body||'').replace(MK,'')};mtab='new';rr()};
 const markAll=()=>act(sb.from('message_recipients').update({read_at:new Date().toISOString()}).eq('recipient_id',me.id).is('read_at',null),async()=>{await calcDots();nav();rr()},'Oznaczono jako przeczytane');
 async function sendMsg(){
   const set=new Set();
@@ -1235,7 +1187,7 @@ V.gr=async()=>{
   }
   
   if(isM()&&gmode==='term'){const per=gtp,cl=a=>per==='1'?s1(a):per==='2'?s2(a):a;
-    return pn(ttlM,barM+`<div class="mb-2">${seg('gp',[['1','Okres 1'],['2','Okres 2'],['y','Rok']],gtp,k=>{gtp=k;rr()})}</div><p class="text-sm mu mb-3">Wpisz ocenę 1-6. Puste pole oznacza brak oceny.</p><div class="gt" id="mgl">${sts.map((p,i)=>{const a=by(p),c=cl(a);return `<div class="trw"><span class="arn">${i+1}</span><div class="grm"><b>${esc(ln(p.id))}</b><small>średnia <b>${fa(wavg(c))}</b></small><div class="grc">${c.length?chips(c):'<span class="mu text-sm">Brak ocen</span>'}</div></div><label class="tgl"><small>Propon.</small>${tgi(p.id,per,'proposed')}</label><label class="tgl"><small>Ocena</small>${tgi(p.id,per,'final')}</label></div>`}).join('')}</div>`+`<div class="abar"><button class="btn" style="flex:1;justify-content:center" onclick="saveTerm('${t.id}')">Zapisz oceny okresowe</button></div>`,'','gr')}
+    return pn(ttlM,barM+`<div class="mb-2">${seg('gp',[['1','Okres 1'],['2','Okres 2'],['y','Rok']],gtp,k=>{gtp=k;rr()})}</div><div class="gt" id="mgl">${sts.map((p,i)=>{const a=by(p),c=cl(a);return `<div class="trw"><span class="arn">${i+1}</span><div class="grm"><b>${esc(ln(p.id))}</b><small>średnia <b>${fa(wavg(c))}</b></small><div class="grc">${c.length?chips(c):'<span class="mu text-sm">Brak ocen</span>'}</div></div><label class="tgl"><small>Propon.</small>${tgi(p.id,per,'proposed')}</label><label class="tgl"><small>Ocena</small>${tgi(p.id,per,'final')}</label></div>`}).join('')}</div>`+`<div class="abar"><button class="btn" style="flex:1;justify-content:center" onclick="saveTerm('${t.id}')">Zapisz oceny okresowe</button></div>`,'','gr')}
   if(isM()){
     const cur=gsem==='2'?s2:s1,mrows=sts.map((p,i)=>{const a=by(p),c=cur(a);return `<div class="grw"><span class="arn">${i+1}</span><div class="grm"><b>${esc(ln(p.id))}</b><div class="grc">${c.length?chips(c):'<span class="mu text-sm">Brak ocen</span>'}</div><small>średnia okresu <b>${fa(wavg(c))}</b> · roczna <b>${fa(wavg(a))}</b></small><div class="tgm">Propon. ${tv(p.id,gsem,'proposed')} Ocena ${tv(p.id,gsem,'final')} · Rok ${tv(p.id,'y','proposed')} ${tv(p.id,'y','final')}</div></div><button type="button" class="gadd" title="Dodaj ocenę" onclick="gradeModal('${p.id}')">${ic('plus')}</button></div>`}).join('');
     return pn(ttlM,barM+`<div class="mb-3">${seg('gs',[['1','Okres 1'],['2','Okres 2']],gsem,k=>{gsem=k;rr()})}</div><div class="gt" id="mgl">${mrows}<div class="grw" style="border-top:1px solid #eef1f6"><span></span><div class="grm"><b>Średnia klasy</b><small>okres: <b>${fa(cav(cur))}</b> · roczna: <b>${fa(cav(all))}</b></small></div><span></span></div></div>`,'','gr')}
@@ -1486,7 +1438,7 @@ new MutationObserver(()=>{clearTimeout(czT);czT=setTimeout(cardify,0)}).observe(
 V.ad=async()=>{
   const back=`<button class="gh sm" onclick="adTab=null;rr()">${ic('back')} Administracja</button>`;
   if(!adTab){const n=(k)=>Object.values(P).filter(p=>p.role===k).length;
-    const tl2=(k,i,t,d)=>`<button class="tile" onclick="adTab='${k}';rr()">${ic(i)}<b>${t}</b><span>${d}</span></button>`;
+    const tl2=(k,i,t,d)=>`<button class="tile" onclick="adTab='${k}';rr()">${ic(i)}<b>${t}</b></button>`;
     return `<div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">${tl2('ppl','user','Osoby i konta',`${n('teacher')+n('director')} pracowników · ${n('student')} uczniów · ${n('parent')} rodziców`)}${tl2('cls','cl','Klasy i wychowawcy',`${C.length} klas`)}${tl2('sub','book','Przedmioty',`${SUB.length} przedmiotów`)}${tl2('tb','book','Podręczniki',`${TB.length} podręczników · działy, tematy, przydziały do klas`)}${tl2('plan','pl','Plan lekcji','Układanie lekcji klas')}${tl2('prn','print','Drukowanie planu lekcji','Plan klas i nauczycieli do PDF')}${tl2('log','cal','Archiwum zmian w planie','Kto, co i kiedy zmienił')}${tl2('tpa','book','Tematy i frekwencja','Wpisy nauczycieli z całej szkoły')}${tl2('chg','pl','Zmiany w planie','Zastępstwa i odwołania lekcji')}${tl2('off','cal','Dni wolne i święta','Ferie i dni wolne')}${tl2('bells','at','Godziny lekcji','Dzwonki i lekcja 0')}${tl2('logins','key','Logowania','Historia logowań')}${tl2('new','plus','Nowe konto','Uczeń, rodzic, nauczyciel')}${tl2('imp','up','Import uczniów','Lista lub plik CSV')}</div>`}
   return AD[adTab](back);
 };
@@ -1683,7 +1635,7 @@ function saveChg(cid,d,n,tid){const k=FV.ck,okd=q=>{const x=new Date(q+'T12:00')
   else if(k==='cancelled')rows=[{...b,kind:'cancelled'}];
   else{const g=crypto.randomUUID();rows=[{...b,kind:'moved_out',grp:g},{...b,kind:'moved_in',date:FV.md,lesson_no:+FV.mn2,grp:g}]}
   act(sb.from('timetable_changes').insert(rows),async()=>{closeModal();await reload()},'Zapisano zmianę')}
-AD.off=back=>pn('Nowy dzień wolny',`<p class="text-sm mu mb-3">Święta państwowe dodają się same. Tutaj dodasz ferie i dni dyrektorskie.</p><div class="grid md:grid-cols-4 gap-3 items-end"><div><label class="lb">Od</label>${dp('od','')}</div><div><label class="lb">Do (opcjonalnie)</label>${dp('od2','')}</div><div><label class="lb">Nazwa</label><input type="text" id="odn" placeholder="np. Dzień dyrektorski"></div><div><button class="btn" onclick="addOff()">${ic('plus')} Dodaj</button></div></div>`,back,'cal')
+AD.off=back=>pn('Nowy dzień wolny',`<div class="grid md:grid-cols-4 gap-3 items-end"><div><label class="lb">Od</label>${dp('od','')}</div><div><label class="lb">Do (opcjonalnie)</label>${dp('od2','')}</div><div><label class="lb">Nazwa</label><input type="text" id="odn" placeholder="np. Dzień dyrektorski"></div><div><button class="btn" onclick="addOff()">${ic('plus')} Dodaj</button></div></div>`,back,'cal')
  +pn('Dni wolne ustawione przez dyrekcję',Object.values(DOFF).length?tbl(['Data','Nazwa',''],Object.values(DOFF).sort((a,b)=>a.date.localeCompare(b.date)).map(x=>`<tr><td>${fdl(x.date)}</td><td>${esc(x.name)}</td><td><button class="gh sm red" onclick="delOff('${x.id}')">${ic('trash')}</button></td></tr>`)):'<p class="em">Brak.</p>','','cal');
 function addOff(){const a=FV.od,b=FV.od2||a,nmv=v('odn').trim();if(!a||!nmv)return warn('Podaj datę i nazwę.');if(b<a)return warn('Data końcowa jest przed początkową.');
   const rows=[];for(let d=new Date(a+'T12:00');isoL(d)<=b&&rows.length<200;d=addD(d,1))if(d.getDay()%6)rows.push({school_id:me.school_id,date:isoL(d),name:nmv});
@@ -1821,7 +1773,7 @@ const tpaDet=k=>{const {A,TPm,L}=TPAD,e=L[k],t=byId(T,e.teaching_id),a=A[k]||[],
    ${a.length?`<div class="lb">Nieobecni</div><p class="mb-2">${g('absent')}</p><div class="lb">Spóźnieni</div><p class="mb-2">${g('late')}</p><div class="lb">Usprawiedliwieni</div><p class="mb-2">${g('excused')}</p>`:'<p class="mu">Brak wpisu frekwencji.</p>'}
    <div class="flex justify-end mt-3"><button class="btn" onclick="closeModal()">Zamknij</button></div></div>`)};
 AD.bells=back=>{const ns=LNS(),mx=ns[ns.length-1];
-  return pn('Godziny lekcji',`<p class="text-sm mu mb-3">Godziny obowiązują wszystkich. Dostępna jest lekcja 0 i lekcje po dziesiątej (do ${MAXL}).</p>`
+  return pn('Godziny lekcji',``
    +tbl(['Lekcja','Od','Do',''],ns.map(i=>{const b=BELLS[i-1]||['',''];return `<tr><td><span class="av">${i}</span></td><td><input type="text" id="bs${i}" class="inp" value="${b[0]}" maxlength="5" style="max-width:110px"></td><td><input type="text" id="be${i}" class="inp" value="${b[1]}" maxlength="5" style="max-width:110px"></td><td>${i===0||(i>10&&i===mx)?`<button class="gh sm red" title="Usuń lekcję" onclick="rmLesson(${i})">${ic('trash')}</button>`:''}</td></tr>`}))
    +`<div class="flex flex-wrap gap-2 mt-3"><button class="btn" onclick="saveBells()">Zapisz godziny</button><button class="gh" onclick="addLesson(false)">${ic('plus')} Dodaj lekcję ${mx+1}</button>${BELLS[-1]?'':`<button class="gh" onclick="addLesson(true)">${ic('plus')} Dodaj lekcję 0</button>`}<button class="gh" onclick="resetBells()">Przywróć domyślne</button></div>`,back,'at')};
 function saveBells(){const re=/^([01]?\d|2[0-3]):[0-5]\d$/,rows=[];for(const i of LNS()){let a=v('bs'+i).trim(),b=v('be'+i).trim();if(!re.test(a)||!re.test(b))return warn(`Lekcja ${i}: podaj godziny w formacie GG:MM.`);a=a.padStart(5,'0');b=b.padStart(5,'0');if(a>=b)return warn(`Lekcja ${i}: koniec musi być po początku.`);rows.push({school_id:me.school_id,lesson_no:i,start_t:a,end_t:b})}
@@ -1996,7 +1948,7 @@ V.tr=async()=>{
   const cs=dir()?C:C.filter(c=>c.homeroom_teacher_id===me.id),L=LNS().map(n=>[n,'Lekcja '+n]);
   const {data,error}=await sb.from('trips').select('*').gte('date_to',isoL(addD(new Date(),-30))).order('date_from');if(error)throw error;
   const mineC=id=>cs.some(c=>c.id===id);
-  return pn('Nowa wycieczka',`<p class="text-sm mu mb-3">Lekcje klasy w tym terminie zostaną odwołane (z pominięciem weekendów i dni wolnych).</p>
+  return pn('Nowa wycieczka',`
    <div class="grid md:grid-cols-3 gap-3"><div><label class="lb">Klasa</label>${dd('trc',cs.map(c=>[c.id,'Klasa '+c.name]),cs[0]?.id||'')}</div><div><label class="lb">Od dnia</label>${dp('trf',isoL(new Date()))}</div><div><label class="lb">Do dnia (puste = jeden dzień)</label>${dp('trd','')}</div>
    <div><label class="lb">Odwołaj od lekcji</label>${dd('trl1',L,LNS()[0])}</div><div><label class="lb">Do lekcji</label>${dd('trl2',L,LNS().slice(-1)[0])}</div><div><label class="lb">Cel / nazwa</label><input type="text" id="trt" placeholder="np. Wycieczka do Krakowa"></div></div>
    <label class="lb mt-3">Notatka (opcjonalnie)</label><input type="text" id="trn" style="max-width:480px"><div><button class="btn mt-3" onclick="saveTrip()">Dodaj wycieczkę i odwołaj lekcje</button></div>`,'','tr')
@@ -2111,7 +2063,7 @@ const _cp=chPick;chPick=function(cid,d,n,tid){_cp(cid,d,n,tid);tchAt(d,n).then((
   const r=id=>abs.has(id)?2:busy.has(id)?1:0;
   DD.ct2.o=DD.ct2.o.map(([id,l])=>[id,l,abs.has(id)?'nieobecny':busy.has(id)?'ma lekcję':'wolny']).sort((a,b)=>r(a[0])-r(b[0]));$('#dd_ct2').innerHTML=ddb('ct2')})};
 
-const _ad=V.ad;V.ad=async()=>{let h=await _ad();if(!adTab)h=h.replace(/<\/div>$/,`<button class="tile" onclick="adTab='abs';rr()">${ic('user')}<b>Nieobecności nauczycieli</b><span>Choroba, wycieczka - system proponuje zastępstwa</span></button></div>`);return h};
+const _ad=V.ad;V.ad=async()=>{let h=await _ad();if(!adTab)h=h.replace(/<\/div>$/,`<button class="tile" onclick="adTab='abs';rr()">${ic('user')}<b>Nieobecności nauczycieli</b></button></div>`);return h};
 let ABP=[];
 AD.abs=async back=>{
   const tch=Object.values(P).filter(p=>['teacher','director'].includes(p.role)).sort((a,b)=>ln(a.id).localeCompare(ln(b.id),'pl')),L=LNS().map(n=>[n,'Lekcja '+n]);
