@@ -50,7 +50,7 @@ tr.hv{cursor:pointer}tr.hv:hover td{background:#fffaf0}tr.today td{background:#f
 .gc.lg{height:36px;min-width:36px;font-size:1.1rem;vertical-align:middle}
 .g1{background:#dc2626}.g2{background:#ea580c}.g3{background:#ca8a04}.g4{background:#65a30d}.g5{background:#16a34a}.g6{background:#0d9488}
 .tag{display:inline-flex;gap:.3rem;align-items:center;padding:.1rem .55rem;border-radius:999px;font-size:.78rem;font-weight:600;background:#e8ecf4;color:#334155}.tag.g{background:#dcfce7;color:#166534}.tag.r{background:#fee2e2;color:#991b1b}.tag.y{background:#fef3c7;color:#92400e}.tag.b{background:#dbeafe;color:#1e40af}
-.tag.p{background:#8e44ad;color:#fff;text-transform:uppercase;letter-spacing:.02em}
+.tag.p{background:#efe3f7;color:#6b2a8c}
 .st{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:.75rem;margin-bottom:1rem}.st div{background:#fff;border:1px solid var(--ln);border-radius:12px;padding:.8rem 1rem}.st b{font-size:1.7rem;color:var(--in);display:block;line-height:1.2}.st span{font-size:.8rem;color:var(--mu)}
 .side{background:#080B1A;color:#fff}
 .nv{display:flex;align-items:center;gap:.7rem;width:100%;padding:.65rem 1rem;color:#cbd5e1;font-weight:600;font-size:.9rem;border:0;border-left:3px solid transparent;background:none;text-align:left;white-space:nowrap}.nv:hover{background:#ffffff12;color:#fff}.nv.on{background:var(--in);color:#fff;border-left-color:var(--am)}
@@ -176,10 +176,10 @@ tbody tr:nth-child(even) td{background:#fafbfd}tbody tr:hover td{background:#fff
 <style>
 @media(max-width:767px),all and (display-mode:standalone){*{scrollbar-width:none;-ms-overflow-style:none}*::-webkit-scrollbar{display:none;width:0;height:0}}
 @media(max-width:767px){
- main :is(div,p,span,b,h3,label,td,li,a,button,small){overflow-wrap:anywhere}
+ main :is(div,p,span,b,h3,label,td,li,a,button,small){overflow-wrap:break-word}
  .btn,.gh{white-space:normal;text-align:center}.ic{flex-shrink:0}
  #ptitle{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
- .ph>*{min-width:0}.ph h3{overflow-wrap:anywhere}
+ .ph>*{min-width:0}.ph h3{overflow-wrap:break-word}
  #mnav .nv span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
  .hm-ls>*{min-width:0}.hm-t{white-space:nowrap}.hm-ls{grid-template-columns:86px minmax(0,1fr) auto}.hm-r{max-width:96px}
  .tile{min-width:0}.tile *{min-width:0}
@@ -190,9 +190,9 @@ tbody tr:nth-child(even) td{background:#fafbfd}tbody tr:hover td{background:#fff
 .bd{display:inline-block;border-radius:999px;padding:.05rem .55rem;font-size:.72rem;font-weight:700;margin:.2rem .3rem 0 0}.bd.g{background:#dcfce7;color:#166534}.bd.r{background:#fee2e2;color:#991b1b}.bd.y{background:#fef3c7;color:#92400e}.bd.b{background:#e0e7ff;color:#3730a3}
 </style>
 <style>
-.dl{grid-template-columns:minmax(84px,max-content) minmax(0,1fr);gap:.55rem 1rem}.dl dt{white-space:nowrap}.dl dd{overflow-wrap:anywhere}
+.dl{grid-template-columns:minmax(84px,max-content) minmax(0,1fr);gap:.55rem 1rem}.dl dt{white-space:nowrap}.dl dd{overflow-wrap:break-word}
 .dd{min-width:0}.dd .flex>.inp{min-width:0;flex:1 1 0}
-.evdesc{background:#f5f7fb;border-radius:12px;padding:.7rem .85rem;margin:0 0 .9rem;font-size:.9rem;white-space:pre-wrap;overflow-wrap:anywhere}
+.evdesc{background:#f5f7fb;border-radius:12px;padding:.7rem .85rem;margin:0 0 .9rem;font-size:.9rem;white-space:pre-wrap;overflow-wrap:break-word}
 .adv{background:#fff4d6;border-radius:14px;padding:.55rem .8rem;margin-bottom:.6rem}.adv small{display:block;font-size:.66rem;text-transform:uppercase;letter-spacing:.04em;color:#92400e;font-weight:700}
 #popbg{position:fixed;inset:0;background:#0b103088;z-index:299;display:none}#popbg.show{display:block}
 @media(max-width:767px){
@@ -642,31 +642,46 @@ tr.today td{background:#FFF6E0}.att .myc,.myc{background:#FFF4D6!important}
 .lgfoot{margin:1.4rem 0 0;text-align:center;font-size:.76rem;color:#9AA4C0;line-height:1.5}
 .lg-h{display:none!important}
 @keyframes rot{to{transform:rotate(360deg)}}
+/* ===== v57: spójność, tabele, nachodzenie ===== */
+.tag{white-space:nowrap;line-height:1.3;font-size:.76rem;padding:.12rem .6rem;vertical-align:middle}
+.lsn .tag{margin:.2rem 0 .1rem}
+.lsn .lk{font-size:.78rem}
+.lsn small,.lsn .text-xs{display:block;line-height:1.3}
+.lsn>*{max-width:100%}
+.lsn b{font-size:.92rem;line-height:1.25}
+th{white-space:nowrap;vertical-align:middle;line-height:1.3}
+td{vertical-align:middle;line-height:1.35;word-break:normal;hyphens:manual}
+td:first-child,th:first-child{padding-left:.8rem}
+table .tag{white-space:nowrap}
+.overflow-x-auto{-webkit-overflow-scrolling:touch}
+.overflow-x-auto>table{min-width:100%}
+.pn .ph h3{line-height:1.3}
+.ph>div .btn,.ph>div .gh{white-space:nowrap}
+.seg button{white-space:nowrap}
+.ms-top .seg{max-width:100%;overflow-x:auto}
+.tile b{line-height:1.25}
 /* ===== v56: antynachodzenie, okienka, wiadomości, logowanie, ładowanie ===== */
 .flex>*,.grid>*{min-width:0}
 .pn,.ph,.pb,.fcard,.hm-c{min-width:0}
-.ph{flex-wrap:wrap;row-gap:.5rem}.ph h3{flex:1 1 11rem;min-width:0;overflow-wrap:anywhere;line-height:1.25}.ph>div{max-width:100%}
-td,th{overflow-wrap:anywhere}.tag,.chip{max-width:100%;white-space:normal;line-height:1.3}
-.tile b,.tile span{overflow-wrap:anywhere}
-.lsn{overflow:hidden;overflow-wrap:anywhere;line-height:1.3}.lsn .lt{display:block;text-align:left;margin-bottom:.15rem}.lsn b{display:block}
+.ph{flex-wrap:wrap;row-gap:.5rem}.ph h3{flex:1 1 11rem;min-width:0;overflow-wrap:break-word;line-height:1.25}.ph>div{max-width:100%}
+td,th{overflow-wrap:break-word}.tag,.chip{max-width:100%;white-space:normal;line-height:1.3}
+.tile b,.tile span{overflow-wrap:break-word}
+.lsn{overflow:hidden;overflow-wrap:break-word;line-height:1.3}.lsn .lt{display:block;text-align:left;margin-bottom:.15rem}.lsn b{display:block}
 .dlr{grid-template-columns:62px minmax(0,1fr)}
 .hm-ls{grid-template-columns:4.7rem minmax(0,1fr) auto!important}
 .hm-t{white-space:normal!important;font-size:.74rem;line-height:1.25}
-.hm-r{max-width:6rem!important;overflow-wrap:anywhere;text-align:right}
-.hm-ls b{overflow-wrap:anywhere}
+.hm-r{max-width:6rem!important;overflow-wrap:break-word;text-align:right}
+.hm-ls b{overflow-wrap:break-word}
 .nl b{right:2px;top:-9px;font-size:.6rem;pointer-events:none}
 @media(max-width:767px){#fs,#um{display:none!important}.top .flex{gap:.5rem}#quick{flex-shrink:0}}
 
-/* okienka w planie */
-.okn{display:flex;flex-direction:column;justify-content:center;gap:.1rem;min-height:48px;padding:.5rem .75rem;border-radius:14px;border:1.5px dashed #C9D0E6;background:repeating-linear-gradient(135deg,#F7F8FD 0 8px,#F1F3FA 8px 9px);color:#8A94B3;font-size:.78rem}
-.okn b{font-weight:700;color:#7B86A6;text-transform:lowercase}.okn span{font-size:.72rem}
 .dlr.okr .dn{background:#F1F3FA;color:#8A94B3}
 
 /* wiadomości */
 .ms-top{display:flex;flex-wrap:wrap;gap:.7rem;align-items:center;justify-content:space-between;margin-bottom:1rem}
 .msg-meta{display:flex;flex-direction:column;gap:.3rem;padding-bottom:.9rem;border-bottom:1px solid var(--ln);font-size:.9rem}
-.msg-mr{display:flex;gap:.6rem}.msg-mr span{width:3.2rem;flex-shrink:0;color:var(--mu)}.msg-mr b{font-weight:600;overflow-wrap:anywhere}
-.msg-body{margin-top:1rem;max-width:75ch;overflow-wrap:anywhere;line-height:1.55}
+.msg-mr{display:flex;gap:.6rem}.msg-mr span{width:3.2rem;flex-shrink:0;color:var(--mu)}.msg-mr b{font-weight:600;overflow-wrap:break-word}
+.msg-body{margin-top:1rem;max-width:75ch;overflow-wrap:break-word;line-height:1.55}
 
 /* logowanie w aplikacji */
 #lgv{position:fixed;inset:0;z-index:9000;display:none;flex-direction:column;overflow:auto;color:#fff;background:radial-gradient(900px 520px at 15% -10%,#3445C2 0%,#3445C200 60%),radial-gradient(700px 520px at 100% 110%,#4a2f9a 0%,#4a2f9a00 55%),linear-gradient(160deg,#101659,#1E2A78 55%,#0c1034)}
@@ -676,8 +691,6 @@ td,th{overflow-wrap:anywhere}.tag,.chip{max-width:100%;white-space:normal;line-h
 /* ładowanie: licznik procent */
 @property --pc{syntax:'<integer>';initial-value:0;inherits:false}
 @keyframes pcu{from{--pc:0}to{--pc:100}}
-#splash .pcn{position:relative;text-align:center;margin-bottom:.8rem;font-weight:800;font-size:1.5rem;letter-spacing:-.03em;color:#fff;font-variant-numeric:tabular-nums;counter-reset:pc var(--pc);animation:pcu 3.4s .6s cubic-bezier(.45,0,.2,1) both}
-#splash .pcn:after{content:counter(pc) "%"}
 #splash .pgb{height:7px;box-shadow:0 0 18px #F5A52455}
 #splash .lg:before{content:"";position:absolute;inset:-40%;border-radius:50%;background:radial-gradient(circle,#F5A5242e,#F5A52400 65%);animation:breath 2.6s ease-in-out infinite alternate;pointer-events:none}
 @keyframes breath{from{transform:scale(.85);opacity:.6}to{transform:scale(1.1);opacity:1}}
@@ -696,7 +709,7 @@ window.offShow=function(){o.classList.add('on')};
 })();
 </script>
 
-<div id="splash"><i class="orb o1"></i><i class="orb o2"></i><i class="ring"></i><i class="ring r2"></i><i class="spin"></i><i class="pt" style="--x:8%;--d:0s;--s:5px"></i><i class="pt" style="--x:22%;--d:1.2s;--s:7px"></i><i class="pt" style="--x:37%;--d:0.5s;--s:4px"></i><i class="pt" style="--x:52%;--d:2.1s;--s:6px"></i><i class="pt" style="--x:66%;--d:0.8s;--s:5px"></i><i class="pt" style="--x:81%;--d:1.7s;--s:7px"></i><i class="pt" style="--x:93%;--d:0.3s;--s:4px"></i><div class="lg"><img src="themes/logo-horizontal-white.svg" alt="Minerva" onerror="if(!this.dataset.f){this.dataset.f=1;this.src='https://dziennik-minerva.pages.dev/themes/logo-horizontal-white.svg'}"></div><div class="pgw"><div class="pcn"></div><div class="pgb"><i></i></div><div class="pgm"><span>Łączenie z dziennikiem</span><span>Wczytywanie planu lekcji</span><span>Sprawdzanie ocen i frekwencji</span><span>Prawie gotowe</span></div></div><div class="sfoot">Dziennik elektroniczny</div></div>
+<div id="splash"><i class="orb o1"></i><i class="orb o2"></i><i class="ring"></i><i class="ring r2"></i><i class="spin"></i><i class="pt" style="--x:8%;--d:0s;--s:5px"></i><i class="pt" style="--x:22%;--d:1.2s;--s:7px"></i><i class="pt" style="--x:37%;--d:0.5s;--s:4px"></i><i class="pt" style="--x:52%;--d:2.1s;--s:6px"></i><i class="pt" style="--x:66%;--d:0.8s;--s:5px"></i><i class="pt" style="--x:81%;--d:1.7s;--s:7px"></i><i class="pt" style="--x:93%;--d:0.3s;--s:4px"></i><div class="lg"><img src="themes/logo-horizontal-white.svg" alt="Minerva" onerror="if(!this.dataset.f){this.dataset.f=1;this.src='https://dziennik-minerva.pages.dev/themes/logo-horizontal-white.svg'}"></div><div class="pgw"><div class="pgb"><i></i></div><div class="pgm"><span>Łączenie z dziennikiem</span><span>Wczytywanie planu lekcji</span><span>Sprawdzanie ocen i frekwencji</span><span>Prawie gotowe</span></div></div><div class="sfoot">Dziennik elektroniczny</div></div>
 <script>document.getElementById('splash').classList.add('on')</script>
 <div class="md:flex min-h-screen">
 <aside class="side md:w-60 md:h-screen md:sticky md:top-0 md:flex md:flex-col shrink-0">
@@ -985,7 +998,7 @@ function entries(base,m,scope){
   return res.filter(scope)}
 const ENT={};
 const chTag=r=>{if(!r.st)return'';const key=r.d+'|'+r.n+'|'+r.class_id+'|'+r.teaching_id+'|'+r.st;ENT[key]=r;
-  const tg={cancel:'<span class="tag r">odwołane</span>',moved:'<span class="tag y">przeniesione</span>',in:'<span class="tag b">przeniesione tu</span>',sub:'<span class="tag p">zastępstwo</span>'}[r.st]||'';
+  const tg={cancel:'<span class="tag r">Odwołane</span>',moved:'<span class="tag y">Przeniesione</span>',in:'<span class="tag b">Przeniesione tu</span>',sub:'<span class="tag p">Zastępstwo</span>'}[r.st]||'';
   const tg2=tg.replace('<span class="tag','<span style="cursor:pointer" title="Kliknij, aby zobaczyć szczegóły" onclick="event.stopPropagation();chDet(\''+key+'\')" class="tag');
   return `<div class="mt-1">${tg2}</div>`};
 function chDet(key){const r=ENT[key];if(!r)return;
@@ -1004,7 +1017,7 @@ function weekGrid(data,cell){
   if(!ns.length)return '<p class="em">Brak lekcji w planie.</p>';
   if(isM())return weekM(days,ns,data,cell,td);
   let h='<div class="overflow-x-auto"><div class="pw"><div></div>'+days.map((d,i)=>{const ho=hol(d);return `<div class="dh${ho?' hol':''}${isoL(d)===td?' tdy':''}"><b>${pad(d.getDate())}</b><div>${DAYS[i+1].toLowerCase()}</div>${ho?`<small>${ho}</small>`:''}</div>`}).join('');
-  for(const n of ns){h+=`<div class="tm">${(BELLS[n-1]||[]).join('<br>')}</div>`;days.forEach(d=>{const ds=isoL(d),es=data.filter(x=>x.d===ds&&x.n===n),mk=ds===td?nowMark(n,ns):null,inner=es.map(e=>cell(e,T.find(x=>x.id===e.teaching_id),ds)).join('')+(mk&&mk.pos!=null?nowLine(mk.pos):'');h+=hol(d)?'<div class="hol"></div>':mk?`<div class="nlc ${mk.st}">${inner}</div>`:es.length?'<div>'+inner+'</div>':(data.some(x=>x.d===ds&&x.n<n)&&data.some(x=>x.d===ds&&x.n>n)?'<div class="okn"><b>okienko</b></div>':'<div></div>')})}
+  for(const n of ns){h+=`<div class="tm">${(BELLS[n-1]||[]).join('<br>')}</div>`;days.forEach(d=>{const ds=isoL(d),es=data.filter(x=>x.d===ds&&x.n===n),mk=ds===td?nowMark(n,ns):null,inner=es.map(e=>cell(e,T.find(x=>x.id===e.teaching_id),ds)).join('')+(mk&&mk.pos!=null?nowLine(mk.pos):'');h+=hol(d)?'<div class="hol"></div>':mk?`<div class="nlc ${mk.st}">${inner}</div>`:es.length?'<div>'+inner+'</div>':(data.some(x=>x.d===ds&&x.n<n)&&data.some(x=>x.d===ds&&x.n>n)?'<div></div>':'<div></div>')})}
   return h+'</div></div>'}
 const V={};V.ps=()=>viewPs();
 V.home=async()=>{
@@ -1050,7 +1063,7 @@ V.msgOld=async()=>{
   const th=(k,l)=>`<th style="cursor:pointer" onclick="msortBy('${k}')">${l} ${msort[0]===k?(msort[1]>0?'↑':'↓'):'↕'}</th>`;
   const allck=inb?ck('ms_all',false,''):'';if(inb)DD.ms_all={on:x=>{MIDS.forEach(i=>FV['ms_'+i]=x);$$('.mt td:first-child .ck').forEach(b=>b.classList.toggle('on',x))}};
   const left=`<div class="pn pb msgl"><button class="btn w-full justify-center mb-3" onclick="mtab='new';rr()">${ic('edit')} Nowa wiadomość</button><button class="fl ${mtab==='in'?'on':''}" onclick="mtab='in';rr()"><span>${ic('msg')} Odebrane</span>${unread?`<em>${unread}</em>`:''}</button><button class="fl ${mtab==='out'?'on':''}" onclick="mtab='out';rr()"><span>${ic('ann')} Wysłane</span></button></div>`;
-  const list=pn(inb?'Odebrane':'Wysłane',`<input type="text" placeholder="Filtruj wiadomości…" class="mb-3" oninput="const q=this.value.toLowerCase();$$('.msg-row').forEach(r=>r.style.display=r.textContent.toLowerCase().includes(q)?'':'none')">`+(rows.length?`<div class="overflow-x-auto"><table class="mt"><thead><tr><th style="width:44px">${allck}</th>${th('f',inb?'Nadawca':'Odbiorcy')}${th('s','Temat')}${th('d',inb?'Otrzymano':'Wysłano')}<th>Przeczytano</th></tr></thead><tbody>${rows.map(m=>{const o=`onclick="openMsg('${m.id}')"`;return `<tr class="hv msg-row"><td>${inb?ck('ms_'+m.id,false,''):''}</td><td ${o} class="${m.unread?'font-bold':''}">${esc(m.who)}</td><td ${o} class="${m.unread?'font-bold':''}">${m.unread?'<span class="tag r" style="padding:0 .4rem">nowa</span> ':''}${m.recalled_at?'<i class="mu">(wycofana)</i> ':''}${esc(m.subject)}</td><td ${o} class="text-xs mu" style="white-space:nowrap">${fd(m.created_at)}</td><td ${o}>${inb?(!m.unread?ic('check','text-green-600'):''):`<span class="text-xs mu">${m.rd}</span>`}</td></tr>`}).join('')}</tbody></table></div>`:'<p class="em">Brak wiadomości.</p>'),
+  const list=pn(inb?'Odebrane':'Wysłane',`<input type="text" placeholder="Filtruj wiadomości…" class="mb-3" oninput="const q=this.value.toLowerCase();$$('.msg-row').forEach(r=>r.style.display=r.textContent.toLowerCase().includes(q)?'':'none')">`+(rows.length?`<div class="overflow-x-auto"><table class="mt"><thead><tr><th style="width:44px">${allck}</th>${th('f',inb?'Nadawca':'Odbiorcy')}${th('s','Temat')}${th('d',inb?'Otrzymano':'Wysłano')}<th>Przeczytano</th></tr></thead><tbody>${rows.map(m=>{const o=`onclick="openMsg('${m.id}')"`;return `<tr class="hv msg-row"><td>${inb?ck('ms_'+m.id,false,''):''}</td><td ${o} class="${m.unread?'font-bold':''}">${esc(m.who)}</td><td ${o} class="${m.unread?'font-bold':''}">${m.unread?'<span class="tag r" style="padding:0 .4rem">Nowa</span> ':''}${m.recalled_at?'<i class="mu">(wycofana)</i> ':''}${esc(m.subject)}</td><td ${o} class="text-xs mu" style="white-space:nowrap">${fd(m.created_at)}</td><td ${o}>${inb?(!m.unread?ic('check','text-green-600'):''):`<span class="text-xs mu">${m.rd}</span>`}</td></tr>`}).join('')}</tbody></table></div>`:'<p class="em">Brak wiadomości.</p>'),
    `<button class="btn sm" onclick="refresh()">Odśwież</button>${inb?`<button class="gh sm red" onclick="delSel()">${ic('trash')} Usuń zaznaczone</button>`:''}${inb&&unread?`<button class="gh sm" onclick="markAll()">Oznacz jako przeczytane</button>`:''}`);
   return `<div class="grid md:grid-cols-[210px_1fr] gap-4 items-start">${left}<div>${mtab==='new'?compose():list}</div></div>`;
 };
@@ -1078,7 +1091,7 @@ V.msg=async()=>{
   const allck=inb?ck('ms_all',false,''):'';if(inb)DD.ms_all={on:x=>{MIDS.forEach(i=>FV['ms_'+i]=x);$$('.mt td:first-child .ck').forEach(b=>b.classList.toggle('on',x))}};
   const tb=rows.length?`<div class="overflow-x-auto"><table class="mt"><thead><tr>${inb?`<th style="width:44px">${allck}</th>`:''}<th>${inb?'Nadawca':'Odbiorcy'}</th><th>Temat</th><th>${inb?'Otrzymano':'Wysłano'}</th><th>Przeczytano</th></tr></thead><tbody>${rows.map(m=>{const o=`onclick="openMsg('${m.id}')"`,b=m.unread?'font-bold':'';
     const rd=m.mine&&m.rq&&m.rq.length?m.rq.filter(x=>x.read_at).length+'/'+m.rq.length:'';
-    return `<tr class="hv msg-row">${inb?`<td>${ck('ms_'+m.id,false,'')}</td>`:''}<td ${o} class="${b}">${esc(inb?nm(m.sender_id):msgTo(m))}</td><td ${o} class="${b}">${m.unread?'<span class="tag r" style="padding:0 .4rem">nowa</span> ':''}${m.recalled_at?'<i class="mu">(wycofana)</i> ':''}${esc(msgNorm(m.subject))}</td><td ${o} class="text-xs mu" style="white-space:nowrap">${fd(m.created_at)}</td><td ${o}>${inb?(!m.unread?ic('check','text-green-600'):''):`<span class="text-xs mu">${rd}</span>`}</td></tr>`}).join('')}</tbody></table></div>`:'<p class="em">Brak wiadomości.</p>';
+    return `<tr class="hv msg-row">${inb?`<td>${ck('ms_'+m.id,false,'')}</td>`:''}<td ${o} class="${b}">${esc(inb?nm(m.sender_id):msgTo(m))}</td><td ${o} class="${b}">${m.unread?'<span class="tag r" style="padding:0 .4rem">Nowa</span> ':''}${m.recalled_at?'<i class="mu">(wycofana)</i> ':''}${esc(msgNorm(m.subject))}</td><td ${o} class="text-xs mu" style="white-space:nowrap">${fd(m.created_at)}</td><td ${o}>${inb?(!m.unread?ic('check','text-green-600'):''):`<span class="text-xs mu">${rd}</span>`}</td></tr>`}).join('')}</tbody></table></div>`:'<p class="em">Brak wiadomości.</p>';
   const acts=(inb&&rows.length?`<button class="gh sm red" onclick="delSel()">${ic('trash')} Usuń zaznaczone</button>`:'')+(un&&inb?`<button class="gh sm" onclick="markAll()">Oznacz jako przeczytane</button>`:'');
   return `<div class="ms-top">${seg('mf',[['in','Odebrane'+(un?' ('+un+')':'')],['out','Wysłane']],f,k=>{mtab=k;rr()})}<button class="btn" onclick="mtab='new';rr()">${ic('edit')} Nowa wiadomość</button></div>`
    +pn(inb?'Odebrane':'Wysłane',`<input type="text" placeholder="Szukaj…" class="mb-3" oninput="const q=this.value.toLowerCase();$$('.msg-row').forEach(r=>r.style.display=r.textContent.toLowerCase().includes(q)?'':'none')">`+tb,acts,'msg')};
@@ -1429,7 +1442,7 @@ function weekM(days,ns,data,cell,td){
   const act=mDay!=null?mDay:Math.max(0,days.findIndex(d=>isoL(d)===td));
   return `<div class="dtabs">${days.map((d,i)=>`<button class="dt${i===act?' on':''}${isoL(d)===td?' tdy':''}" onclick="pickDay(${i})"><small>${DAYS[i+1].slice(0,3)}</small><b>${pad(d.getDate())}</b></button>`).join('')}</div>`
    +days.map((d,i)=>{const ds=isoL(d),ho=hol(d),real=ns.filter(n=>data.some(x=>x.d===ds&&x.n===n)),lst=real.length?Array.from({length:Math.max(...real)-Math.min(...real)+1},(_,k)=>Math.min(...real)+k):[];
-    return `<div class="dp" style="${i===act?'':'display:none'}">${ALLDAY?ALLDAY(ds):''}${ho?`<div class="hol"><b>${esc(ho)}</b><div class="text-xs mu">Dzień wolny od zajęć</div></div>`:lst.length?lst.map(n=>{if(!real.includes(n)){const b=BELLS[n-1]||[],du=b[0]&&b[1]?(tmin2(b[1])-tmin2(b[0]))+' min wolnego':'wolna lekcja';return `<div class="dlr okr"><div class="dn">${n}<small>${b.join('<br>')}</small></div><div><div class="okn"><b>Okienko</b><span>${du}</span></div></div></div>`}const mk=ds===td?nowMark(n,real):null;return `<div class="dlr${mk?' nlc '+mk.st:''}"><div class="dn">${n}<small>${(BELLS[n-1]||[]).join('<br>')}</small></div><div>${data.filter(x=>x.d===ds&&x.n===n).map(e=>cell(e,T.find(x=>x.id===e.teaching_id),ds)).join('')}</div>${mk&&mk.pos!=null?nowLine(mk.pos):''}</div>`}).join(''):'<p class="em">Brak lekcji tego dnia.</p>'}</div>`}).join('')}
+    return `<div class="dp" style="${i===act?'':'display:none'}">${ALLDAY?ALLDAY(ds):''}${ho?`<div class="hol"><b>${esc(ho)}</b><div class="text-xs mu">Dzień wolny od zajęć</div></div>`:lst.length?lst.map(n=>{if(!real.includes(n)){const b=BELLS[n-1]||[],du=b[0]&&b[1]?(tmin2(b[1])-tmin2(b[0]))+' min wolnego':'wolna lekcja';return `<div class="dlr okr"><div class="dn">${n}<small>${b.join('<br>')}</small></div><div></div></div>`}const mk=ds===td?nowMark(n,real):null;return `<div class="dlr${mk?' nlc '+mk.st:''}"><div class="dn">${n}<small>${(BELLS[n-1]||[]).join('<br>')}</small></div><div>${data.filter(x=>x.d===ds&&x.n===n).map(e=>cell(e,T.find(x=>x.id===e.teaching_id),ds)).join('')}</div>${mk&&mk.pos!=null?nowLine(mk.pos):''}</div>`}).join(''):'<p class="em">Brak lekcji tego dnia.</p>'}</div>`}).join('')}
 const pickDay=i=>{mDay=i;$$('.dt').forEach((b,j)=>b.classList.toggle('on',j===i));$$('.dp').forEach((q,j)=>q.style.display=j===i?'':'none')};
 let czT;const cardify=()=>{if(!isM())return;$$('#main table:not(.gt):not(.rt),#modal table:not(.gt):not(.rt)').forEach(t=>{
   const hs=[...t.querySelectorAll('thead th')].map(h=>h.textContent.replace(/[↑↓↕]/g,'').trim());t.classList.add('rt');
@@ -1992,7 +2005,7 @@ weekGrid=(data,cell)=>{
     add=EVADD&&e.st!=='cancel'&&e.st!=='moved'&&(dir()||T.find(y=>y.id===e.teaching_id)?.teacher_id===me.id||e.sub===me.id)?`<div><a class="lk np" onclick="evAdd('${e.class_id}','${ds}',${e.n},'${e.teaching_id}')">+ Wydarzenie</a></div>`:'';
     return h.replace(/<\/div>\s*$/,()=>L+add+'</div>')})}finally{ALLDAY=null}
   if(isM()||!al.some(a=>a.length)||!h0.includes('<div class="tm">'))return h0;
-  const row='<div class="tm">cały dzień</div>'+days.map((ds,i)=>hol(new Date(ds+'T12:00'))?'<div class="hol"></div>':'<div>'+al[i].map(adTag).join('')+'</div>').join('');
+  const row='<div class="tm">Cały dzień</div>'+days.map((ds,i)=>hol(new Date(ds+'T12:00'))?'<div class="hol"></div>':'<div>'+al[i].map(adTag).join('')+'</div>').join('');
   return h0.replace('<div class="tm">',row+'<div class="tm">')};
 function evShow(id){const x0=EVM[id];if(!x0)return;const x={...x0,lesson_no:evLn(x0)};const k=EVN[x.kind]||['Inne',''],hrs=x.lesson_no?(BELLS[x.lesson_no-1]||[]).join(' - '):'',
   when=x.lesson_no?`${fdl(x.date)} · lekcja ${x.lesson_no}${hrs?' ('+hrs+')':''}`:((x.date_to&&x.date_to!==x.date?fdl(x.date)+' - '+fdl(x.date_to):fdl(x.date))+' · cały dzień'),
