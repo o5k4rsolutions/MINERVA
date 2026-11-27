@@ -337,6 +337,42 @@ tbody tr:nth-child(even) td{background:#fafbfd}tbody tr:hover td{background:#fff
 #gate ol{text-align:left;margin:1.2rem 0 0;padding-left:1.3rem;display:grid;gap:.6rem}
 #gate .sv{display:inline-block;vertical-align:-4px}
 </style>
+<style id="v49">
+/* ===== v49: frekwencja, tematy, podręczniki ===== */
+.lc{border-radius:14px;box-shadow:0 1px 3px #1e2a780f;transition:transform .15s var(--ez),box-shadow .15s,border-color .15s}
+.lc:not(:disabled):hover{border-color:var(--in);transform:translateY(-1px);box-shadow:0 6px 16px -8px #1e2a7866}
+.lc.on{background:linear-gradient(135deg,#eef0fb,#fff);box-shadow:0 0 0 2px var(--am),0 6px 16px -8px #1e2a7866}
+.lc .av{width:34px;height:34px}
+#ltp{font-size:1rem;font-weight:600;min-height:44px}
+button.ae.present{background:#e8f6ec;border-color:#a7d9b3}
+.att .ac.present{background:#eaf7ee}
+.att .ac.none{background:#f5f7fb}
+.att th.hc{border-radius:8px;transition:background .15s}
+.hdt{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:3px;background:#dbe0ec;vertical-align:0}
+.hdt.present{background:#22a55b}.hdt.absent{background:#ef4444}.hdt.late{background:#f59e0b}.hdt.excused{background:#3b82f6}
+.apill{display:inline-flex;align-items:center;background:#eef0fb;color:var(--in);border-radius:999px;padding:.25rem .8rem;font-size:.8rem;font-weight:700}
+#tpsrc{display:flex;align-items:center;gap:.5rem;min-height:1.4rem}
+.tbx{margin-top:.9rem;padding:.85rem .95rem;border-radius:14px;background:#f5f7fd;border:1px solid #e3e8f6}
+.tbx-h{display:flex;flex-wrap:wrap;gap:.1rem .6rem;align-items:baseline}.tbx-h b{color:var(--in)}.tbx-h span{color:var(--mu);font-size:.8rem}
+.tbx-p{height:8px;border-radius:99px;background:#dfe5f5;margin:.55rem 0 .35rem;overflow:hidden}
+.tbx-p i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--in),#4f63e0);transition:width .5s var(--ez)}
+.tbx small{color:var(--mu);display:block}
+.tbpick{max-height:58vh;overflow:auto;margin:0 -.2rem;padding:0 .2rem}
+.tbuh{position:sticky;top:0;background:#fff;font-weight:800;color:var(--in);padding:.55rem 0 .3rem;font-size:.9rem;border-bottom:1px solid var(--ln);z-index:1;margin-bottom:.2rem}
+.tbt{display:flex;align-items:center;justify-content:space-between;gap:.6rem;width:100%;text-align:left;border:0;background:none;padding:.55rem .6rem;border-radius:10px;font-size:.9rem;color:var(--tx)}
+.tbt:hover{background:#f1f4fa}.tbt.us{color:var(--mu)}
+.tbt.nx{background:#fff4d6;font-weight:700}
+.tbt.on{background:#eef0fb;box-shadow:inset 0 0 0 2px var(--in);font-weight:700}
+.tbt em{font-style:normal;font-size:.7rem;font-weight:700;background:#fff;border-radius:99px;padding:.05rem .55rem;color:#92400e;border:1px solid #fcd34d;white-space:nowrap}
+.tbt.us em{color:var(--mu);border-color:var(--ln)}
+.tbt.ro{cursor:default}.tbt.ro:hover{background:none}
+.tbk{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:.6rem;align-items:center;border:1px solid var(--ln);border-radius:14px;padding:.75rem 1rem;margin-bottom:.6rem;background:#fff;transition:border-color .15s,box-shadow .15s}
+.tbk:hover{border-color:var(--in);box-shadow:0 4px 14px -8px #1e2a7866}
+.tbk b{display:block;color:var(--in)}.tbk span{color:var(--mu);font-size:.8rem}
+textarea#tbt{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.8rem}
+@media(max-width:767px){.tbk{grid-template-columns:1fr}.hdt{width:8px;height:8px}.tbpick{max-height:62vh}}
+
+</style>
 </head>
 <body>
 <div id="off" role="alert"><div class="bx"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2 8.8a15 15 0 0 1 4-2.4M22 8.8a15 15 0 0 0-10-3.3M5 12.5a10 10 0 0 1 3-1.9M19 12.5a10 10 0 0 0-3.5-2M8.5 16a5 5 0 0 1 2-1.1M15.5 16a5 5 0 0 0-1.4-1M12 19.5h.01M3 3l18 18"/></svg><h2>Brak połączenia z internetem</h2><p>Sprawdź Wi‑Fi lub dane komórkowe. Dziennik wróci automatycznie, gdy sieć znów będzie dostępna.</p><button type="button" onclick="offTry()">Spróbuj ponownie</button></div></div>
@@ -380,7 +416,7 @@ const RL={director:'Dyrektor',teacher:'Nauczyciel',parent:'Rodzic/opiekun',stude
 const AS={present:'obecny',absent:'nieobecny',late:'spóźniony',excused:'usprawiedliwiony'};
 const DAYS=['','Poniedziałek','Wtorek','Środa','Czwartek','Piątek'];
 let me,school,P={},C=[],SUB=[],T=[],ST={},PC=[],KIDS=[],tab='home',sid=null,dots={},curT=null,curC=null,rid=0,detail=null,mtab='in',pre={},dirty=false,
- curD=isoL(new Date()),curL=1,plSel=null,annNew=false,ntF='all',jsF='pending',adTab=null,GR={},GW='1',wk=null,atV='week',gsem='1',gmode='list',gN=null,msort=['d',-1],MIDS=[];
+ curD=isoL(new Date()),curL=1,plSel=null,annNew=false,ntF='all',jsF='pending',adTab=null,GR={},GW='1',wk=null,atV='week',gsem='1',gmode='list',gN=null,msort=['d',-1],MIDS=[],TB=[],TBA=[],TBT={},TPID=null;
 const nm=id=>P[id]?P[id].first_name+' '+P[id].last_name:'-',ln=id=>P[id]?P[id].last_name+' '+P[id].first_name:'-';
 const cn=id=>C.find(c=>c.id===id)?.name||'-',sn=id=>SUB.find(s=>s.id===id)?.name||'-',tl=t=>cn(t.class_id)+' - '+sn(t.subject_id);
 const staff=()=>me.role==='teacher'||me.role==='director',dir=()=>me.role==='director';
@@ -534,9 +570,9 @@ async function init(){
   document.addEventListener('visibilitychange',()=>{if(idle())refresh(true)});window.addEventListener('online',()=>refresh(true));
 }
 async function load(){
-  const [p,c,s,t,st,pc,sc,xch,xdo,xbl]=await Promise.all([sb.from('profiles').select('*'),sb.from('classes').select('*').order('name'),sb.from('subjects').select('*').order('name'),sb.from('teaching').select('*'),sb.from('students').select('*'),sb.from('parent_children').select('*'),sb.from('schools').select('name').single(),sb.from('timetable_changes').select('*'),sb.from('days_off').select('*'),sb.from('bells').select('*')]);
+  const [p,c,s,t,st,pc,sc,xch,xdo,xbl,xtb,xta]=await Promise.all([sb.from('profiles').select('*'),sb.from('classes').select('*').order('name'),sb.from('subjects').select('*').order('name'),sb.from('teaching').select('*'),sb.from('students').select('*'),sb.from('parent_children').select('*'),sb.from('schools').select('name').single(),sb.from('timetable_changes').select('*'),sb.from('days_off').select('*'),sb.from('bells').select('*'),sb.from('textbooks').select('*').order('name'),sb.from('textbook_assignments').select('*')]);
   for(const r of [p,c,s,t,st,pc])if(r.error)throw r.error;
-  P={};p.data.forEach(x=>P[x.id]=x);C=c.data;SUB=s.data;T=t.data;ST={};st.data.forEach(x=>ST[x.profile_id]=x);PC=pc.data;school=sc.data?.name||'';
+  P={};p.data.forEach(x=>P[x.id]=x);C=c.data;SUB=s.data;T=t.data;ST={};st.data.forEach(x=>ST[x.profile_id]=x);PC=pc.data;school=sc.data?.name||'';TB=xtb.error?[]:xtb.data;TBA=xta.error?[]:xta.data;TBT={};
   KIDS=PC.filter(r=>r.parent_id===me.id).map(r=>r.student_id);
   CH=xch.error?[]:xch.data;DOFF={};(xdo.error?[]:xdo.data).forEach(x=>DOFF[x.date]=x);BELLS.length=10;delete BELLS[-1];BELLS0.forEach((b,i)=>BELLS[i]=[...b]);(xbl.error?[]:xbl.data).forEach(b=>{if(b.lesson_no>=0&&b.lesson_no<=MAXL)BELLS[b.lesson_no-1]=[String(b.start_t).slice(0,5),String(b.end_t).slice(0,5)]});
 }
@@ -835,24 +871,24 @@ V.at=async()=>{
   const plA=pl.filter(e=>!e.dead);
   if(!atManual&&plA.length&&!plA.some(e=>e.teaching_id===curT&&e.lesson_no===curL)){const h_=new Date(),nowM=h_.getHours()*60+h_.getMinutes(),tmin=q=>{const a=q.split(':');return +a[0]*60+ +a[1]},c0=curD===isoL(h_)&&plA.find(e=>{const b=BELLS[e.lesson_no-1];return b&&nowM>=tmin(b[0])-5&&nowM<=tmin(b[1])})||plA[0];curT=c0.teaching_id;curL=c0.lesson_no}
   if(!ts.find(x=>x.id===curT))curT=ts[0].id;
-  const t=ts.find(x=>x.id===curT),sts=classStudents(t.class_id),ids=sts.map(p=>p.id),hv=atView==='hist';
-  const [A,B,H]=await Promise.all([ids.length?sb.from('attendance').select('*').in('student_id',ids).eq('date',curD):{data:[]},!hv&&wk5?sb.from('timetable').select('*').eq('class_id',t.class_id).eq('weekday',wdd):{data:[]},hv&&ids.length?sb.from('attendance').select('*').eq('teaching_id',curT).in('student_id',ids).order('date',{ascending:false}).limit(3000):{data:[]}]);
+  const t=ts.find(x=>x.id===curT),sts=classStudents(t.class_id),ids=sts.map(p=>p.id),hv=atView!=='day',tidsSame=T.filter(x=>String(x.class_id)===String(t.class_id)&&String(x.subject_id)===String(t.subject_id)).map(x=>x.id);
+  const [A,B,H]=await Promise.all([ids.length?sb.from('attendance').select('*').in('student_id',ids).eq('date',curD):{data:[]},!hv&&wk5?sb.from('timetable').select('*').eq('class_id',t.class_id).eq('weekday',wdd):{data:[]},hv&&ids.length?pageN(()=>{let q=sb.from('attendance').select('*').in('student_id',ids).lte('date',curD);if(atView==='hist')q=q.in('teaching_id',tidsSame.length?tidsSame:[curT]);return q.order('date',{ascending:false}).order('lesson_no',{ascending:false}).order('student_id')},3).then(d=>({data:d})).catch(error=>({data:[],error})):{data:[]}]);
   if(A.error)throw A.error;if(B.error)throw B.error;if(H.error)throw H.error;
   const mine={},oth={};A.data.forEach(a=>{if(a.teaching_id===curT&&a.lesson_no===curL)mine[a.student_id]=a.status;else oth[a.student_id+'|'+a.lesson_no]=a.status});
   ATT={};sts.forEach(p=>ATT[p.id]=mine[p.id]||'present');ATTPRIV=dir()||C.some(c=>c.id===t.class_id&&c.homeroom_teacher_id===me.id);ATTLOCK={};sts.forEach(p=>{if(!ATTPRIV&&mine[p.id]==='excused')ATTLOCK[p.id]=1});const saved=Object.keys(mine).length>0;
   const curK=curD+'|'+curL,lm={},hm={};
-  H.data.forEach(a=>{const k=a.date+'|'+a.lesson_no;if(k===curK)return;hm[a.student_id+'|'+k]=a.status;lm[k]={d:a.date,n:a.lesson_no}});
+  H.data.forEach(a=>{const k=a.date+'|'+a.lesson_no;if(k===curK)return;hm[a.student_id+'|'+k]=a.status;lm[k]={d:a.date,n:a.lesson_no,s:a.teaching_id}});
   const past=Object.values(lm).filter(l=>l.d<curD||(l.d===curD&&l.n<curL)).sort((a,b)=>a.d===b.d?a.n-b.n:a.d<b.d?-1:1),hist=past.slice(-10);
   const stat=p=>{let ok=0,tot=0;past.forEach(l=>{const s=hm[p.id+'|'+l.d+'|'+l.n];if(!s)return;tot++;if(s==='present'||s==='late')ok++});return{ok,tot}};
   let cols;
-  if(hv)cols=[...hist.map(l=>({l,hd:`${l.d.slice(8)}.${l.d.slice(5,7)}`,sub:'lekcja '+l.n,get:p=>hm[p.id+'|'+l.d+'|'+l.n]})),{my:1}];
+  if(hv)cols=[...hist.map(l=>({l,hd:`${l.d.slice(8)}.${l.d.slice(5,7)}`,sub:atView==='cls'?(sn(T.find(x=>String(x.id)===String(l.s))?.subject_id)||'').slice(0,10)+' · '+l.n:'lekcja '+l.n,get:p=>hm[p.id+'|'+l.d+'|'+l.n]})),{my:1}];
   else{const N=Math.min(MAXL,Math.max(7,curL,...B.data.map(e=>e.lesson_no),...A.data.map(a=>a.lesson_no)));cols=LNS().filter(n=>n>0?n<=N:(n===curL||B.data.some(e=>e.lesson_no===0)||A.data.some(a=>a.lesson_no===0))).map(n=>n===curL?{my:1}:{hd:n,sub:'',title:B.data.filter(e=>e.lesson_no===n).map(e=>sn(T.find(x=>x.id===e.teaching_id)?.subject_id)).join(', '),get:p=>oth[p.id+'|'+n]})}
   const cnt=(c,k)=>{const v=sts.map(c.get).filter(Boolean);return v.length?(k?v.filter(x=>x==='absent'||x==='excused').length:v.filter(x=>x==='present'||x==='late').length):''};
   const ip=sts.filter(p=>ATT[p.id]==='present'||ATT[p.id]==='late').length;
-  const head=`<tr><th>Nr</th><th>Uczeń</th>${cols.map(c=>c.my?`<th class="myc">${hv?`${curD.slice(8)}.${curD.slice(5,7)}<small>lekcja ${curL} (ta)</small>`:curL}</th>`:c.l?`<th class="hc" title="Otwórz tę lekcję do edycji" onclick="atOpen('${c.l.d}',${c.l.n})">${c.hd}<small>${c.sub}</small></th>`:`<th title="${esc(c.title)}">${c.hd}</th>`).join('')}${hv?'<th>Frekw.</th>':''}</tr>`;
+  const head=`<tr><th>Nr</th><th>Uczeń</th>${cols.map(c=>c.my?`<th class="myc">${hv?`${curD.slice(8)}.${curD.slice(5,7)}<small>lekcja ${curL} (ta)</small>`:curL}</th>`:c.l?`<th class="hc" title="${ts.some(x=>x.id===c.l.s)?'Otwórz tę lekcję do edycji':esc(sn(T.find(x=>String(x.id)===String(c.l.s))?.subject_id))}" ${ts.some(x=>x.id===c.l.s)?`onclick="atOpen('${c.l.d}',${c.l.n},'${c.l.s}')"`:'style="cursor:default"'}>${c.hd}<small>${c.sub}</small></th>`:`<th title="${esc(c.title)}">${c.hd}</th>`).join('')}${hv?'<th>Frekw.</th>':''}</tr>`;
   const body=sts.map((p,i)=>{const st=stat(p);return `<tr><td class="mu">${i+1}</td><td style="white-space:nowrap"><b>${esc(ln(p.id))}</b></td>${cols.map(c=>{if(c.my)return `<td class="myc"><button class="ae ac ${ATT[p.id]}" id="ae_${p.id}"${ATTLOCK[p.id]?' style="opacity:.65;cursor:not-allowed" title="Usprawiedliwione - zmienia tylko wychowawca"':''} onclick="attSet('${p.id}')">${SYM[ATT[p.id]]}</button></td>`;const s=c.get(p);return `<td><span class="ac ${s||'none'}">${s?SYM[s]:'·'}</span></td>`}).join('')}${hv?`<td title="${st.tot-st.ok} nieobecności z ${st.tot} lekcji"><b>${st.tot?Math.round(st.ok/st.tot*100)+'%':'-'}</b></td>`:''}</tr>`}).join('');
   const foot=['Obecnych','Nieobecnych'].map((l,k)=>`<tr><td></td><td style="text-align:left">${l}</td>${cols.map(c=>c.my?`<td class="myc" id="${k?'cnt_a':'cnt_p'}">${k?sts.length-ip:ip}</td>`:`<td>${cnt(c,k)}</td>`).join('')}${hv?'<td></td>':''}</tr>`).join('');
-  const TPr=await sb.from('lesson_topics').select('*').eq('date',curD).in('teaching_id',ts.map(x=>x.id));TP={};TPERR=!!TPr.error;(TPr.data||[]).forEach(x=>TP[x.teaching_id+'|'+x.lesson_no]=x.topic);
+  const TPr=await sb.from('lesson_topics').select('*').eq('date',curD).in('teaching_id',ts.map(x=>x.id));TP={};TPERR=!!TPr.error;(TPr.data||[]).forEach(x=>{TP[x.teaching_id+'|'+x.lesson_no]=x.topic;TPI[x.teaching_id+'|'+x.lesson_no]=x.textbook_topic_id||null});TBX=await tbCtx(t);
   const cards=pl.map(e=>{const x=T.find(y=>y.id===e.teaching_id),on=!e.dead&&!atManual&&e.teaching_id===curT&&e.lesson_no===curL,hrs=(BELLS[e.lesson_no-1]||[]).join(' - '),subj=esc(sn(e.subj||x?.subject_id));
     if(e.dead)return `<button class="lc" disabled title="Lekcja odwołana lub przeniesiona" style="opacity:.55;cursor:not-allowed"><span class="av">${e.lesson_no}</span><span><b style="text-decoration:line-through">${esc(cn(x?.class_id))} · ${subj}</b><small>${hrs} · lekcja odwołana</small></span></button>`;
     return `<button class="lc${on?' on':''}" onclick="atPick('${e.teaching_id}',${e.lesson_no})"><span class="av">${e.lesson_no}</span><span><b>${esc(cn(x?.class_id))} · ${subj}</b><small>${hrs}${e.isSub?' · zastępstwo':''}${TP[e.teaching_id+'|'+e.lesson_no]?' · '+esc(TP[e.teaching_id+'|'+e.lesson_no]):''}</small></span></button>`}).join('');
@@ -860,13 +896,17 @@ V.at=async()=>{
   const clsOpts=[...new Set(pl.map(e=>T.find(y=>y.id===e.teaching_id)?.class_id).filter(Boolean))].map(c=>[c,'Klasa '+cn(c)]);
   const top=pn('Sprawdzanie obecności',`<div class="flex flex-wrap items-center gap-2 atd"><button class="gh" onclick="attDay(-1)">${ic('back')}</button><div style="width:240px">${dp('at_d',curD,{on:attSel('at_d',x=>curD=x,()=>curD,dpb)})}</div><button class="gh" onclick="attDay(1)"><span style="display:inline-block;transform:scaleX(-1)">${ic('back')}</span></button><button class="gh" onclick="attDay(0)">Dziś</button><span class="text-sm mu ml-2">${dt.toLocaleDateString('pl-PL',{weekday:'long'})}${ho?' · '+ho:''}</span></div>`,'','at');
   const left=`<div class="pn"><div class="ph"><h3>Lekcje tego dnia</h3></div><div class="pb"><div class="mb-3">${dd('atcf',[['','Wszystkie klasy'],...clsOpts],atCF,{on:x=>{atCF=x;applyCF()}})}</div><div class="flex flex-col gap-2 lcs">${cards||'<p class="mu text-sm">Brak Twoich lekcji w planie na ten dzień.</p>'}</div><button class="gh mt-3 aml" onclick="atManual=!atManual;rr()">Inna lekcja…</button>${atManual?`<div class="mt-3"><label class="lb">Klasa i przedmiot</label>${dd('at_t',ts.map(x=>[x.id,tl(x)]),curT,{on:attSel('at_t',x=>curT=x,()=>curT,ddb)})}<label class="lb mt-2">Lekcja</label>${dd('at_l',L,curL,{on:attSel('at_l',x=>curL=+x,()=>curL,ddb)})}</div>`:''}</div></div>`;
-  const tpn=pn('Temat lekcji',`<input type="text" id="ltp" placeholder="Wpisz temat lekcji…" value="${esc(TP[curT+'|'+curL]||'')}" oninput="attMark()">${TPERR?'<p class="text-xs mt-2" style="color:#b91c1c">Brak tabeli lesson_topics w bazie - temat nie zapisze się, dopóki jej nie utworzysz.</p>':''}`,'','book');
-  const vw=`<div class="mb-3">${seg('atvw',[['hist','Poprzednie lekcje tej klasy'],['day','Wszystkie lekcje tego dnia']],atView,async k=>{if(await attLeave()){atView=k;rr()}else{FV.atvw=atView;$$('#sg_atvw button').forEach(b=>b.classList.toggle('on',b.dataset.k===atView))}})}</div>`;
+  const tpS=TP[curT+'|'+curL]||'';TPID=TPI[curT+'|'+curL]||null;let tpV=tpS,tpAuto=false;
+  if(TBX&&!tpS&&TBX.next){tpV=TBX.next.title;TPID=TBX.next.id;tpAuto=true}
+  const tbn=TBX?(()=>{const n=TBX.D.topics.length,u=TBX.used.size,pc=n?Math.min(100,Math.round(u/n*100)):0;return `<div class="tbx"><div class="tbx-h"><b>${esc(TBX.book.name)}</b>${TBX.book.publisher?`<span>${esc(TBX.book.publisher)}</span>`:''}</div><div class="tbx-p"><i style="width:${pc}%"></i></div><small>Zrealizowano ${u} z ${n} tematów${TBX.last?' · ostatni: '+esc(TBX.last.title):''}</small><div class="flex flex-wrap gap-2 mt-3"><button type="button" class="btn sm" onclick="tbPick()">${ic('book')} Wybierz z podręcznika</button><button type="button" class="gh sm" onclick="tbOwn()">${ic('edit')} Własny temat</button>${TBX.done?'<span class="bd g">Podręcznik zrealizowany</span>':''}</div></div>`})():'<p class="text-xs mu mt-3">Do tej klasy i przedmiotu nie przypisano podręcznika, więc temat wpisujesz ręcznie. Podręcznik przydziela dyrekcja w Administracja → Podręczniki.</p>';
+  const tpn=pn('Temat lekcji',`<input type="text" id="ltp" placeholder="Wpisz własny temat lub wybierz z podręcznika…" value="${esc(tpV)}" oninput="attMark();tbTyped()"><div id="tpsrc" class="mt-2"></div>${tpAuto?'<p class="text-xs mu mt-1">Podpowiedź: kolejny temat z podręcznika. Zmień go albo wpisz własny, potem zapisz.</p>':''}${tbn}${TPERR?'<p class="text-xs mt-2" style="color:#b91c1c">Brak tabeli lesson_topics w bazie - temat nie zapisze się, dopóki jej nie utworzysz.</p>':''}`,'','book');setTimeout(tbTag,0);
+  const ca=(()=>{let o=0,tt=0;sts.forEach(p=>{const s=stat(p);o+=s.ok;tt+=s.tot});return tt?Math.round(o/tt*100):null})();
+  const vw=`<div class="mb-3 flex flex-wrap items-center gap-2">${seg('atvw',[['hist','Ten przedmiot – poprzednie dni'],['cls','Cała klasa – poprzednie dni'],['day','Ten dzień – wszystkie lekcje']],atView,async k=>{if(await attLeave()){atView=k;rr()}else{FV.atvw=atView;$$('#sg_atvw button').forEach(b=>b.classList.toggle('on',b.dataset.k===atView))}})}${hv&&ca!=null?`<span class="apill" title="Średnia z widocznych lekcji">Frekwencja klasy: ${ca}%</span>`:''}</div>`;
   const ctl=`<div class="mt-4 flex flex-wrap items-center gap-2"><span class="lb" style="margin:0">Klikanie w żółtą kolumnę:</span>${seg('brush',[['cycle','Kolejno'],['present','● obecny'],['absent','- nieobecny'],['late','s spóźniony'],['excused','u usprawiedliwiony']],FV.brush||'cycle',()=>{})}</div><div class="flex flex-wrap items-center gap-2 mt-3"><button class="btn" onclick="saveAtt()">Zapisz</button><button class="gh" onclick="attAll()">Wszyscy obecni</button><button class="gh" onclick="copyPrev()">Kopiuj z poprzedniej</button><span id="attd" class="tag y" style="display:none">niezapisane zmiany</span></div>${hv?'':''}`;
   setTimeout(applyCF,0);
   if(isM()){
     const sj=esc(sn(plA.find(e=>e.teaching_id===curT&&e.lesson_no===curL)?.subj||t.subject_id)),ipm=sts.filter(p=>ATT[p.id]==='present'||ATT[p.id]==='late').length;
-    const rowsM=sts.map((p,i)=>{const st=stat(p);return `<div class="arw"><span class="arn">${i+1}</span><div class="arm"><b>${esc(ln(p.id))}</b>${st.tot?`<small>frekwencja ${Math.round(st.ok/st.tot*100)}%</small>`:''}</div><button type="button" class="ae ac ${ATT[p.id]}" id="ae_${p.id}"${ATTLOCK[p.id]?' style="opacity:.65"':''} onclick="attSet('${p.id}')">${SYM[ATT[p.id]]}</button></div>`}).join('');
+    const rowsM=sts.map((p,i)=>{const st=stat(p);return `<div class="arw"><span class="arn">${i+1}</span><div class="arm"><b>${esc(ln(p.id))}</b>${st.tot?`<small>${hist.slice(-6).map(l=>`<i class="hdt ${hm[p.id+'|'+l.d+'|'+l.n]||'none'}"></i>`).join('')} ${Math.round(st.ok/st.tot*100)}%</small>`:''}</div><button type="button" class="ae ac ${ATT[p.id]}" id="ae_${p.id}"${ATTLOCK[p.id]?' style="opacity:.65"':''} onclick="attSet('${p.id}')">${SYM[ATT[p.id]]}</button></div>`}).join('');
     const bodyM=sts.length?`<div class="flex gap-2 flex-wrap mb-3"><button class="gh sm" onclick="attAll()">Wszyscy obecni</button><button class="gh sm" onclick="copyPrev()">Kopiuj z poprzedniej</button></div><div class="text-xs mu mb-1">Po dotknięciu statusu ustaw:</div>${seg('brush',[['cycle','Kolejno'],['present','Obecny'],['absent','Nieobecny'],['late','Spóźniony'],['excused','Usprawiedl.']],FV.brush||'cycle',()=>{})}<div class="mt-2">${rowsM}</div>`:'<p class="em">W tej klasie nie ma jeszcze uczniów.</p>';
     const noph=h=>h.replace(/<(section|div) class="pn">/,'<$1 class="pn mpc">').replace(/<div class="ph">[\s\S]*?<\/h3>(?:<div class="flex[^"]*"><\/div>)?<\/div><div class="pb">/,'<div class="pb">');
     const leftM=noph(clsOpts.length<2?left.replace(/<div class="mb-3"><div class="dd" id="dd_atcf">[\s\S]*?<\/div><\/div>/,''):left);
@@ -875,7 +915,7 @@ V.at=async()=>{
   const mainPn=pn(`Klasa ${esc(cn(t.class_id))} · ${esc(sn(plA.find(e=>e.teaching_id===curT&&e.lesson_no===curL)?.subj||t.subject_id))} · lekcja ${curL}`,vw+(sts.length?(hv&&!hist.length?'<p class="text-sm mu mb-3">Brak wcześniejszych wpisów frekwencji dla tej klasy i przedmiotu.</p>':'')+`<div class="overflow-x-auto att"><table><thead>${head}</thead><tbody>${body}</tbody><tfoot>${foot}</tfoot></table></div>`+ctl:'<p class="em">W tej klasie nie ma jeszcze uczniów.</p>'),'','at');
   return top+`<div class="grid md:grid-cols-[280px_1fr] gap-4 items-start">${left}<div>${tpn}${mainPn}</div></div>`;
 };
-let TP={},TPERR=false;
+let TP={},TPERR=false,TPI={},TBX=null;
 const STC=['present','absent','late','excused'],SYM={present:'●',absent:'-',late:'s',excused:'u'};let attDirty=false,atManual=false,ATT={},atView='hist',atCF='';
 const applyCF=()=>$$('.lc').forEach(b=>{const t=b.querySelector('b')?.textContent||'';b.style.display=!atCF||t.startsWith(cn(atCF)+' ·')?'':'none'});
 const attMark=()=>{attDirty=true;dirty=true;const e=$('#attd');if(e)e.style.display=''};
@@ -895,9 +935,13 @@ const attLeave=async()=>!attDirty||await ask('Masz niezapisane zmiany frekwencji
 const attSel=(id,set,cur,rd)=>async x=>{if(await attLeave()){set(x);rr()}else{FV[id]=cur();$('#dd_'+id).innerHTML=rd(id)}};
 const attDay=async n=>{if(await attLeave()){curD=n?isoL(addD(new Date(curD+'T12:00'),n)):isoL(new Date());rr()}};
 const atPick=async(t,n)=>{if(await attLeave()){curT=t;curL=n;atManual=false;rr()}};
-const atOpen=async(d,n)=>{if(await attLeave()){curD=d;curL=n;atManual=true;rr()}};
-const saveAtt=async()=>{const t=T.find(x=>x.id===curT),tp=v('ltp').trim();
-  if(tp!==(TP[curT+'|'+curL]||'')){const r=await sb.from('lesson_topics').upsert({school_id:me.school_id,teaching_id:curT,date:curD,lesson_no:curL,topic:tp,updated_by:me.id},{onConflict:'teaching_id,date,lesson_no'});if(r.error)return warn('Nie zapisano tematu: '+r.error.message)}
+const atOpen=async(d,n,s)=>{if(await attLeave()){curD=d;curL=n;const x=s&&T.find(y=>String(y.id)===String(s));if(x)curT=x.id;atManual=true;rr()}};
+const saveAtt=async()=>{const t=T.find(x=>x.id===curT),tp=v('ltp').trim(),key=curT+'|'+curL;
+  if(tp!==(TP[key]||'')||(tp?TPID||null:null)!==(TPI[key]||null)){
+    const row={school_id:me.school_id,teaching_id:curT,date:curD,lesson_no:curL,topic:tp,updated_by:me.id,textbook_topic_id:tp?TPID||null:null};
+    let r=await sb.from('lesson_topics').upsert(row,{onConflict:'teaching_id,date,lesson_no'});
+    if(r.error&&/textbook_topic_id|schema cache|column/i.test(r.error.message||'')){delete row.textbook_topic_id;r=await sb.from('lesson_topics').upsert(row,{onConflict:'teaching_id,date,lesson_no'})}
+    if(r.error)return warn('Nie zapisano tematu: '+r.error.message)}
   act(sb.from('attendance').upsert(classStudents(t.class_id).map(p=>({student_id:p.id,teaching_id:curT,date:curD,lesson_no:curL,status:ATT[p.id]||'present',updated_by:me.id})),{onConflict:'student_id,teaching_id,date,lesson_no'}),()=>{attDirty=false;rr()},'Frekwencja i temat zapisane')};
 
 // Usprawiedliwienia
@@ -1017,10 +1061,111 @@ V.ad=async()=>{
   const back=`<button class="gh sm" onclick="adTab=null;rr()">${ic('back')} Administracja</button>`;
   if(!adTab){const n=(k)=>Object.values(P).filter(p=>p.role===k).length;
     const tl2=(k,i,t,d)=>`<button class="tile" onclick="adTab='${k}';rr()">${ic(i)}<b>${t}</b><span>${d}</span></button>`;
-    return `<div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">${tl2('ppl','user','Osoby i konta',`${n('teacher')+n('director')} pracowników · ${n('student')} uczniów · ${n('parent')} rodziców`)}${tl2('cls','cl','Klasy i wychowawcy',`${C.length} klas`)}${tl2('sub','book','Przedmioty',`${SUB.length} przedmiotów`)}${tl2('plan','pl','Plan lekcji','Układanie lekcji klas')}${tl2('prn','print','Drukowanie planu lekcji','Plan klas i nauczycieli do PDF')}${tl2('log','cal','Archiwum zmian w planie','Kto, co i kiedy zmienił')}${tl2('tpa','book','Tematy i frekwencja','Wpisy nauczycieli z całej szkoły')}${tl2('chg','pl','Zmiany w planie','Zastępstwa i odwołania lekcji')}${tl2('off','cal','Dni wolne i święta','Ferie i dni wolne')}${tl2('bells','at','Godziny lekcji','Dzwonki i lekcja 0')}${tl2('logins','key','Logowania','Historia logowań')}${tl2('new','plus','Nowe konto','Uczeń, rodzic, nauczyciel')}${tl2('imp','up','Import uczniów','Lista lub plik CSV')}</div>`}
+    return `<div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">${tl2('ppl','user','Osoby i konta',`${n('teacher')+n('director')} pracowników · ${n('student')} uczniów · ${n('parent')} rodziców`)}${tl2('cls','cl','Klasy i wychowawcy',`${C.length} klas`)}${tl2('sub','book','Przedmioty',`${SUB.length} przedmiotów`)}${tl2('tb','book','Podręczniki',`${TB.length} podręczników · działy, tematy, przydziały do klas`)}${tl2('plan','pl','Plan lekcji','Układanie lekcji klas')}${tl2('prn','print','Drukowanie planu lekcji','Plan klas i nauczycieli do PDF')}${tl2('log','cal','Archiwum zmian w planie','Kto, co i kiedy zmienił')}${tl2('tpa','book','Tematy i frekwencja','Wpisy nauczycieli z całej szkoły')}${tl2('chg','pl','Zmiany w planie','Zastępstwa i odwołania lekcji')}${tl2('off','cal','Dni wolne i święta','Ferie i dni wolne')}${tl2('bells','at','Godziny lekcji','Dzwonki i lekcja 0')}${tl2('logins','key','Logowania','Historia logowań')}${tl2('new','plus','Nowe konto','Uczeń, rodzic, nauczyciel')}${tl2('imp','up','Import uczniów','Lista lub plik CSV')}</div>`}
   return AD[adTab](back);
 };
 const AD={};
+/* ===== v49: historia frekwencji, podręczniki, tematy z podręcznika ===== */
+const pageN=async(mk,max)=>{let all=[];for(let i=0;i<max;i++){const r=await mk().range(i*1000,i*1000+999);if(r.error)throw r.error;all=all.concat(r.data);if(r.data.length<1000)break}return all};
+const tbFor=t=>TBA.find(a=>String(a.class_id)===String(t.class_id)&&String(a.subject_id)===String(t.subject_id));
+async function tbTopics(bid){if(TBT[bid])return TBT[bid];
+  const [u,tp]=await Promise.all([pageAll(()=>sb.from('textbook_units').select('*').eq('textbook_id',bid).order('position')),pageAll(()=>sb.from('textbook_topics').select('*').eq('textbook_id',bid).order('position'))]);
+  return TBT[bid]={units:u,topics:tp}}
+/* kontekst podręcznika dla lekcji: przypisany podręcznik, zrealizowane tematy i następny temat */
+async function tbCtx(t){
+  try{const as=tbFor(t);if(!as)return null;const bk=TB.find(b=>String(b.id)===String(as.textbook_id));if(!bk)return null;
+    const D=await tbTopics(bk.id);if(!D.topics.length)return null;
+    const tids=T.filter(x=>String(x.class_id)===String(t.class_id)&&String(x.subject_id)===String(t.subject_id)).map(x=>x.id);
+    const u=tids.length?await pageAll(()=>sb.from('lesson_topics').select('teaching_id,date,lesson_no,textbook_topic_id').in('teaching_id',tids).not('textbook_topic_id','is',null).order('date').order('lesson_no').order('teaching_id')):[];
+    const pos={};D.topics.forEach(x=>pos[x.id]=x.position);
+    const used=new Set(u.map(x=>x.textbook_topic_id).filter(id=>pos[id]!=null));
+    const before=u.filter(x=>pos[x.textbook_topic_id]!=null&&(x.date<curD||(x.date===curD&&x.lesson_no<curL)));
+    const lastRow=before[before.length-1],last=lastRow?D.topics.find(x=>x.id===lastRow.textbook_topic_id):null;
+    const next=last?D.topics.find(x=>x.position>last.position)||null:D.topics[0]||null;
+    return{book:bk,D,used,next,last,done:!!last&&!next}
+  }catch(e){return null}}
+function tbTag(){const e=$('#tpsrc');if(!e)return;
+  if(TPID&&TBX){const x=TBX.D.topics.find(y=>String(y.id)===String(TPID)),u=TBX.D.units.find(y=>String(y.id)===String(x?.unit_id));
+    e.innerHTML=x?`<span class="bd g">z podręcznika</span><span class="mu text-xs">${esc(u?.name||'')}</span>`:''}
+  else e.innerHTML=($('#ltp')?.value||'').trim()?'<span class="bd b">własny temat</span>':''}
+function tbTyped(){if(TPID)TPID=null;tbTag()}
+function tbSet(id){const x=TBX?.D.topics.find(y=>String(y.id)===String(id));if(!x)return;closeModal();const e=$('#ltp');e.value=x.title;TPID=x.id;tbTag();attMark()}
+function tbOwn(){TPID=null;const e=$('#ltp');e.value='';e.focus();tbTag();attMark()}
+function tbPick(){if(!TBX)return;const {D,used,next}=TBX,by={};
+  D.topics.forEach(x=>(by[x.unit_id||'_']=by[x.unit_id||'_']||[]).push(x));
+  const units=[...D.units.filter(u=>by[u.id]),...(by._?[{id:'_',name:'Bez działu'}]:[])];
+  modal(`<div class="box w"><h3 class="mh">${ic('book')} ${esc(TBX.book.name)}</h3><input type="text" id="tbs" placeholder="Szukaj tematu lub działu…" oninput="tbFilter()" class="mb-3"><div class="tbpick">${units.map(u=>`<div class="tbu"><div class="tbuh">${esc(u.name)}</div>${by[u.id].map(x=>`<button type="button" class="tbt${String(x.id)===String(TPID)?' on':''}${next&&x.id===next.id?' nx':''}${used.has(x.id)?' us':''}" data-q="${esc((x.title+' '+u.name).toLowerCase())}" onclick="tbSet('${x.id}')"><span>${esc(x.title)}</span>${next&&x.id===next.id?'<em>następny</em>':used.has(x.id)?'<em>był</em>':''}</button>`).join('')}</div>`).join('')}</div><div class="flex justify-end mt-3"><button class="gh" onclick="closeModal()">Zamknij</button></div></div>`);
+  setTimeout(()=>{$('.tbt.nx')?.scrollIntoView({block:'center'})},60)}
+function tbFilter(){const q=v('tbs').toLowerCase();$$('.tbt').forEach(b=>b.style.display=!q||b.dataset.q.includes(q)?'':'none');$$('.tbu').forEach(u=>u.style.display=[...u.querySelectorAll('.tbt')].some(b=>b.style.display!=='none')?'':'none')}
+
+/* ---------- Administracja: podręczniki ---------- */
+const readTxt=f=>new Promise((res,rej)=>{const r=new FileReader();r.onerror=rej;r.onload=()=>{let t=new TextDecoder('utf-8').decode(r.result);if(t.includes('\uFFFD'))t=new TextDecoder('windows-1250').decode(r.result);res(t.replace(/^\uFEFF/,''))};r.readAsArrayBuffer(f)});
+function csvRows(txt){const first=txt.split(/\r?\n/).find(l=>l.trim())||'',cnt=c=>first.split(c).length-1,d=cnt('\t')?'\t':cnt(';')>=cnt(',')?';':',',rows=[];
+  let row=[],cell='',q=false;
+  for(let i=0;i<txt.length;i++){const c=txt[i];
+    if(q){if(c==='"'){if(txt[i+1]==='"'){cell+='"';i++}else q=false}else cell+=c}
+    else if(c==='"')q=true;
+    else if(c===d){row.push(cell);cell=''}
+    else if(c==='\n'||c==='\r'){if(c==='\r'&&txt[i+1]==='\n')i++;row.push(cell);cell='';if(row.some(x=>x.trim()))rows.push(row);row=[]}
+    else cell+=c}
+  row.push(cell);if(row.some(x=>x.trim()))rows.push(row);return rows.map(r=>r.map(x=>x.trim()))}
+/* kolumny: Podręcznik; Wydawnictwo; Dział; Temat; Przedmiot (opcjonalnie). Puste komórki w dół są dziedziczone. */
+function tbParse(txt){const rows=csvRows(txt),errs=[],books=[];if(!rows.length)return{books,errs:['Plik jest pusty.']};
+  const i0=/^podr/i.test(rows[0][0]||'')||/^wydaw/i.test(rows[0][1]||'')?1:0;let bn='',pb='',un='',cur=null;
+  rows.slice(i0).forEach((r,k)=>{const b=r[0]||'',p=r[1]||'',u=r[2]||'',t=r[3]||'',s=r[4]||'';
+    if(b&&(b!==bn||(p&&p!==pb))){bn=b;pb=p||'';cur=null;un=''}else if(!b&&!bn){errs.push('Wiersz '+(k+i0+1)+': brak nazwy podręcznika.');return}
+    if(!cur){cur={name:bn,publisher:pb,subject:s,units:[],n:0};books.push(cur)}
+    if(s&&!cur.subject)cur.subject=s;
+    if(u)un=u;if(!t)return;
+    const name=un||'Bez działu';let cu=cur.units.find(x=>x.name===name);if(!cu){cu={name,topics:[]};cur.units.push(cu)}
+    cu.topics.push(t);cur.n++});
+  books.forEach(b=>{if(!b.n)errs.push('Podręcznik „'+b.name+'” nie ma żadnego tematu.')});
+  return{books:books.filter(b=>b.n),errs}}
+const tbSame=(x,b)=>x.name.toLowerCase()===b.name.toLowerCase()&&(x.publisher||'').toLowerCase()===(b.publisher||'').toLowerCase();
+async function tbFile(el){const f=el.files[0];if(!f)return;try{$('#tbt').value=await readTxt(f);toast('Wczytano plik: '+f.name,'ok',2200)}catch(e){warn('Nie udało się odczytać pliku.')}}
+function tbTpl(){const t='Podręcznik;Wydawnictwo;Dział;Temat;Przedmiot\nMatematyka 5;Przykładowe Wydawnictwo;1. Liczby naturalne;1.1 Zapisywanie liczb naturalnych;Matematyka\nMatematyka 5;Przykładowe Wydawnictwo;1. Liczby naturalne;1.2 Porównywanie liczb;Matematyka\nMatematyka 5;Przykładowe Wydawnictwo;2. Ułamki;2.1 Ułamki zwykłe;Matematyka\n';
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\uFEFF'+t],{type:'text/csv;charset=utf-8'}));a.download='wzor-podreczniki.csv';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000)}
+async function tbRun(){const txt=v('tbt').trim();if(!txt)return warn('Wgraj plik lub wklej listę.');
+  const {books,errs}=tbParse(txt),o=$('#tbo');
+  if(errs.length){o.innerHTML='<div class="tag r mb-2">Popraw błędy:</div><ul class="list-disc ml-5">'+errs.slice(0,15).map(e=>`<li>${esc(e)}</li>`).join('')+'</ul>';return warn('Plik zawiera błędy.')}
+  if(!books.length)return warn('Nie znaleziono żadnych tematów.');
+  o.innerHTML='';const ex=books.filter(b=>TB.some(x=>tbSame(x,b)));
+  const sm=books.map(b=>`${b.name}${b.publisher?' ('+b.publisher+')':''}: ${b.units.length} działów, ${b.n} tematów`).join('; ');
+  if(!await ask('Zaimportować: '+sm+'.'+(ex.length?' Podręczniki o tej samej nazwie ('+ex.map(b=>b.name).join(', ')+') zostaną zastąpione. Przydziały do klas zostaną zachowane, ale zapamiętany postęp (zrealizowane tematy) tych podręczników zostanie wyzerowany.':''),'Importuj'))return;
+  try{for(const b of books){
+      const old=TB.find(x=>tbSame(x,b));let keep=[];
+      if(old){keep=TBA.filter(a=>String(a.textbook_id)===String(old.id));const d=await sb.from('textbooks').delete().eq('id',old.id);if(d.error)throw d.error}
+      const sj=b.subject?SUB.find(s=>s.name.toLowerCase()===b.subject.toLowerCase()):null;
+      const bk=await sb.from('textbooks').insert({school_id:me.school_id,name:b.name,publisher:b.publisher||null,subject_id:sj?.id||old?.subject_id||null}).select().single();if(bk.error)throw bk.error;
+      const un=await sb.from('textbook_units').insert(b.units.map((u,i)=>({school_id:me.school_id,textbook_id:bk.data.id,name:u.name,position:i+1}))).select();if(un.error)throw un.error;
+      const uid={};un.data.forEach(u=>uid[u.position]=u.id);let pos=0;const tr=[];
+      b.units.forEach((u,i)=>u.topics.forEach(t=>tr.push({school_id:me.school_id,textbook_id:bk.data.id,unit_id:uid[i+1],title:t,position:++pos})));
+      for(let i=0;i<tr.length;i+=400){const r=await sb.from('textbook_topics').insert(tr.slice(i,i+400));if(r.error)throw r.error}
+      if(keep.length){const r=await sb.from('textbook_assignments').insert(keep.map(a=>({school_id:me.school_id,class_id:a.class_id,subject_id:a.subject_id,textbook_id:bk.data.id})));if(r.error)throw r.error}}
+  }catch(e){return warn('Import nie powiódł się: '+(e.message||e))}
+  TBT={};toast('Zaimportowano podręczniki: '+books.length);await reload()}
+const tbAssign=()=>{if(!FV.tbab||!FV.tbas||!(FV.tbac||[]).length)return warn('Wybierz podręcznik, przedmiot i co najmniej jedną klasę.');
+  act(sb.from('textbook_assignments').upsert(FV.tbac.map(c=>({school_id:me.school_id,class_id:c,subject_id:FV.tbas,textbook_id:FV.tbab})),{onConflict:'class_id,subject_id'}),reload,'Przydzielono podręcznik klasom: '+FV.tbac.length)};
+const tbUnassign=async id=>await ask('Odebrać podręcznik tej klasie? Nauczyciel znów będzie wpisywał temat ręcznie.','Odbierz')&&act(sb.from('textbook_assignments').delete().eq('id',id),reload,'Odebrano przydział');
+const tbDel=async id=>await ask('Usunąć podręcznik wraz z działami, tematami i przydziałami do klas? Tematy już wpisane w lekcjach zostaną w dzienniku.','Usuń')&&act(sb.from('textbooks').delete().eq('id',id),async()=>{TBT={};await reload()},'Usunięto podręcznik');
+async function tbView(id){const b=TB.find(x=>String(x.id)===String(id));if(!b)return;modal('<div class="box w"><div class="skel"></div><div class="skel"></div></div>');
+  try{const D=await tbTopics(id),by={};D.topics.forEach(x=>(by[x.unit_id]=by[x.unit_id]||[]).push(x));
+    modal(`<div class="box w"><h3 class="mh">${ic('book')} ${esc(b.name)}</h3><p class="text-sm mu mb-2">${esc(b.publisher||'')}${b.publisher?' · ':''}${D.units.length} działów · ${D.topics.length} tematów</p><div class="tbpick">${D.units.map(u=>`<div class="tbu"><div class="tbuh">${esc(u.name)}</div>${(by[u.id]||[]).map(x=>`<div class="tbt ro"><span>${esc(x.title)}</span></div>`).join('')}</div>`).join('')}</div><div class="flex justify-end mt-3"><button class="gh" onclick="closeModal()">Zamknij</button></div></div>`)}
+  catch(e){closeModal();warn(e.message||String(e))}}
+AD.tb=async back=>{
+  const cnt={};
+  try{const tp=await pageAll(()=>sb.from('textbook_topics').select('id,textbook_id,unit_id').order('id'));tp.forEach(x=>{const c=cnt[x.textbook_id]=cnt[x.textbook_id]||{t:0,u:new Set()};c.t++;c.u.add(x.unit_id)})}
+  catch(e){return pn('Podręczniki',`<p class="em">Tabele podręczników nie istnieją w bazie. Uruchom w Supabase (SQL Editor) plik <b>supabase-podreczniki.sql</b>, a potem odśwież tę stronę.</p><p class="text-xs mu text-center">${esc(e.message||e)}</p>`,back,'book')}
+  const cs=[...C].sort((a,b)=>a.name.localeCompare(b.name,'pl',{numeric:true})),bt=id=>TB.find(b=>String(b.id)===String(id));
+  const imp=pn('Import podręczników z pliku',`<p class="text-sm mu mb-3">Wgraj plik CSV z Excela (kolumny: <b>Podręcznik; Wydawnictwo; Dział; Temat; Przedmiot</b> – ostatnia opcjonalna) albo wklej tabelę. Puste komórki w dół są dziedziczone, więc nazwę podręcznika i dział wystarczy wpisać raz. Jeden plik może zawierać wiele podręczników.</p>
+   <div class="flex flex-wrap gap-2 mb-3"><input type="file" id="tbf" accept=".csv,.txt,.tsv" class="inp" style="max-width:340px" onchange="tbFile(this)"><button class="gh" onclick="tbTpl()">${ic('up')} Pobierz wzór CSV</button></div>
+   <textarea id="tbt" rows="6" placeholder="Podręcznik;Wydawnictwo;Dział;Temat;Przedmiot"></textarea><div id="tbo" class="mt-2"></div><div class="mt-3"><button class="btn" onclick="tbRun()">${ic('up')} Importuj</button></div>`,'','up');
+  const books=pn(`Podręczniki (${TB.length})`,TB.length?TB.map(b=>{const c=cnt[b.id]||{t:0,u:new Set()};return `<div class="tbk"><div><b>${esc(b.name)}</b><span>${esc(b.publisher||'bez wydawnictwa')}${b.subject_id?' · '+esc(sn(b.subject_id)):''} · ${c.u.size} działów · ${c.t} tematów</span></div><div class="flex gap-2"><button class="gh sm" onclick="tbView('${b.id}')">Podgląd</button><button class="gh sm red" onclick="tbDel('${b.id}')">${ic('x')}</button></div></div>`}).join(''):'<p class="em">Nie ma jeszcze podręczników. Zaimportuj pierwszy z pliku powyżej.</p>','','book');
+  const asg=[...TBA].sort((a,b)=>cn(a.class_id).localeCompare(cn(b.class_id),'pl',{numeric:true})||sn(a.subject_id).localeCompare(sn(b.subject_id),'pl'));
+  const asn=pn('Przydział do klas i przedmiotów',`<div class="grid md:grid-cols-3 gap-3 mb-3"><div><label class="lb">Podręcznik</label>${dd('tbab',TB.map(b=>[b.id,b.name,b.publisher||'']),'',{ph:'Wybierz podręcznik',on:x=>{const b=bt(x);if(b?.subject_id){FV.tbas=b.subject_id;$('#dd_tbas').innerHTML=ddb('tbas')}}})}</div><div><label class="lb">Przedmiot</label>${dd('tbas',SUB.map(s=>[s.id,s.name]),'',{ph:'Wybierz przedmiot'})}</div><div><label class="lb">Klasy</label>${dd('tbac',cs.map(c=>[c.id,'Klasa '+c.name]),[],{multi:1,ph:'Wybierz klasy'})}</div></div><button class="btn" onclick="tbAssign()">${ic('check')} Przydziel</button>
+   <div class="mt-4">${asg.length?tbl(['Klasa','Przedmiot','Podręcznik',''],asg.map(a=>`<tr><td><b>${esc(cn(a.class_id))}</b></td><td>${esc(sn(a.subject_id))}</td><td>${esc(bt(a.textbook_id)?.name||'-')} <span class="mu text-xs">${esc(bt(a.textbook_id)?.publisher||'')}</span></td><td style="text-align:right"><button class="gh sm red" onclick="tbUnassign('${a.id}')">Odbierz</button></td></tr>`)):'<p class="em">Żadna klasa nie ma jeszcze przydzielonego podręcznika. Przydzielony podręcznik pojawia się nauczycielowi przy sprawdzaniu frekwencji.</p>'}</div>`,back,'cl');
+  return asn+books+imp};
+
 AD.ppl=back=>{
   const us=Object.values(P).sort((a,b)=>a.role.localeCompare(b.role)||ln(a.id).localeCompare(ln(b.id),'pl'));
   const info=p=>p.role==='student'?'klasa '+cn(ST[p.id]?.class_id):p.role==='parent'?'rodzic: '+PC.filter(r=>r.parent_id===p.id).map(r=>nm(r.student_id)).join(', '):[...new Set(T.filter(t=>t.teacher_id===p.id).map(t=>sn(t.subject_id)))].join(', ')+(C.filter(c=>c.homeroom_teacher_id===p.id).length?' · wych. '+C.filter(c=>c.homeroom_teacher_id===p.id).map(c=>c.name).join(', '):'');
@@ -1661,8 +1806,6 @@ pushTest=async()=>{try{
   toast('Wysłano testowe powiadomienie - jeśli go nie widzisz, sprawdź ustawienia powiadomień urządzenia (tryb skupienia / nie przeszkadzać).','info',6000)
  }catch(e){warn('Nie udało się pokazać powiadomienia: '+(e.message||e))}};
 
-/* ===== v48 ===== */
-/* plan: zielony = obecność sprawdzona (i uczeń obecny) + wpisany temat */
 let DONE=new Set();
 async function loadDone(){DONE=new Set();try{
   const f=isoL(wk),t=isoL(addD(wk,4)),pup=!staff();
